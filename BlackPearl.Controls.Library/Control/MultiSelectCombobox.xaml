@@ -1,0 +1,48 @@
+﻿<UserControl x:Class="BlackPearl.Controls.Library.MultiSelectCombobox"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:behavior="clr-namespace:BlackPearl.Controls.Library.Behavior"
+             x:Name="mc">
+    <!--Main Grid-->
+    <Grid Name="grd"
+          DataContext="{Binding ElementName=mc}">
+        <!--Rich TextBox bound to document-->
+        <RichTextBox Name="rtxt"
+                     IsDocumentEnabled="False"
+                     AcceptsReturn="False"
+                     VerticalContentAlignment="Center"
+                     FontSize="{Binding FontSize, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"/>
+        
+        <!--Suggestion Drop-Down -->
+        <Popup Name="popup"
+               Placement="Bottom"
+               PlacementTarget="{Binding RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}}"
+               IsOpen="{Binding IsDropDownOpen, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+               StaysOpen="False"
+               PopupAnimation="Slide"
+               SnapsToDevicePixels="True"
+               Width="{Binding ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}">
+            <Border BorderBrush="Black"
+                    BorderThickness="1">
+                <ScrollViewer MaxHeight="300"
+                              HorizontalScrollBarVisibility="Auto"
+                              VerticalScrollBarVisibility="Auto">
+                    <ListBox ItemsSource="{Binding SuggestionItemsSource, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             SelectedIndex="{Binding SuggestionIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             SelectionMode="Single"
+                             HorizontalContentAlignment="Stretch"
+                             DisplayMemberPath="{Binding DisplayMemberPath, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                        <ListBox.ItemContainerStyle>
+                            <!--Setting style to bring item into view when selected-->
+                            <Style TargetType="ListBoxItem"
+                                   BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                                <Setter Property="behavior:ListBoxItemBehavior.IsBroughtIntoViewWhenSelected"
+                                        Value="True" />
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
+                </ScrollViewer>
+            </Border>
+        </Popup>
+    </Grid>
+</UserControl>

@@ -1,0 +1,31 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:BlackPearl.Controls.Library;assembly=BlackPearl.Controls.Library">
+    <Style TargetType="Label"
+           BasedOn="{StaticResource {x:Type Label}}">
+        <Setter Property="FontSize"
+                Value="16" />
+        <Setter Property="FontWeight"
+                Value="Bold" />
+    </Style>
+    <Style TargetType="{x:Type controls:MultiSelectCombobox}">
+        <Setter Property="Margin"
+                Value="5" />
+        <Setter Property="FontSize"
+                Value="14" />
+    </Style>
+    <Style TargetType="Button"
+           BasedOn="{StaticResource {x:Type Button}}">
+        <Setter Property="HorizontalAlignment"
+                Value="Center" />
+        <Setter Property="VerticalAlignment"
+                Value="Center" />
+        <Setter Property="Height"
+                Value="30" />
+        <Setter Property="FontWeight"
+                Value="Bold" />
+        <Setter Property="Margin"
+                Value="5" />
+    </Style>
+   
+</ResourceDictionary>
