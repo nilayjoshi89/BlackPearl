@@ -20,7 +20,8 @@ namespace BlackPearl.Controls.Library
         #region Members
         private bool areHandlersRegistered = false;
         private readonly object handlerLock = new object();
-        Paragraph paragraph = null;
+        private Paragraph paragraph = null;
+        private int selectionStart = -1, suggestionIndex = -1;
         #endregion
 
         #region Constructor
@@ -121,16 +122,6 @@ namespace BlackPearl.Controls.Library
             set => SetValue(SuggestionItemsSourceProperty, value);
         }
 
-        /// <summary>
-        /// Internal property - Selected index in Suggestion drop down
-        /// </summary>
-        private static readonly DependencyProperty SuggestionIndexProperty =
-            DependencyProperty.Register(nameof(SuggestionIndex), typeof(int), typeof(MultiSelectCombobox));
-        private int SuggestionIndex
-        {
-            get => (int)GetValue(SuggestionIndexProperty);
-            set => SetValue(SuggestionIndexProperty, value);
-        }
         #endregion
 
         #region Event handlers
@@ -200,6 +191,17 @@ namespace BlackPearl.Controls.Library
             {
                 case Key.Down:
                     {
+                        //If multi-selection
+                        if (Keyboard.Modifiers == ModifierKeys.Shift)
+                        {
+                            DoDownwardMultiSelection();
+                            e.Handled = true;
+                            break;
+                        }
+                        
+                        //Reset multi-select flag
+                        selectionStart = -1;
+                        
                         //Open suggestion drop down for entered
                         //Or Increment selection index in drop-down
 
@@ -221,6 +223,17 @@ namespace BlackPearl.Controls.Library
                     break;
                 case Key.Up:
                     {
+                        //If multi-select
+                        if(Keyboard.Modifiers == ModifierKeys.Shift)
+                        {
+                            DoUpwardMultiSelection();
+                            e.Handled = true;
+                            break;
+                        }
+
+                        //Reset multi-select flag
+                        selectionStart = -1;
+
                         //Get current text
                         string currentText = GetUserEnteredText();
                         //Check if any suggestion available for given text
@@ -418,6 +431,8 @@ namespace BlackPearl.Controls.Library
             if (IsDropDownOpen)
             {
                 IsDropDownOpen = false;
+                suggestionIndex = -1;
+                selectionStart = -1;
             }
         }
         /// <summary>
@@ -445,18 +460,95 @@ namespace BlackPearl.Controls.Library
         private void IncrementSelectedIndex()
         {
             var totalCount = SuggestionItemsSource.Count;
-            SuggestionIndex = (SuggestionIndex + 1 >= totalCount)
+            suggestionIndex = (suggestionIndex + 1 >= totalCount)
                                 ? totalCount - 1
-                                : SuggestionIndex + 1;
+                                : suggestionIndex + 1;
+
+            //Clear any previous selection
+            lstSuggestion.SelectedItems.Clear();
+            lstSuggestion.SelectedItems.Add(SuggestionItemsSource[suggestionIndex]);
         }
         /// <summary>
         /// Decrement selection index for suggestion drop-down
         /// </summary>
         private void DecrementSelectedIndex()
         {
-            SuggestionIndex = SuggestionIndex < 0
-                ? -1
-                : SuggestionIndex - 1;
+            suggestionIndex = suggestionIndex < 1
+                ? 0
+                : suggestionIndex - 1;
+
+            //Clear any previous selection
+            lstSuggestion.SelectedItems.Clear();
+            lstSuggestion.SelectedItems.Add(SuggestionItemsSource[suggestionIndex]);
+        }
+        /// <summary>
+        /// Downward selection for suggestion drop-down
+        /// </summary>
+        private void DoDownwardMultiSelection()
+        {
+            var oldIndex = suggestionIndex;
+            var totalCount = SuggestionItemsSource.Count;
+            suggestionIndex = (suggestionIndex + 1 >= totalCount)
+                                ? totalCount - 1
+                                : suggestionIndex + 1;
+
+            //If its boundary, return
+            if (oldIndex == suggestionIndex)
+                return;
+
+            //If its first time - Start of selection
+            if (selectionStart == -1)
+            {
+                //set previous index as selection start
+                selectionStart = oldIndex;
+                //Add current item to selected items list
+                lstSuggestion.SelectedItems.Add(SuggestionItemsSource[suggestionIndex]);
+                return;
+            }
+
+            //If selection is shrinking then remove previous selected element
+            if (selectionStart > oldIndex)
+            {
+                lstSuggestion.SelectedItems.Remove(SuggestionItemsSource[oldIndex]);
+                return;
+            }
+
+            //Otherwise, selection is growing, add current element to selected items list
+            lstSuggestion.SelectedItems.Add(SuggestionItemsSource[suggestionIndex]);
+        }
+        /// <summary>
+        /// Upward selection for suggestion drop-down
+        /// </summary>
+        private void DoUpwardMultiSelection()
+        {
+            var oldIndex = suggestionIndex;
+            suggestionIndex = suggestionIndex < 1
+                ? 0
+                : suggestionIndex - 1;
+
+            //If its boundary, return
+            if (oldIndex == suggestionIndex)
+                return;
+
+            //If its first time - Start of selection
+            if (selectionStart == -1)
+            {
+                //set previous index as selection start
+                selectionStart = oldIndex;
+                //Add current item to selected items list
+                lstSuggestion.SelectedItems.Add(SuggestionItemsSource[suggestionIndex]);
+                return;
+            }
+
+            //If selection is shrinking then remove previous selected element
+            if (selectionStart < oldIndex)
+            {
+                lstSuggestion.SelectedItems.Remove(SuggestionItemsSource[oldIndex]);
+                return;
+            }
+
+            //Otherwise, selection is growing, add current element to selected items list
+            lstSuggestion.SelectedItems.Add(SuggestionItemsSource[suggestionIndex]);
         }
         /// <summary>
         /// Tries to set item from entered text in RichTextBox
@@ -587,12 +679,10 @@ namespace BlackPearl.Controls.Library
                 }
 
                 //Check if drop down is open or has any item selected
-                if (!IsDropDownOpen || SuggestionIndex < -1)
+                if (!IsDropDownOpen || lstSuggestion.SelectedItems.Count < 1)
                 {
                     return;
                 }
-
-                var itemObject = SuggestionItemsSource.ElementAtOrDefault(SuggestionIndex);
 
                 //Hide drop-down
                 HideSuggestionDropDown();
@@ -603,16 +693,21 @@ namespace BlackPearl.Controls.Library
                     paragraph.Inlines.Remove(runElementToRemove);
                 }
 
-                //Check if item is already selected or not
-                if (SelectedItems?.Contains(itemObject) == true)
+                foreach (var itemObject in lstSuggestion.SelectedItems)
                 {
-                    return;
+                    //Check if item is already selected or not
+                    if (SelectedItems?.Contains(itemObject) == true)
+                    {
+                        return;
+                    }
+
+                    //Add item to selected item list
+                    SelectedItems?.Add(itemObject);
+                    //Add item to UI
+                    AddItemToUI(itemObject);
                 }
 
-                //Add item to selected item list
-                SelectedItems?.Add(itemObject);
-                //Add item to UI
-                AddItemToUI(itemObject);
+                lstSuggestion.SelectedItems?.Clear();
             }
             finally
             {

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package >
+  <metadata>
+    <id>BlackPearl.Controls.Library</id>
+    <version>1.0.1.0</version>
+    <title>BlackPearl.Controls.Library</title>
+    <authors>nilayjoshi89</authors>
+    <owners>nilayjoshi89</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <projectUrl>https://github.com/nilayjoshi89/BlackPearl</projectUrl>
+    <description>WPF control library.</description>
+    <releaseNotes>MultiSelectCombobox added.</releaseNotes>
+    <copyright>Copyright 2020</copyright>
+    <tags>WPF MultiSelectCombobox ComboBox MultiSelectDropDown</tags>
+	<dependencies>
+      <group targetFramework=".NETFramework4.6.1" />
+    </dependencies>
+  </metadata>
+</package>
