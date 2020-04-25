@@ -11,8 +11,8 @@
                      IsDocumentEnabled="False"
                      AcceptsReturn="False"
                      VerticalContentAlignment="Center"
-                     FontSize="{Binding FontSize, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"/>
-        
+                     FontSize="{Binding FontSize, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}" />
+
         <!--Suggestion Drop-Down -->
         <Popup Name="popup"
                Placement="Bottom"
@@ -27,9 +27,9 @@
                 <ScrollViewer MaxHeight="300"
                               HorizontalScrollBarVisibility="Auto"
                               VerticalScrollBarVisibility="Auto">
-                    <ListBox ItemsSource="{Binding SuggestionItemsSource, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             SelectedIndex="{Binding SuggestionIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             SelectionMode="Single"
+                    <ListBox Name="lstSuggestion"
+                             ItemsSource="{Binding SuggestionItemsSource, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             SelectionMode="Multiple"
                              HorizontalContentAlignment="Stretch"
                              DisplayMemberPath="{Binding DisplayMemberPath, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
                         <ListBox.ItemContainerStyle>
