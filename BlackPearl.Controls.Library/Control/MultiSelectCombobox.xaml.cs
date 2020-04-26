@@ -122,6 +122,16 @@ namespace BlackPearl.Controls.Library
             set => SetValue(SuggestionItemsSourceProperty, value);
         }
 
+        /// <summary>
+        /// Internal property - Selected index in Suggestion drop down
+        /// </summary>
+        private static readonly DependencyProperty SuggestionIndexProperty =
+            DependencyProperty.Register(nameof(SuggestionIndex), typeof(int), typeof(MultiSelectCombobox));
+        private int SuggestionIndex
+        {
+            get => (int)GetValue(SuggestionIndexProperty);
+            set => SetValue(SuggestionIndexProperty, value);
+        }
         #endregion
 
         #region Event handlers
@@ -289,9 +299,28 @@ namespace BlackPearl.Controls.Library
         {
             //Remove all invalid texts from
             RemoveInvalidTexts();
+        }
 
-            //Hide drop-down
-            HideSuggestionDropDown();
+        /// <summary>
+        /// When item it clicked in suggestion list, we check if any is selected and try to add
+        /// </summary>
+        private void LstSuggestion_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+	        if (lstSuggestion.SelectedItems.Count > 0 && Keyboard.Modifiers != ModifierKeys.Control)
+	        {
+		        TrySetSelectedItemFromSuggestionDropDown();
+		        rtxt.Focus();
+            }
+        }
+
+
+        private void LstSuggestion_OnPreviewKeyUp(object sender, KeyEventArgs e)
+        {
+	        if (e.Key == Key.LeftCtrl || e.Key == Key.RightCtrl)
+	        {
+                TrySetSelectedItemFromSuggestionDropDown();
+                rtxt.Focus();
+            }
         }
         #endregion
 

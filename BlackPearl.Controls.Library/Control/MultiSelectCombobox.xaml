@@ -29,10 +29,10 @@
                               VerticalScrollBarVisibility="Auto">
                     <ListBox Name="lstSuggestion"
                              ItemsSource="{Binding SuggestionItemsSource, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             SelectionMode="Multiple"
+                             SelectionMode="Multiple" PreviewMouseUp="LstSuggestion_PreviewMouseUp" PreviewKeyUp="LstSuggestion_OnPreviewKeyUp"
                              HorizontalContentAlignment="Stretch"
                              DisplayMemberPath="{Binding DisplayMemberPath, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
-                        <ListBox.ItemContainerStyle>
+						<ListBox.ItemContainerStyle>
                             <!--Setting style to bring item into view when selected-->
                             <Style TargetType="ListBoxItem"
                                    BasedOn="{StaticResource {x:Type ListBoxItem}}">
