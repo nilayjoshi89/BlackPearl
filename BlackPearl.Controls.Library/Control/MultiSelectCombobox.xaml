@@ -16,7 +16,7 @@
         <!--Suggestion Drop-Down -->
         <Popup Name="popup"
                Placement="Bottom"
-               PlacementTarget="{Binding RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}}"
+               PlacementTarget="{Binding ElementName=mc}"
                IsOpen="{Binding IsDropDownOpen, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                StaysOpen="False"
                PopupAnimation="Slide"

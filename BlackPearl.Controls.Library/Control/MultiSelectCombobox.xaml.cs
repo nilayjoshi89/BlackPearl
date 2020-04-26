@@ -170,6 +170,7 @@ namespace BlackPearl.Controls.Library
                 //Show/Hide pop-up based on selected-item
                 ShowHideSuggestionDropDown();
             }
+            catch { }
             finally
             {
                 //Subscribe back
@@ -183,86 +184,102 @@ namespace BlackPearl.Controls.Library
         /// <param name="e">arg</param>
         private void Grid_KeyDown(object sender, KeyEventArgs e)
         {
-            //User can remove paragraph reference by 'Select all & delete' in RichTextBox
-            //Following method call with make sure local paragraph remains part of RichTextBox
-            ReInitializeParagraphIfRequired();
-
-            switch (e.Key)
+            try
             {
-                case Key.Down:
-                    {
-                        //If multi-selection
-                        if (Keyboard.Modifiers == ModifierKeys.Shift)
+                //User can remove paragraph reference by 'Select all & delete' in RichTextBox
+                //Following method call with make sure local paragraph remains part of RichTextBox
+                ReInitializeParagraphIfRequired();
+
+                switch (e.Key)
+                {
+                    case Key.Down:
                         {
-                            DoDownwardMultiSelection();
                             e.Handled = true;
-                            break;
+
+                            //Open suggestion drop down for entered
+                            //Or Increment selection index in drop-down
+
+                            //Get current text
+                            string currentText = GetUserEnteredText();
+
+                            //Check if any suggestion available for given text
+                            if (!HasAnyItemStartingWith(SuggestionItemsSource, currentText))
+                            {
+                                //No suggestion to show, return
+                                return;
+                            }
+
+                            //Show drop-down
+                            ShowSuggestionDropDown();
+
+                            //If multi-selection
+                            if (Keyboard.Modifiers == ModifierKeys.Shift)
+                            {
+                                DoDownwardMultiSelection();
+                                break;
+                            }
+
+                            //Reset multi-select flag
+                            selectionStart = -1;
+                            
+                            //Increment selected item index in drop-down
+                            IncrementSelectedIndex();
                         }
-                        
-                        //Reset multi-select flag
-                        selectionStart = -1;
-                        
-                        //Open suggestion drop down for entered
-                        //Or Increment selection index in drop-down
-
-                        //Get current text
-                        string currentText = GetUserEnteredText();
-
-                        //Check if any suggestion available for given text
-                        if (!HasAnyItemStartingWith(SuggestionItemsSource, currentText))
+                        break;
+                    case Key.Up:
                         {
-                            //No suggestion to show, return
-                            return;
-                        }
-
-                        //Show drop-down
-                        ShowSuggestionDropDown();
-                        //Increment selected item index in drop-down
-                        IncrementSelectedIndex();
-                    }
-                    break;
-                case Key.Up:
-                    {
-                        //If multi-select
-                        if(Keyboard.Modifiers == ModifierKeys.Shift)
-                        {
-                            DoUpwardMultiSelection();
                             e.Handled = true;
-                            break;
+
+                            //Get current text
+                            string currentText = GetUserEnteredText();
+                            //Check if any suggestion available for given text
+                            if (!HasAnyItemStartingWith(SuggestionItemsSource, currentText))
+                            {
+                                //No suggestion to show, return
+                                return;
+                            }
+                            //Show drop-down
+                            ShowSuggestionDropDown();
+
+                            //If multi-select
+                            if (Keyboard.Modifiers == ModifierKeys.Shift)
+                            {
+                                DoUpwardMultiSelection();
+                                break;
+                            }
+
+                            //Reset multi-select flag
+                            selectionStart = -1;
+
+                            //Decrement selected item index in drop-down
+                            DecrementSelectedIndex();
                         }
-
-                        //Reset multi-select flag
-                        selectionStart = -1;
-
-                        //Get current text
-                        string currentText = GetUserEnteredText();
-                        //Check if any suggestion available for given text
-                        if (!HasAnyItemStartingWith(SuggestionItemsSource, currentText))
+                        break;
+                    case Key.Enter:
                         {
-                            //No suggestion to show, return
-                            return;
+                            e.Handled = true;
+
+                            //Try select item based on selection in Suggestion drop-down
+                            TrySetSelectedItemFromSuggestionDropDown();
+
+                            TrySettingFocusToRichTextBox();
                         }
-                        //Show drop-down
-                        ShowSuggestionDropDown();
-                        //Decrement selected item index in drop-down
-                        DecrementSelectedIndex();
-                    }
-                    break;
-                case Key.Enter:
-                    {
-                        //Try select item based on selection in Suggestion drop-down
-                        TrySetSelectedItemFromSuggestionDropDown();
-                    }
-                    break;
-                case Key.Escape:
-                    {
-                        //Hide suggestion drop-down
-                        HideSuggestionDropDown();
-                    }
-                    break;
-                default:
-                    break;
+                        break;
+                    case Key.Escape:
+                        {
+                            e.Handled = true;
+
+                            //Hide suggestion drop-down
+                            HideSuggestionDropDown();
+
+                            TrySettingFocusToRichTextBox();
+                        }
+                        break;
+                    default:
+                        break;
+                }
             }
+            catch { }
         }
         /// <summary>
         /// Event to handle scenario where User removes selected item from UI
@@ -271,14 +288,18 @@ namespace BlackPearl.Controls.Library
         /// <param name="e"></param>
         private void Tb_Unloaded(object sender, RoutedEventArgs e)
         {
-            if (!IsLoaded
-                || !(sender is TextBlock tb))
+            try
             {
-                return;
-            }
+                if (!IsLoaded
+                    || !(sender is TextBlock tb))
+                {
+                    return;
+                }
 
-            tb.Unloaded -= Tb_Unloaded;
-            SelectedItems?.Remove(tb.Tag);
+                tb.Unloaded -= Tb_Unloaded;
+                SelectedItems?.Remove(tb.Tag);
+            }
+            catch { }
         }
         /// <summary>
         /// Control lost focus event handling
@@ -287,11 +308,32 @@ namespace BlackPearl.Controls.Library
         /// <param name="e">arg</param>
         private void MultiChoiceControl_LostFocus(object sender, RoutedEventArgs e)
         {
-            //Remove all invalid texts from
-            RemoveInvalidTexts();
+            try
+            {
+                //If DropDown has focus, return
+                if (popup.IsKeyboardFocusWithin)
+                    return;
 
-            //Hide drop-down
-            HideSuggestionDropDown();
+                //Remove all invalid texts from
+                RemoveInvalidTexts();
+
+                //Hide drop-down
+                HideSuggestionDropDown();
+            }
+            catch { }
+        }
+        private void popup_Closed(object sender, EventArgs e)
+        {
+            try
+            {
+                //If RichTextBox has focus, return
+                if (rtxt.IsFocused)
+                    return;
+
+                RemoveInvalidTexts();
+                lstSuggestion.SelectedItems?.Clear();
+            }
+            catch { }
         }
         #endregion
 
@@ -336,6 +378,7 @@ namespace BlackPearl.Controls.Library
                 rtxt.TextChanged += Rtxt_TextChanged;
                 grd.PreviewKeyDown += Grid_KeyDown;
                 this.LostFocus += MultiChoiceControl_LostFocus;
+                popup.Closed += popup_Closed;
             }
         }
         /// <summary>
@@ -367,6 +410,7 @@ namespace BlackPearl.Controls.Library
                 rtxt.TextChanged -= Rtxt_TextChanged;
                 grd.PreviewKeyDown -= Grid_KeyDown;
                 this.LostFocus -= MultiChoiceControl_LostFocus;
+                popup.Closed -= popup_Closed;
 
                 return true;
             }
@@ -419,6 +463,8 @@ namespace BlackPearl.Controls.Library
             //Opens drop-down if not already
             if (!IsDropDownOpen)
             {
+                suggestionIndex = -1;
+                selectionStart = -1;
                 IsDropDownOpen = true;
             }
         }
@@ -716,6 +762,20 @@ namespace BlackPearl.Controls.Library
             }
         }
         /// <summary>
+        /// Tries to set focus on RichTextBox
+        /// </summary>
+        private void TrySettingFocusToRichTextBox()
+        {
+            try
+            {
+                if (rtxt.Focusable)
+                {
+                    rtxt.Focus();
+                }
+            }
+            catch { }
+        }
+        /// <summary>
         /// Removes all invalid texts from RichTextBox except selected item
         /// </summary>
         private void RemoveInvalidTexts()
@@ -730,7 +790,7 @@ namespace BlackPearl.Controls.Library
                 }
                 var runTags = paragraph?.Inlines?.Where(r => r is Run).ToList();
 
-                for(int i=0;i<runTags.Count; i++)
+                for (int i = 0; i < runTags.Count; i++)
                 {
                     paragraph?.Inlines?.Remove(runTags[i]);
                 }
