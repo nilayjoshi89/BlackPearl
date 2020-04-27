@@ -29,7 +29,7 @@
                               VerticalScrollBarVisibility="Auto">
                     <ListBox Name="lstSuggestion"
                              ItemsSource="{Binding SuggestionItemsSource, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             SelectionMode="Multiple" PreviewMouseUp="LstSuggestion_PreviewMouseUp" PreviewKeyUp="LstSuggestion_OnPreviewKeyUp"
+                             SelectionMode="Multiple"
                              HorizontalContentAlignment="Stretch"
                              DisplayMemberPath="{Binding DisplayMemberPath, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
 						<ListBox.ItemContainerStyle>

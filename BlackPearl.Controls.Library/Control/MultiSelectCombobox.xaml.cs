@@ -121,17 +121,6 @@ namespace BlackPearl.Controls.Library
             get => (ObservableCollection<object>)GetValue(SuggestionItemsSourceProperty);
             set => SetValue(SuggestionItemsSourceProperty, value);
         }
-
-        /// <summary>
-        /// Internal property - Selected index in Suggestion drop down
-        /// </summary>
-        private static readonly DependencyProperty SuggestionIndexProperty =
-            DependencyProperty.Register(nameof(SuggestionIndex), typeof(int), typeof(MultiSelectCombobox));
-        private int SuggestionIndex
-        {
-            get => (int)GetValue(SuggestionIndexProperty);
-            set => SetValue(SuggestionIndexProperty, value);
-        }
         #endregion
 
         #region Event handlers
@@ -299,6 +288,12 @@ namespace BlackPearl.Controls.Library
         {
             //Remove all invalid texts from
             RemoveInvalidTexts();
+
+            //Hide drop-down
+            if (!popup.IsKeyboardFocusWithin)
+            {
+	            HideSuggestionDropDown();
+            }
         }
 
         /// <summary>
@@ -362,10 +357,12 @@ namespace BlackPearl.Controls.Library
                 areHandlersRegistered = true;
 
                 //subscribe
+                lstSuggestion.PreviewMouseUp += LstSuggestion_PreviewMouseUp;
+                lstSuggestion.PreviewKeyUp += LstSuggestion_OnPreviewKeyUp;
                 rtxt.TextChanged += Rtxt_TextChanged;
                 grd.PreviewKeyDown += Grid_KeyDown;
                 this.LostFocus += MultiChoiceControl_LostFocus;
-            }
+	        }
         }
         /// <summary>
         /// Unsubscribes to events for controls
@@ -393,6 +390,8 @@ namespace BlackPearl.Controls.Library
                 areHandlersRegistered = false;
 
                 //unsubscribe
+                lstSuggestion.PreviewMouseUp -= LstSuggestion_PreviewMouseUp;
+                lstSuggestion.PreviewKeyUp -= LstSuggestion_OnPreviewKeyUp;
                 rtxt.TextChanged -= Rtxt_TextChanged;
                 grd.PreviewKeyDown -= Grid_KeyDown;
                 this.LostFocus -= MultiChoiceControl_LostFocus;
