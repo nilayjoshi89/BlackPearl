@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Net.Mail;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -34,7 +33,9 @@ namespace BlackPearl.Controls.Library
         #endregion
 
         #region Events
-
+        /// <summary>
+        /// Occurs when the selection of a <see cref="T:System.Windows.Controls.Primitives.Selector" /> changes.
+        /// </summary>
         public event SelectionChangedEventHandler SelectionChanged;
 		#endregion
 
@@ -284,7 +285,7 @@ namespace BlackPearl.Controls.Library
 
             tb.Unloaded -= Tb_Unloaded;
             SelectedItems?.Remove(tb.Tag);
-            SelectionChanged?.Invoke(this, new SelectionChangedEventArgs(System.Windows.Controls.Primitives.Selector.SelectionChangedEvent, new [] { tb.Tag }, new List<object>()));
+            RaiseSelectionChangedEvent(new[] { tb.Tag }, new List<object>());
         }
         /// <summary>
         /// Control lost focus event handling
@@ -545,7 +546,6 @@ namespace BlackPearl.Controls.Library
             if (selectionStart > oldIndex)
             {
                 lstSuggestion.SelectedItems.Remove(SuggestionItemsSource[oldIndex]);
-                SelectionChanged?.Invoke(this, new SelectionChangedEventArgs(System.Windows.Controls.Primitives.Selector.SelectionChangedEvent, new[] { SuggestionItemsSource[suggestionIndex] }, new List<object>()));
                 return;
             }
 
@@ -580,7 +580,6 @@ namespace BlackPearl.Controls.Library
             if (selectionStart < oldIndex)
             {
                 lstSuggestion.SelectedItems.Remove(SuggestionItemsSource[oldIndex]);
-                SelectionChanged?.Invoke(this, new SelectionChangedEventArgs(System.Windows.Controls.Primitives.Selector.SelectionChangedEvent, new[] { SuggestionItemsSource[suggestionIndex] }, new List<object>()));
                 return;
             }
 
@@ -641,7 +640,7 @@ namespace BlackPearl.Controls.Library
             {
                 //Add item to Selected Item list
                 SelectedItems?.Add(itemToAdd);
-                SelectionChanged?.Invoke(this, new SelectionChangedEventArgs(System.Windows.Controls.Primitives.Selector.SelectionChangedEvent, new List<object>(), new[] { itemToAdd }));
+                RaiseSelectionChangedEvent(new List<object>(), new[] { itemToAdd });
                 //Add item in RichTextBox UI
                 AddItemToUI(itemToAdd);
             }
@@ -741,7 +740,7 @@ namespace BlackPearl.Controls.Library
 
                     //Add item to selected item list
                     SelectedItems?.Add(itemObject);
-                    SelectionChanged?.Invoke(this, new SelectionChangedEventArgs(System.Windows.Controls.Primitives.Selector.SelectionChangedEvent, new List<object>(), new[] { itemObject }));
+                    RaiseSelectionChangedEvent(new List<object>(), new[] { itemObject });
                     //Add item to UI
                     AddItemToUI(itemObject);
                 }
@@ -847,6 +846,16 @@ namespace BlackPearl.Controls.Library
         private bool HasAnyItem(IEnumerable<object> source, string textToSearch)
         {
             return source?.Any(i => LookUpContract?.IsItemEqualToString(this, i, textToSearch) == true) == true;
+        }
+
+        /// <summary>
+        /// Raise SelectionChanged event
+        /// </summary>
+        /// <param name="removed">removed items</param>
+        /// <param name="added">added items</param>
+        private void RaiseSelectionChangedEvent(IList removed, IList added)
+        {
+	        SelectionChanged?.Invoke(this, new SelectionChangedEventArgs(System.Windows.Controls.Primitives.Selector.SelectionChangedEvent, removed, added));
         }
         #endregion
         
