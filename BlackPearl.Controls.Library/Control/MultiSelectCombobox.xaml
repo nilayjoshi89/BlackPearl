@@ -32,7 +32,7 @@
                              SelectionMode="Multiple"
                              HorizontalContentAlignment="Stretch"
                              DisplayMemberPath="{Binding DisplayMemberPath, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
-                        <ListBox.ItemContainerStyle>
+						<ListBox.ItemContainerStyle>
                             <!--Setting style to bring item into view when selected-->
                             <Style TargetType="ListBoxItem"
                                    BasedOn="{StaticResource {x:Type ListBoxItem}}">

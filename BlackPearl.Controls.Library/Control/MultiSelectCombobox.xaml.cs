@@ -32,6 +32,13 @@ namespace BlackPearl.Controls.Library
         }
         #endregion
 
+        #region Events
+        /// <summary>
+        /// Occurs when the selection of a <see cref="T:System.Windows.Controls.Primitives.Selector" /> changes.
+        /// </summary>
+        public event SelectionChangedEventHandler SelectionChanged;
+		#endregion
+
         #region Properties
         /// <summary>
         /// Item source
@@ -121,7 +128,6 @@ namespace BlackPearl.Controls.Library
             get => (ObservableCollection<object>)GetValue(SuggestionItemsSourceProperty);
             set => SetValue(SuggestionItemsSourceProperty, value);
         }
-
         #endregion
 
         #region Event handlers
@@ -279,6 +285,7 @@ namespace BlackPearl.Controls.Library
 
             tb.Unloaded -= Tb_Unloaded;
             SelectedItems?.Remove(tb.Tag);
+            RaiseSelectionChangedEvent(new[] { tb.Tag }, new List<object>());
         }
         /// <summary>
         /// Control lost focus event handling
@@ -291,7 +298,32 @@ namespace BlackPearl.Controls.Library
             RemoveInvalidTexts();
 
             //Hide drop-down
-            HideSuggestionDropDown();
+            if (!popup.IsKeyboardFocusWithin)
+            {
+	            HideSuggestionDropDown();
+            }
+        }
+
+        /// <summary>
+        /// When item it clicked in suggestion list, we check if any is selected and try to add
+        /// </summary>
+        private void LstSuggestion_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+	        if (lstSuggestion.SelectedItems.Count > 0 && Keyboard.Modifiers != ModifierKeys.Control)
+	        {
+		        TrySetSelectedItemFromSuggestionDropDown();
+		        rtxt.Focus();
+            }
+        }
+
+
+        private void LstSuggestion_OnPreviewKeyUp(object sender, KeyEventArgs e)
+        {
+	        if (e.Key == Key.LeftCtrl || e.Key == Key.RightCtrl)
+	        {
+                TrySetSelectedItemFromSuggestionDropDown();
+                rtxt.Focus();
+            }
         }
         #endregion
 
@@ -333,10 +365,12 @@ namespace BlackPearl.Controls.Library
                 areHandlersRegistered = true;
 
                 //subscribe
+                lstSuggestion.PreviewMouseUp += LstSuggestion_PreviewMouseUp;
+                lstSuggestion.PreviewKeyUp += LstSuggestion_OnPreviewKeyUp;
                 rtxt.TextChanged += Rtxt_TextChanged;
                 grd.PreviewKeyDown += Grid_KeyDown;
                 this.LostFocus += MultiChoiceControl_LostFocus;
-            }
+	        }
         }
         /// <summary>
         /// Unsubscribes to events for controls
@@ -364,6 +398,8 @@ namespace BlackPearl.Controls.Library
                 areHandlersRegistered = false;
 
                 //unsubscribe
+                lstSuggestion.PreviewMouseUp -= LstSuggestion_PreviewMouseUp;
+                lstSuggestion.PreviewKeyUp -= LstSuggestion_OnPreviewKeyUp;
                 rtxt.TextChanged -= Rtxt_TextChanged;
                 grd.PreviewKeyDown -= Grid_KeyDown;
                 this.LostFocus -= MultiChoiceControl_LostFocus;
@@ -604,6 +640,7 @@ namespace BlackPearl.Controls.Library
             {
                 //Add item to Selected Item list
                 SelectedItems?.Add(itemToAdd);
+                RaiseSelectionChangedEvent(new List<object>(), new[] { itemToAdd });
                 //Add item in RichTextBox UI
                 AddItemToUI(itemToAdd);
             }
@@ -703,6 +740,7 @@ namespace BlackPearl.Controls.Library
 
                     //Add item to selected item list
                     SelectedItems?.Add(itemObject);
+                    RaiseSelectionChangedEvent(new List<object>(), new[] { itemObject });
                     //Add item to UI
                     AddItemToUI(itemObject);
                 }
@@ -808,6 +846,16 @@ namespace BlackPearl.Controls.Library
         private bool HasAnyItem(IEnumerable<object> source, string textToSearch)
         {
             return source?.Any(i => LookUpContract?.IsItemEqualToString(this, i, textToSearch) == true) == true;
+        }
+
+        /// <summary>
+        /// Raise SelectionChanged event
+        /// </summary>
+        /// <param name="removed">removed items</param>
+        /// <param name="added">added items</param>
+        private void RaiseSelectionChangedEvent(IList removed, IList added)
+        {
+	        SelectionChanged?.Invoke(this, new SelectionChangedEventArgs(System.Windows.Controls.Primitives.Selector.SelectionChangedEvent, removed, added));
         }
         #endregion
         
