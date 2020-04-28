@@ -31,10 +31,11 @@ steps:
   inputs:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+
 - task: NuGetCommand@2
   inputs:
     command: 'pack'
-    packagesToPack: '/BlackPearl.Controls.Library/BlackPearl.Controls.Library.nuspec'
+    packagesToPack: '**/*.nuspec'
     versioningScheme: 'off'
 
 - task: NuGetCommand@2
