@@ -3,8 +3,15 @@
 # Add steps that publish symbols, save build artifacts, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/apps/windows/dot-net
 
-trigger:
-- master
+pr:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - BlackPearl.Controls.Demo/*
+    - BlackPearl.Controls.Library/*
+    - BlackPearl.Controls.Solution.sln
 
 pool:
   vmImage: 'windows-latest'
