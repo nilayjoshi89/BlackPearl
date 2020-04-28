@@ -760,7 +760,7 @@ namespace BlackPearl.Controls.Library
                     //Check if item is already selected or not
                     if (SelectedItems?.Contains(itemObject) == true)
                     {
-                        return;
+                        continue;
                     }
 
                     //Add item to selected item list
