@@ -1,3 +1,5 @@
+### Status - [![Build Status](https://nilayjoshi89.visualstudio.com/BlackPearl%202.0/_apis/build/status/nilayjoshi89.BlackPearl?branchName=master)](https://nilayjoshi89.visualstudio.com/BlackPearl%202.0/_build/latest?definitionId=5&branchName=master)
+***
 # About repository
 This repo was created to put different basic WPF Custom-control/User-controls under same roof. These controls solve basic and frequently faced issue by developers. As of now, this repo contains one user-control **MultiSelectCombobox**. In future, I'm planning to add more.
 ***
