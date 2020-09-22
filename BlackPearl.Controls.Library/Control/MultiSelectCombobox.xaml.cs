@@ -108,6 +108,17 @@ namespace BlackPearl.Controls.Library
         }
 
         /// <summary>
+        /// Style for Search text - Run control
+        /// </summary>
+        public static readonly DependencyProperty SearchTextStyleProperty =
+            DependencyProperty.Register(nameof(SearchTextStyle), typeof(Style), typeof(MultiSelectCombobox), new PropertyMetadata(GetDefaultSearchTextStyle()));
+        public Style SearchTextStyle
+        {
+            get => GetValue(SearchTextStyleProperty) as Style;
+            set => SetValue(SearchTextStyleProperty, value);
+        }
+
+        /// <summary>
         /// Internal property - Show drop-down or not
         /// </summary>
         private static readonly DependencyProperty IsDropDownOpenProperty =
@@ -151,6 +162,12 @@ namespace BlackPearl.Controls.Library
                 //If Current caret position is in run element
                 if (rtxt.CaretPosition.Parent is Run runTag)
                 {
+                    if(SearchTextStyle != null 
+                        && runTag.Style != SearchTextStyle)
+                    {
+                        runTag.Style = SearchTextStyle;
+                    }
+
                     //Check if current text ends with ItemSeparator or not
                     if (runTag.Text.EndsWith(ItemSeparator.ToString()))
                     {
@@ -828,6 +845,16 @@ namespace BlackPearl.Controls.Library
             style.Setters.Add(new Setter(TextBlock.BackgroundProperty, Brushes.LightBlue));
             style.Setters.Add(new Setter(TextBlock.FontWeightProperty, FontWeights.SemiBold));
             style.Setters.Add(new Setter(TextBlock.MarginProperty, new Thickness(0, 0, 5, 0)));
+            return style;
+        }
+        /// <summary>
+        /// Default style Run used for search text
+        /// </summary>
+        /// <returns></returns>
+        private static Style GetDefaultSearchTextStyle()
+        {
+            var style = new Style(typeof(Run));
+            style.Setters.Add(new Setter(Run.BaselineAlignmentProperty, BaselineAlignment.Center));
             return style;
         }
         /// <summary>
