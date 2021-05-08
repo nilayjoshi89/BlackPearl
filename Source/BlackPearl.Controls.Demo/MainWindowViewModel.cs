@@ -28,9 +28,9 @@ namespace BlackPearl.Controls.Demo
         public ILookUpContract AdvanceLookUpContract { get; }
         private void ShowSelectedItemCommandAction(IList<Person> data)
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            var stringBuilder = new StringBuilder();
 
-            foreach (var p in data)
+            foreach (Person p in data)
             {
                 stringBuilder.AppendLine(p.Name);
             }

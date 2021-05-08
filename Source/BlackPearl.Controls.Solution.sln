@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackPearl.Controls.Library", "BlackPearl.Controls.Library\BlackPearl.Controls.Library.csproj", "{8201A3B9-2A05-42BB-83A9-F83FB98B1E6C}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackPearl.Controls.Demo", "BlackPearl.Controls.Demo\BlackPearl.Controls.Demo.csproj", "{EB730717-05BB-4488-808F-6C18F359D652}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlackPearl.Controls.Common", "BlackPearl.Controls.Common\BlackPearl.Controls.Common.csproj", "{90FC32E0-5C11-4EBF-B378-F5EE241EF148}"
@@ -17,10 +15,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8201A3B9-2A05-42BB-83A9-F83FB98B1E6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8201A3B9-2A05-42BB-83A9-F83FB98B1E6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8201A3B9-2A05-42BB-83A9-F83FB98B1E6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8201A3B9-2A05-42BB-83A9-F83FB98B1E6C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EB730717-05BB-4488-808F-6C18F359D652}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EB730717-05BB-4488-808F-6C18F359D652}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB730717-05BB-4488-808F-6C18F359D652}.Release|Any CPU.ActiveCfg = Release|Any CPU

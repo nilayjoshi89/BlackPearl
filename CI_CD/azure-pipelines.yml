@@ -3,15 +3,8 @@
 # Add steps that publish symbols, save build artifacts, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/apps/windows/dot-net
 
-pr:
-  branches:
-    include:
-    - master
-  paths:
-    include:
-    - BlackPearl.Controls.Demo/*
-    - BlackPearl.Controls.Library/*
-    - BlackPearl.Controls.Solution.sln
+trigger:
+- main
 
 pool:
   vmImage: 'windows-latest'
@@ -44,10 +37,3 @@ steps:
     command: 'pack'
     packagesToPack: '**/*.nuspec'
     versioningScheme: 'off'
-
-- task: NuGetCommand@2
-  inputs:
-    command: 'push'
-    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
-    nuGetFeedType: 'external'
-    publishFeedCredentials: 'NuGet_Org'

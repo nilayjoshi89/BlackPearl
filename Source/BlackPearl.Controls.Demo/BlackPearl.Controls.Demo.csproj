@@ -98,19 +98,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\BlackPearl.Controls.Common\BlackPearl.Controls.Common.csproj">
-      <Project>{90fc32e0-5c11-4ebf-b378-f5ee241ef148}</Project>
-      <Name>BlackPearl.Controls.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\BlackPearl.Controls.CoreLibrary\BlackPearl.Controls.CoreLibrary.csproj">
-      <Project>{468d32f2-003b-428e-ba95-2e99ba2949e2}</Project>
-      <Name>BlackPearl.Controls.CoreLibrary</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="MahApps.Metro">
       <Version>2.0.0-alpha0748</Version>
     </PackageReference>
@@ -129,6 +116,16 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BlackPearl.Controls.Common\BlackPearl.Controls.Common.csproj">
+      <Project>{90fc32e0-5c11-4ebf-b378-f5ee241ef148}</Project>
+      <Name>BlackPearl.Controls.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BlackPearl.Controls.CoreLibrary\BlackPearl.Controls.CoreLibrary.csproj">
+      <Project>{468d32f2-003b-428e-ba95-2e99ba2949e2}</Project>
+      <Name>BlackPearl.Controls.CoreLibrary</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

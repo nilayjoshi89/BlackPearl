@@ -8,10 +8,7 @@ namespace BlackPearl.Controls.Demo
         public string Company { get; internal set; }
         public string City { get; internal set; }
         public string Zip { get; internal set; }
-        public string Info
-        {
-            get => $"{Name} - {Company}({Zip})";
-        }
+        public string Info => $"{Name} - {Company}({Zip})";
     }
 
     public static class PersonDataProvider
