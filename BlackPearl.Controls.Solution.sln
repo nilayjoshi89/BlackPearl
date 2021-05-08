@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackPearl.Controls.Library
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackPearl.Controls.Demo", "BlackPearl.Controls.Demo\BlackPearl.Controls.Demo.csproj", "{EB730717-05BB-4488-808F-6C18F359D652}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlackPearl.Controls.Common", "BlackPearl.Controls.Common\BlackPearl.Controls.Common.csproj", "{90FC32E0-5C11-4EBF-B378-F5EE241EF148}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlackPearl.Controls.CoreLibrary", "BlackPearl.Controls.CoreLibrary\BlackPearl.Controls.CoreLibrary.csproj", "{468D32F2-003B-428E-BA95-2E99BA2949E2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{EB730717-05BB-4488-808F-6C18F359D652}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB730717-05BB-4488-808F-6C18F359D652}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EB730717-05BB-4488-808F-6C18F359D652}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90FC32E0-5C11-4EBF-B378-F5EE241EF148}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90FC32E0-5C11-4EBF-B378-F5EE241EF148}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90FC32E0-5C11-4EBF-B378-F5EE241EF148}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90FC32E0-5C11-4EBF-B378-F5EE241EF148}.Release|Any CPU.Build.0 = Release|Any CPU
+		{468D32F2-003B-428E-BA95-2E99BA2949E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{468D32F2-003B-428E-BA95-2E99BA2949E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{468D32F2-003B-428E-BA95-2E99BA2949E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{468D32F2-003B-428E-BA95-2E99BA2949E2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
