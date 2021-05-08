@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package>
+  <metadata>
+    <id>BlackPearl.Controls.CoreLibrary</id>
+    <version>2.0.0.0</version>
+    <title>WPF control library</title>
+    <authors>nilayjoshi89@gmail.com</authors>
+    <owners>nilayjoshi89@gmail.com</owners>
+    <description>WPF control library</description>
+    <releaseNotes>Release notes</releaseNotes>
+    <copyright>Copyright 2021</copyright>
+    <tags>WPF MultiSelectCombobox ComboBox MultiSelectDropDown</tags>
+
+    <dependencies>
+      <group targetFramework=".NETFramework4.6.1"/>
+      <group targetFramework=".NETCoreApp3.1"/>
+    </dependencies>
+    
+  </metadata>
+  <files>
+    <file src="bin\release\net461\BlackPearl.Controls.Common.dll" target="lib\net461" />
+    <file src="bin\release\netcoreapp3.1\BlackPearl.Controls.Common.dll" target="lib\netcoreapp3.1" />
+    <file src="bin\release\net461\BlackPearl.Controls.CoreLibrary.dll" target="lib\net461" />
+    <file src="bin\release\netcoreapp3.1\BlackPearl.Controls.CoreLibrary.dll" target="lib\netcoreapp3.1" />
+  </files>
+</package>
