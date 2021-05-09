@@ -2,19 +2,28 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:BlackPearl.Controls.CoreLibrary"
                     xmlns:behavior="clr-namespace:BlackPearl.Controls.CoreLibrary.Behavior">
-    
+
+    <!--#region Brushes-->
+    <SolidColorBrush x:Key="BlackPearl.MultiSelectCombobox.SelectedItem.BackgroundColor"
+                     Color="LightGray" />
+    <SolidColorBrush x:Key="BlackPearl.MultiSelectCombobox.SelectedItem.ForegroundColor"
+                     Color="Black" />
+    <!--#endregion Brushes-->
+
+    <!--#region Style-->
     <Style TargetType="TextBlock"
            x:Key="BlackPearl.MultiselectCombobox.SelectedTextBlockStyle">
         <Setter Property="Margin"
                 Value="0,0,5,0" />
         <Setter Property="Padding"
-                Value="10,0,10,0" />
+                Value="7,2,7,2" />
         <Setter Property="Background"
-                Value="LightGray" />
+                Value="{DynamicResource BlackPearl.MultiSelectCombobox.SelectedItem.BackgroundColor}" />
+        <Setter Property="Foreground"
+                Value="{DynamicResource BlackPearl.MultiSelectCombobox.SelectedItem.ForegroundColor}" />
         <Setter Property="FontWeight"
                 Value="SemiBold" />
     </Style>
-
     <Style TargetType="{x:Type local:MultiSelectCombobox}">
         <Setter Property="Template">
             <Setter.Value>
@@ -69,5 +78,5 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+    <!--#endregion-->
 </ResourceDictionary>

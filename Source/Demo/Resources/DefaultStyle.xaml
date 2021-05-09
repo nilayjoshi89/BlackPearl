@@ -8,6 +8,13 @@
         <Setter Property="FontWeight"
                 Value="Bold" />
     </Style>
+
+    <SolidColorBrush x:Key="BlackPearl.MultiSelectCombobox.SelectedItem.BackgroundColor"
+                     Color="{DynamicResource MahApps.Colors.Accent3}" />
+
+    <SolidColorBrush x:Key="BlackPearl.MultiSelectCombobox.SelectedItem.ForegroundColor"
+                     Color="{DynamicResource MahApps.Colors.ThemeForeground}" />
+
     <Style TargetType="{x:Type controls:MultiSelectCombobox}">
         <Setter Property="Margin"
                 Value="5" />
