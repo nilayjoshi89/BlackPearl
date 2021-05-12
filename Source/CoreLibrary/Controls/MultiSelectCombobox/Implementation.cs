@@ -18,7 +18,6 @@ namespace BlackPearl.Controls.CoreLibrary
         private readonly object handlerLock = new object();
         private Paragraph paragraph = null;
         private int selectionStart = -1, suggestionIndex = -1;
-        private readonly ObservableCollection<object> suggestionCollection = new ObservableCollection<object>();
         #endregion
 
         #region Control Event Handlers
@@ -77,7 +76,7 @@ namespace BlackPearl.Controls.CoreLibrary
                             string currentText = GetUserEnteredText();
 
                             //Check if any suggestion available for given text
-                            if (!HasAnyItemStartingWith(suggestionCollection, currentText))
+                            if (!HasAnyItemStartingWith(ItemSource?.Cast<object>(), currentText))
                             {
                                 //No suggestion to show, return
                                 return;
@@ -107,7 +106,7 @@ namespace BlackPearl.Controls.CoreLibrary
                             //Get current text
                             string currentText = GetUserEnteredText();
                             //Check if any suggestion available for given text
-                            if (!HasAnyItemStartingWith(suggestionCollection, currentText))
+                            if (!HasAnyItemStartingWith(ItemSource?.Cast<object>(), currentText))
                             {
                                 //No suggestion to show, return
                                 return;
@@ -284,8 +283,6 @@ namespace BlackPearl.Controls.CoreLibrary
         /// </summary>
         private void ShowHideSuggestionDropDown()
         {
-            //Clear all previous suggestions
-            suggestionCollection.Clear();
             //Get current entered text
             string currentText = GetUserEnteredText();
             //Check if there are any items to be shown in suggestion drop-down for given text
@@ -311,10 +308,7 @@ namespace BlackPearl.Controls.CoreLibrary
             }
 
             //Add suggestion items to suggestion drop-down
-            foreach (object i in itemsToAdd)
-            {
-                suggestionCollection.Add(i);
-            }
+            suggestionElement.ItemsSource = itemsToAdd;
 
             //Show suggestion drop-down
             ShowSuggestionDropDown();
@@ -366,35 +360,38 @@ namespace BlackPearl.Controls.CoreLibrary
         /// </summary>
         private void IncrementSelectedIndex()
         {
-            int totalCount = suggestionCollection.Count;
+            var suggestionItemSource = suggestionElement.ItemsSource.Cast<object>();
+            int totalCount = suggestionItemSource.Count();
             suggestionIndex = (suggestionIndex + 1 >= totalCount)
                                 ? totalCount - 1
                                 : suggestionIndex + 1;
 
             //Clear any previous selection
             SuggestionElement.SelectedItems.Clear();
-            SuggestionElement.SelectedItems.Add(suggestionCollection[suggestionIndex]);
+            SuggestionElement.SelectedItems.Add(suggestionItemSource.ElementAt(suggestionIndex));
         }
         /// <summary>
         /// Decrement selection index for suggestion drop-down
         /// </summary>
         private void DecrementSelectedIndex()
         {
+            var suggestionItemSource = suggestionElement.ItemsSource.Cast<object>();
             suggestionIndex = suggestionIndex < 1
                 ? 0
                 : suggestionIndex - 1;
 
             //Clear any previous selection
             SuggestionElement.SelectedItems.Clear();
-            SuggestionElement.SelectedItems.Add(suggestionCollection[suggestionIndex]);
+            SuggestionElement.SelectedItems.Add(suggestionItemSource.ElementAt(suggestionIndex));
         }
         /// <summary>
         /// Downward selection for suggestion drop-down
         /// </summary>
         private void DoDownwardMultiSelection()
         {
+            var suggestionItemSource = suggestionElement.ItemsSource.Cast<object>();
             int oldIndex = suggestionIndex;
-            int totalCount = suggestionCollection.Count;
+            int totalCount = suggestionItemSource.Count();
             suggestionIndex = (suggestionIndex + 1 >= totalCount)
                                 ? totalCount - 1
                                 : suggestionIndex + 1;
@@ -411,19 +408,19 @@ namespace BlackPearl.Controls.CoreLibrary
                 //set previous index as selection start
                 selectionStart = oldIndex;
                 //Add current item to selected items list
-                SuggestionElement.SelectedItems.Add(suggestionCollection[suggestionIndex]);
+                SuggestionElement.SelectedItems.Add(suggestionItemSource.ElementAt(suggestionIndex));
                 return;
             }
 
             //If selection is shrinking then remove previous selected element
             if (selectionStart > oldIndex)
             {
-                SuggestionElement.SelectedItems.Remove(suggestionCollection[oldIndex]);
+                SuggestionElement.SelectedItems.Remove(suggestionItemSource.ElementAt(oldIndex));
                 return;
             }
 
             //Otherwise, selection is growing, add current element to selected items list
-            SuggestionElement.SelectedItems.Add(suggestionCollection[suggestionIndex]);
+            SuggestionElement.SelectedItems.Add(suggestionItemSource.ElementAt(suggestionIndex));
         }
         /// <summary>
         /// Upward selection for suggestion drop-down
@@ -441,25 +438,26 @@ namespace BlackPearl.Controls.CoreLibrary
                 return;
             }
 
+            var suggestionItemSource = suggestionElement.ItemsSource.Cast<object>();
             //If its first time - Start of selection
             if (selectionStart == -1)
             {
                 //set previous index as selection start
                 selectionStart = oldIndex;
                 //Add current item to selected items list
-                SuggestionElement.SelectedItems.Add(suggestionCollection[suggestionIndex]);
+                SuggestionElement.SelectedItems.Add(suggestionItemSource.ElementAt(suggestionIndex));
                 return;
             }
 
             //If selection is shrinking then remove previous selected element
             if (selectionStart < oldIndex)
             {
-                SuggestionElement.SelectedItems.Remove(suggestionCollection[oldIndex]);
+                SuggestionElement.SelectedItems.Remove(suggestionItemSource.ElementAt(oldIndex));
                 return;
             }
 
             //Otherwise, selection is growing, add current element to selected items list
-            SuggestionElement.SelectedItems.Add(suggestionCollection[suggestionIndex]);
+            SuggestionElement.SelectedItems.Add(suggestionItemSource.ElementAt(suggestionIndex));
         }
         /// <summary>
         /// Tries to set item from entered text in RichTextBox
@@ -640,6 +638,7 @@ namespace BlackPearl.Controls.CoreLibrary
                 RaiseSelectionChangedEvent(new ArrayList(0), SuggestionElement.SelectedItems);
 
                 SuggestionElement.SelectedItems?.Clear();
+                SuggestionElement.ItemsSource = ItemSource;
             }
             finally
             {

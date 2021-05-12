@@ -73,8 +73,7 @@
                                         BorderThickness="1">
                                         <ListBox Name="lstSuggestion"
                                                  SelectionMode="Multiple"
-                                                 HorizontalContentAlignment="Stretch"
-                                                 Margin="3">
+                                                 HorizontalContentAlignment="Stretch">
                                             <ListBox.ItemContainerStyle>
                                                 <!--Setting style to bring item into view when selected-->
                                                 <Style TargetType="ListBoxItem"

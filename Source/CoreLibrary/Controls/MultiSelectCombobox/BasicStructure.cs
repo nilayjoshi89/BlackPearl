@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
@@ -83,7 +82,7 @@ namespace BlackPearl.Controls.CoreLibrary
 
                 suggestionElement = value;
                 suggestionElement.DisplayMemberPath = DisplayMemberPath;
-                suggestionElement.ItemsSource = suggestionCollection;
+                suggestionElement.ItemsSource = ItemSource;
 
                 if (suggestionElement != null)
                 {
@@ -186,22 +185,17 @@ namespace BlackPearl.Controls.CoreLibrary
         /// <param name="e">arguments</param>
         private static void ItemSourcePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            IEnumerable<object> itemsToAdd = (e.NewValue as IEnumerable)?.Cast<object>();
             if (!(d is MultiSelectCombobox multiChoiceControl))
             {
                 return;
             }
 
-            multiChoiceControl.suggestionCollection.Clear();
-            if (itemsToAdd == null)
+            if (multiChoiceControl.SuggestionElement == null)
             {
                 return;
             }
 
-            foreach (object i in itemsToAdd)
-            {
-                multiChoiceControl.suggestionCollection.Add(i);
-            }
+            multiChoiceControl.SuggestionElement.ItemsSource = (e.NewValue as IEnumerable)?.Cast<object>();
         }
         /// <summary>
         /// Display member path change handler
