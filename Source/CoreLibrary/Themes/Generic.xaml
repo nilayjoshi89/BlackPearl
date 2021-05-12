@@ -14,11 +14,24 @@
     <Style TargetType="TextBlock"
            x:Key="BlackPearl.MultiselectCombobox.SelectedTextBlockStyle">
         <Setter Property="Margin"
-                Value="0,0,5,0" />
+                Value="0,2,5,2" />
         <Setter Property="Padding"
-                Value="7,2,7,2" />
+                Value="7,1,7,1" />
         <Setter Property="Background"
                 Value="{DynamicResource BlackPearl.MultiSelectCombobox.SelectedItem.BackgroundColor}" />
+        <Setter Property="Foreground"
+                Value="{DynamicResource BlackPearl.MultiSelectCombobox.SelectedItem.ForegroundColor}" />
+        <Setter Property="FontWeight"
+                Value="SemiBold" />
+    </Style>
+    <Style TargetType="Run"
+           x:Key="BlackPearl.MultiselectCombobox.RunStyle">
+        <!--<Setter Property=""
+                Value="0,2,5,2" />-->
+        <!--<Setter Property="Padding"
+                Value="7,1,7,1" />-->
+        <Setter Property="BaselineAlignment"
+                Value="Center" />
         <Setter Property="Foreground"
                 Value="{DynamicResource BlackPearl.MultiSelectCombobox.SelectedItem.ForegroundColor}" />
         <Setter Property="FontWeight"
@@ -40,7 +53,10 @@
                                          VerticalContentAlignment="Center"
                                          FontSize="{Binding FontSize, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}">
                                 <RichTextBox.Resources>
-                                    <Style TargetType="TextBlock" BasedOn="{StaticResource BlackPearl.MultiselectCombobox.SelectedTextBlockStyle}" />
+                                    <Style TargetType="TextBlock" 
+                                           BasedOn="{StaticResource BlackPearl.MultiselectCombobox.SelectedTextBlockStyle}" />
+                                    <Style TargetType="Run"
+                                           BasedOn="{StaticResource BlackPearl.MultiselectCombobox.RunStyle}" />
                                 </RichTextBox.Resources>
                             </RichTextBox>
 
@@ -51,15 +67,14 @@
                                    StaysOpen="False"
                                    PopupAnimation="Slide"
                                    SnapsToDevicePixels="True"
-                                   Width="{Binding ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}">
-                                <Border BorderBrush="Black"
+                                   Width="{Binding ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}"
+                                   MaxHeight="300">
+                                <Border BorderBrush="{DynamicResource BlackPearl.MultiSelectCombobox.SelectedItem.ForegroundColor}"
                                         BorderThickness="1">
-                                    <ScrollViewer MaxHeight="300"
-                                                  HorizontalScrollBarVisibility="Auto"
-                                                  VerticalScrollBarVisibility="Auto">
                                         <ListBox Name="lstSuggestion"
                                                  SelectionMode="Multiple"
-                                                 HorizontalContentAlignment="Stretch">
+                                                 HorizontalContentAlignment="Stretch"
+                                                 Margin="3">
                                             <ListBox.ItemContainerStyle>
                                                 <!--Setting style to bring item into view when selected-->
                                                 <Style TargetType="ListBoxItem"
@@ -69,7 +84,6 @@
                                                 </Style>
                                             </ListBox.ItemContainerStyle>
                                         </ListBox>
-                                    </ScrollViewer>
                                 </Border>
                             </Popup>
                         </Grid>

@@ -1,20 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Input;
 
-using BlackPearl.Controls.Contract;
 using BlackPearl.Controls.Extension;
 
 namespace BlackPearl.Controls.CoreLibrary
 {
-
     public sealed partial class MultiSelectCombobox
     {
         #region Members
@@ -522,7 +518,7 @@ namespace BlackPearl.Controls.CoreLibrary
                 //Add item in RichTextBox UI
                 AddItemToUI(itemToAdd);
 
-                RaiseSelectionChangedEvent(null, new[] { itemToAdd });
+                RaiseSelectionChangedEvent(new ArrayList(0), new[] { itemToAdd });
             }
         }
         /// <summary>
@@ -592,7 +588,7 @@ namespace BlackPearl.Controls.CoreLibrary
 
                 tb.Unloaded -= Tb_Unloaded;
                 SelectedItems?.Remove(tb.Tag);
-                RaiseSelectionChangedEvent(new[] { tb.Tag }, null);
+                RaiseSelectionChangedEvent(new[] { tb.Tag }, new ArrayList(0));
             }
             catch { }
         }
@@ -641,7 +637,7 @@ namespace BlackPearl.Controls.CoreLibrary
                     AddItemToUI(itemObject);
                 }
 
-                RaiseSelectionChangedEvent(null, SuggestionElement.SelectedItems);
+                RaiseSelectionChangedEvent(new ArrayList(0), SuggestionElement.SelectedItems);
 
                 SuggestionElement.SelectedItems?.Clear();
             }
@@ -691,7 +687,7 @@ namespace BlackPearl.Controls.CoreLibrary
                 SubsribeHandlers();
             }
         }
-        
+
         #region LookUp Methods
         /// <summary>
         /// Gets all items from source matching search criteria
@@ -715,7 +711,7 @@ namespace BlackPearl.Controls.CoreLibrary
         /// <returns></returns>
         private bool HasAnyItem(IEnumerable<object> source, string textToSearch) => source?.Any(i => LookUpContract?.IsItemEqualToString(this, i, textToSearch) == true) == true;
         #endregion
-        
+
         #endregion
     }
 }
