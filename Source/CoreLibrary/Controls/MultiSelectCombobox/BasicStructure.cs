@@ -76,8 +76,9 @@ namespace BlackPearl.Controls.CoreLibrary
             {
                 if (suggestionElement != null)
                 {
-                    suggestionElement.PreviewMouseUp -= SuggestionElement_PreviewMouseUp;
+                    suggestionElement.PreviewMouseUp -= SuggestionDropdown_PreviewMouseUp;
                     suggestionElement.PreviewKeyUp -= SuggestionElement_PreviewKeyUp;
+                    suggestionElement.PreviewMouseDown -= SuggestionDropdown_PreviewMouseDown;
                 }
 
                 suggestionElement = value;
@@ -86,8 +87,9 @@ namespace BlackPearl.Controls.CoreLibrary
 
                 if (suggestionElement != null)
                 {
-                    suggestionElement.PreviewMouseUp += SuggestionElement_PreviewMouseUp;
+                    suggestionElement.PreviewMouseUp += SuggestionDropdown_PreviewMouseUp;
                     suggestionElement.PreviewKeyUp += SuggestionElement_PreviewKeyUp;
+                    suggestionElement.PreviewMouseDown += SuggestionDropdown_PreviewMouseDown;
                 }
             }
         }
