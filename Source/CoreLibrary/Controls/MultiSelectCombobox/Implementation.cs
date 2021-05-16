@@ -15,7 +15,6 @@ namespace BlackPearl.Controls.CoreLibrary
         #region Members
         private bool areHandlersRegistered = true;
         private readonly object handlerLock = new object();
-        private Paragraph paragraph = null;
         private int selectionStart = -1, suggestionIndex = -1;
         #endregion
 
@@ -28,13 +27,14 @@ namespace BlackPearl.Controls.CoreLibrary
         /// <param name="e"></param>
         private void SuggestionElement_PreviewKeyUp(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.LeftCtrl
-                || e.Key == Key.RightCtrl)
+            if (!IsSelectionProcessAboutToComplete(e.Key))
             {
-                UpdateSelectionFromSuggestionDropdown();
+                return;
             }
+
+            UpdateSelectedItemsFromSuggestionDropdown();
         }
-        private void SuggestionDropdown_PreviewMouseDown(object sender, MouseButtonEventArgs e) => SuggestionElement.ClearSelectionIfNoOperationInProgress();
+        private void SuggestionDropdown_PreviewMouseDown(object sender, MouseButtonEventArgs e) => SuggestionElement.ClearSelection(IsSelectionProcessCompleted);
         /// <summary>
         /// Suggestion drop down - mouse key up
         /// Forces control to update selected item based on selection in suggestion drop down
@@ -44,13 +44,12 @@ namespace BlackPearl.Controls.CoreLibrary
         private void SuggestionDropdown_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
             if ((SuggestionElement?.SelectedItems?.Count ?? 0) == 0
-                || Keyboard.Modifiers == ModifierKeys.Control
-                || Keyboard.Modifiers == ModifierKeys.Shift)
+                || IsSelectionProcessInProgress())
             {
                 return;
             }
 
-            UpdateSelectionFromSuggestionDropdown();
+            UpdateSelectedItemsFromSuggestionDropdown();
         }
         private void MultiSelectCombobox_LostFocus(object sender, RoutedEventArgs e)
         {
@@ -66,7 +65,7 @@ namespace BlackPearl.Controls.CoreLibrary
                 RemoveInvalidTexts();
 
                 //Hide drop-down
-                HideAndResetSuggestionDropDown();
+                HideSuggestions(SuggestionCleanupOperation.ResetIndex | SuggestionCleanupOperation.ClearSelection);
             }
             catch { }
         }
@@ -76,7 +75,7 @@ namespace BlackPearl.Controls.CoreLibrary
             {
                 //User can remove paragraph reference by 'Select all & delete' in RichTextBox
                 //Following method call with make sure local paragraph remains part of RichTextBox
-                RichTextBoxElement.SetParagraphAsFirstBlock(paragraph);
+                RichTextBoxElement.SetupOrCheckParagraph();
 
                 switch (e.Key)
                 {
@@ -95,17 +94,13 @@ namespace BlackPearl.Controls.CoreLibrary
                     case Key.Enter:
                         {
                             e.Handled = true;
-
-                            //Try select item based on selection in Suggestion drop-down
-                            UpdateSelectionFromSuggestionDropdown();
+                            UpdateSelectedItemsFromSuggestionDropdown();
                         }
                         break;
                     case Key.Escape:
                         {
                             e.Handled = true;
-
-                            //Hide suggestion drop-down
-                            HideAndResetSuggestionDropDown();
+                            HideSuggestions(SuggestionCleanupOperation.ResetIndex | SuggestionCleanupOperation.ClearSelection);
                             RichTextBoxElement.TryFocus();
                         }
                         break;
@@ -125,14 +120,14 @@ namespace BlackPearl.Controls.CoreLibrary
                 if (string.IsNullOrEmpty(userEnteredText)
                     || !userEnteredText.EndsWith(ItemSeparator.ToString()))
                 {
-                    bool hasAnySuggestionToShow = UpdateSuggestionsFromUserEnteredText();
+                    bool hasAnySuggestionToShow = UpdateSuggestions(userEnteredText);
                     if (hasAnySuggestionToShow)
                     {
-                        ShowSuggestionDropDown();
+                        ShowSuggestions();
                         return;
                     }
 
-                    HideAndResetSuggestionDropDown();
+                    HideSuggestions(SuggestionCleanupOperation.ResetIndex | SuggestionCleanupOperation.ClearSelection);
                     return;
                 }
 
@@ -144,10 +139,8 @@ namespace BlackPearl.Controls.CoreLibrary
                 }
 
                 //Hide suggestion drop-down
-                HideSuggestionDropDown();
-
                 //Reset suggestion drop down list
-                ResetSuggestionDropDown();
+                HideSuggestions(SuggestionCleanupOperation.ResetIndex | SuggestionCleanupOperation.ResetItemSource);
 
                 //User is expecting to complete item selection
                 //Check if current text is blank + separator
@@ -201,12 +194,12 @@ namespace BlackPearl.Controls.CoreLibrary
                 areHandlersRegistered = true;
 
                 //subscribe
-                SuggestionElement.PreviewMouseDown += SuggestionDropdown_PreviewMouseDown;
-                SuggestionElement.PreviewMouseUp += SuggestionDropdown_PreviewMouseUp;
-                SuggestionElement.PreviewKeyUp += SuggestionElement_PreviewKeyUp;
+                //SuggestionElement.PreviewMouseDown += SuggestionDropdown_PreviewMouseDown;
+                //SuggestionElement.PreviewMouseUp += SuggestionDropdown_PreviewMouseUp;
+                //SuggestionElement.PreviewKeyUp += SuggestionElement_PreviewKeyUp;
                 RichTextBoxElement.TextChanged += RichTextBoxElement_TextChanged;
-                PreviewKeyDown += MultiSelectCombobox_PreviewKeyDown;
-                LostFocus += MultiSelectCombobox_LostFocus;
+                //PreviewKeyDown += MultiSelectCombobox_PreviewKeyDown;
+                //LostFocus += MultiSelectCombobox_LostFocus;
             }
         }
         /// <summary>
@@ -235,76 +228,46 @@ namespace BlackPearl.Controls.CoreLibrary
                 areHandlersRegistered = false;
 
                 //unsubscribe
-                SuggestionElement.PreviewMouseDown -= SuggestionDropdown_PreviewMouseDown;
-                SuggestionElement.PreviewMouseUp -= SuggestionDropdown_PreviewMouseUp;
-                SuggestionElement.PreviewKeyUp -= SuggestionElement_PreviewKeyUp;
+                //SuggestionElement.PreviewMouseDown -= SuggestionDropdown_PreviewMouseDown;
+                //SuggestionElement.PreviewMouseUp -= SuggestionDropdown_PreviewMouseUp;
+                //SuggestionElement.PreviewKeyUp -= SuggestionElement_PreviewKeyUp;
                 RichTextBoxElement.TextChanged -= RichTextBoxElement_TextChanged;
-                PreviewKeyDown -= MultiSelectCombobox_PreviewKeyDown;
-                LostFocus -= MultiSelectCombobox_LostFocus;
+                //PreviewKeyDown -= MultiSelectCombobox_PreviewKeyDown;
+                //LostFocus -= MultiSelectCombobox_LostFocus;
 
                 return true;
             }
         }
-        private bool UpdateSuggestionsFromUserEnteredText()
+        private bool UpdateSuggestions(string userEnteredText)
         {
-            //Items found for suggestion drop-down
             //Get Items to be shown in suggestion drop-down for current text
-
-            string userEnteredText = RichTextBoxElement.GetCurrentText();
-            IEnumerable<object> itemsToAdd = ItemSource?.Cast<object>()
-                                                .Where(i => LookUpContract?.IsItemMatchingSearchString(this, i, userEnteredText) == true);
+            IEnumerable<object> itemsToAdd = ItemSource?.Cast<object>().GetSuggestions(userEnteredText, LookUpContract, this);
 
             //Add suggestion items to suggestion drop-down
             SuggestionElement.ItemsSource = itemsToAdd;
 
             return itemsToAdd?.Any() == true;
         }
-        private void ResetSuggestionDropDown() => SuggestionElement.ItemsSource = ItemSource;
         /// <summary>
         /// Shows suggestion drop-down
         /// </summary>
-        private void ShowSuggestionDropDown()
-        {
-            //Opens drop-down if not already
-            if (!PopupElement.IsOpen
-                && SuggestionElement?.ItemsSource?.Cast<object>()?.Any() == true)
-            {
-                suggestionIndex = -1;
-                selectionStart = -1;
-                PopupElement.IsOpen = true;
-            }
-        }
-        private void HideAndResetSuggestionDropDown()
-        {
-            HideSuggestionDropDown();
-            SuggestionElement?.SelectedItems?.Clear();
-        }
-        /// <summary>
-        /// Hides suggestion drop-down
-        /// </summary>
-        private void HideSuggestionDropDown()
-        {
-            //Closes drop-down if not already
-            if (PopupElement.IsOpen)
-            {
-                PopupElement.IsOpen = false;
-                suggestionIndex = -1;
-                selectionStart = -1;
-            }
-        }
+        private void ShowSuggestions() => PopupElement.Show(HasAnySuggestion, ResetSelectedIndex);
+        private void HideSuggestions(SuggestionCleanupOperation cleanupOperation) => PopupElement.Hide(null, () => PerformSuggestionCleanupOperation(cleanupOperation));
+        private bool HasAnySuggestion() => SuggestionElement.GetItemSource()?.Any() == true;
+
         /// <summary>
         /// Increments selection index for suggestion drop-down
         /// </summary>
         private void IncrementSelectedIndex()
         {
-            IEnumerable<object> suggestionItemSource = suggestionElement.GetItemSource();
+            IEnumerable<object> suggestionItemSource = SuggestionElement.GetItemSource();
             int totalCount = suggestionItemSource.Count();
             suggestionIndex = (suggestionIndex + 1 >= totalCount)
                                 ? totalCount - 1
                                 : suggestionIndex + 1;
 
             //Clear any previous selection
-            SuggestionElement.SelectedItems.Clear();
+            SuggestionElement.ClearSelection();
             SuggestionElement.SelectedItems.Add(suggestionItemSource.ElementAt(suggestionIndex));
         }
         /// <summary>
@@ -312,13 +275,13 @@ namespace BlackPearl.Controls.CoreLibrary
         /// </summary>
         private void DecrementSelectedIndex()
         {
-            IEnumerable<object> suggestionItemSource = suggestionElement.GetItemSource();
+            IEnumerable<object> suggestionItemSource = SuggestionElement.GetItemSource();
             suggestionIndex = suggestionIndex < 1
                 ? 0
                 : suggestionIndex - 1;
 
             //Clear any previous selection
-            SuggestionElement.SelectedItems.Clear();
+            SuggestionElement.ClearSelection();
             SuggestionElement.SelectedItems.Add(suggestionItemSource.ElementAt(suggestionIndex));
         }
         /// <summary>
@@ -326,7 +289,7 @@ namespace BlackPearl.Controls.CoreLibrary
         /// </summary>
         private void DoDownwardMultiSelection()
         {
-            IEnumerable<object> suggestionItemSource = suggestionElement.GetItemSource();
+            IEnumerable<object> suggestionItemSource = SuggestionElement.GetItemSource();
             int oldIndex = suggestionIndex;
             int totalCount = suggestionItemSource.Count();
             suggestionIndex = (suggestionIndex + 1 >= totalCount)
@@ -375,7 +338,7 @@ namespace BlackPearl.Controls.CoreLibrary
                 return;
             }
 
-            IEnumerable<object> suggestionItemSource = suggestionElement.GetItemSource();
+            IEnumerable<object> suggestionItemSource = SuggestionElement.GetItemSource();
             //If its first time - Start of selection
             if (selectionStart == -1)
             {
@@ -413,7 +376,7 @@ namespace BlackPearl.Controls.CoreLibrary
             IEnumerable<object> controlItemSource = ItemSource?.Cast<object>();
 
             if ((LookUpContract?.SupportsNewObjectCreation != true)
-                && (!HasAnySuggestionWithExactMatch(controlItemSource, itemString)))
+                && !controlItemSource.HasAnyExactMatch(itemString, LookUpContract, this))
             {
                 //Not a valid item, return
                 return;
@@ -421,14 +384,14 @@ namespace BlackPearl.Controls.CoreLibrary
 
             //item text is a valid in ItemSource or can be created using LookUpContract
             //Check if item is already selected or not
-            if (HasAnySuggestionWithExactMatch(SelectedItems?.Cast<object>(), itemString))
+            if (SelectedItems?.Cast<object>().HasAnyExactMatch(itemString, LookUpContract, this) != false)
             {
                 //already selected, return
                 return;
             }
 
             //Try to get item from source based on itemString
-            object itemToAdd = GetItemFromSource(controlItemSource, itemString);
+            object itemToAdd = controlItemSource.GetExactMatch(itemString, LookUpContract, this);
 
             if (itemToAdd == null && LookUpContract?.SupportsNewObjectCreation == true)
             {
@@ -455,9 +418,9 @@ namespace BlackPearl.Controls.CoreLibrary
             //Add item to Selected Item list
             SelectedItems?.Add(itemToAdd);
             //Add item in RichTextBox UI
-            AddItemToUI(itemToAdd);
+            RichTextBoxElement.AddToParagraph(itemToAdd, CreateInlineUIElement);
         }
-        private void AddToSelectedItems(IList itemsToAdd)
+        private void AddSuggestionsToSelectedItems(IList itemsToAdd)
         {
             foreach (object item in itemsToAdd)
             {
@@ -465,37 +428,6 @@ namespace BlackPearl.Controls.CoreLibrary
             }
 
             RaiseSelectionChangedEvent(new ArrayList(0), new ArrayList(itemsToAdd));
-        }
-        /// <summary>
-        /// Gets item from source for given text
-        /// </summary>
-        /// <param name="source">Item source to search</param>
-        /// <param name="textToSearch">text to search</param>
-        /// <returns>Item from source if any else null</returns>
-        private object GetItemFromSource(IEnumerable<object> source, string textToSearch) =>  source?.FirstOrDefault(i => LookUpContract?.IsItemEqualToString(this, i, textToSearch) == true);
-
-        /// <summary>
-        /// Adds new item to RichTextBox and sets caret position to end
-        /// </summary>
-        /// <param name="itemToAdd"></param>
-        private void AddItemToUI(object itemToAdd)
-        {
-            //Get new element to add in RichTextBox
-            InlineUIContainer itemToAddUIElement = CreateInlineUIElement(itemToAdd);
-
-            if (paragraph.Inlines.FirstInline == null)
-            {
-                //First element to insert
-                paragraph.Inlines.Add(itemToAddUIElement);
-            }
-            else
-            {
-                //Insert at the end
-                paragraph.Inlines.InsertAfter(paragraph.Inlines.LastInline, itemToAddUIElement);
-            }
-
-            //Set caret position to the end
-            RichTextBoxElement.SetCaretPositionToEnd();
         }
         /// <summary>
         /// Create RichTextBox document element for given object
@@ -541,7 +473,7 @@ namespace BlackPearl.Controls.CoreLibrary
         /// </summary>
         /// <param name="runTagToRemove"></param>
         /// <param name="itemObject"></param>
-        private void UpdateSelectionFromSuggestionDropdown()
+        private void UpdateSelectedItemsFromSuggestionDropdown()
         {
             try
             {
@@ -559,14 +491,13 @@ namespace BlackPearl.Controls.CoreLibrary
                 }
 
                 //Hide drop-down
-                HideSuggestionDropDown();
+                HideSuggestions(SuggestionCleanupOperation.ResetIndex);
 
                 //Remove any user entered text if any
                 RichTextBoxElement.RemoveRunBlocks();
 
-                AddToSelectedItems(SuggestionElement.SelectedItems);
-                SuggestionElement.SelectedItems?.Clear();
-                ResetSuggestionDropDown();
+                AddSuggestionsToSelectedItems(SuggestionElement.SelectedItems);
+                PerformSuggestionCleanupOperation(SuggestionCleanupOperation.ClearSelection | SuggestionCleanupOperation.ResetItemSource);
             }
             finally
             {
@@ -600,12 +531,12 @@ namespace BlackPearl.Controls.CoreLibrary
         }
         private void HandleKeyboardUpKeyPress()
         {
-            if (!CanShowSuggestionDropDown())
+            if (!HasAnySuggestionToShow())
             {
                 return;
             }
 
-            ShowSuggestionDropDown();
+            ShowSuggestions();
 
             //If multi-selection
             if (Keyboard.Modifiers == ModifierKeys.Shift)
@@ -622,12 +553,12 @@ namespace BlackPearl.Controls.CoreLibrary
         }
         private void HandleKeyboardDownKeyPress()
         {
-            if (!CanShowSuggestionDropDown())
+            if (!HasAnySuggestionToShow())
             {
                 return;
             }
 
-            ShowSuggestionDropDown();
+            ShowSuggestions();
 
             //If multi-selection
             if (Keyboard.Modifiers == ModifierKeys.Shift)
@@ -642,19 +573,44 @@ namespace BlackPearl.Controls.CoreLibrary
             //Increment selected item index in drop-down
             IncrementSelectedIndex();
         }
-        private bool CanShowSuggestionDropDown()
+        private bool HasAnySuggestionToShow() => SuggestionElement?.GetItemSource()?.Any() == true;
+        private bool IsSelectionProcessCompleted() => !(Keyboard.IsKeyDown(Key.LeftCtrl)
+                                                        || Keyboard.IsKeyDown(Key.RightCtrl)
+                                                        || Keyboard.IsKeyDown(Key.LeftShift)
+                                                        || Keyboard.IsKeyDown(Key.RightShift));
+        private bool IsSelectionProcessAboutToComplete(Key key) => key == Key.LeftCtrl || key == Key.RightCtrl;
+        public bool IsSelectionProcessInProgress() => Keyboard.Modifiers == ModifierKeys.Control
+                                                        || Keyboard.Modifiers == ModifierKeys.Shift;
+        private void PerformSuggestionCleanupOperation(SuggestionCleanupOperation operation)
         {
-            string userEnteredText = RichTextBoxElement.GetCurrentText();
-            return ItemSource?.Cast<object>()
-                            .Any(i => LookUpContract?.IsItemMatchingSearchString(this, i, userEnteredText) == true) == true;
+            if ((operation & SuggestionCleanupOperation.ClearSelection) == SuggestionCleanupOperation.ClearSelection)
+            {
+                SuggestionElement.ClearSelection();
+            }
+
+            if ((operation & SuggestionCleanupOperation.ResetIndex) == SuggestionCleanupOperation.ResetIndex)
+            {
+                ResetSelectedIndex();
+            }
+
+            if ((operation & SuggestionCleanupOperation.ResetItemSource) == SuggestionCleanupOperation.ResetItemSource)
+            {
+                ResetSuggestionItemSource();
+            }
         }
-        /// <summary>
-        /// Checks source for item having equivalent value as textToSearch
-        /// </summary>
-        /// <param name="source">source</param>
-        /// <param name="textToSearch">search text</param>
-        /// <returns></returns>
-        private bool HasAnySuggestionWithExactMatch(IEnumerable<object> source, string textToSearch) => source?.Any(i => LookUpContract?.IsItemEqualToString(this, i, textToSearch) == true) == true;
+        private void ResetSelectedIndex()
+        {
+            suggestionIndex = -1;
+            selectionStart = -1;
+        }
+        private void ResetSuggestionItemSource() => SuggestionElement.ItemsSource = ItemSource;
         #endregion
+
+        internal enum SuggestionCleanupOperation
+        {
+            ResetIndex = 1,
+            ClearSelection = 2,
+            ResetItemSource = 4
+        };
     }
 }

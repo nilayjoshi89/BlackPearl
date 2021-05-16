@@ -4,7 +4,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Documents;
 
 using BlackPearl.Controls.Contract;
 
@@ -51,14 +50,12 @@ namespace BlackPearl.Controls.CoreLibrary
 
                 if (richTextBoxElement != null)
                 {
-                    paragraph = new Paragraph() { Style = new Style() };
-                    richTextBoxElement.Document.Blocks.Clear();
-                    richTextBoxElement.Document.Blocks.Add(paragraph);
+                    richTextBoxElement.SetupOrCheckParagraph();
 
                     //Add all selected items
                     foreach (object item in SelectedItems)
                     {
-                        AddItemToUI(item);
+                        richTextBoxElement.AddToParagraph(item, CreateInlineUIElement);
                     }
 
                     richTextBoxElement.TextChanged += RichTextBoxElement_TextChanged;
@@ -162,23 +159,22 @@ namespace BlackPearl.Controls.CoreLibrary
         private static void SelectedItemsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (!(d is MultiSelectCombobox multiChoiceControl
-                && e.NewValue is IList selectedItems && selectedItems != null)
-                || multiChoiceControl.paragraph == null)
+                && e.NewValue is IList selectedItems && selectedItems != null))
             {
                 return;
             }
 
             //Clear everything in RichTextBox
-            multiChoiceControl.paragraph.Inlines.Clear();
+            multiChoiceControl.RichTextBoxElement?.ClearParagraph();
 
             //Add all selected items
             foreach (object item in selectedItems)
             {
-                multiChoiceControl.AddItemToUI(item);
+                multiChoiceControl?.RichTextBoxElement?.AddToParagraph(item, multiChoiceControl.CreateInlineUIElement);
             }
 
             //Notify UI of these changes
-            multiChoiceControl.NotifyPropertyChanged(string.Empty);
+            //multiChoiceControl.NotifyPropertyChanged(string.Empty);
         }
         /// <summary>
         /// When ItemSource property is changed

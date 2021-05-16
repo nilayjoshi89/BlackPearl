@@ -53,7 +53,7 @@
                                          VerticalContentAlignment="Center"
                                          FontSize="{Binding FontSize, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}">
                                 <RichTextBox.Resources>
-                                    <Style TargetType="TextBlock" 
+                                    <Style TargetType="TextBlock"
                                            BasedOn="{StaticResource BlackPearl.MultiselectCombobox.SelectedTextBlockStyle}" />
                                     <Style TargetType="Run"
                                            BasedOn="{StaticResource BlackPearl.MultiselectCombobox.RunStyle}" />
@@ -71,18 +71,20 @@
                                    MaxHeight="300">
                                 <Border BorderBrush="{DynamicResource BlackPearl.MultiSelectCombobox.SelectedItem.ForegroundColor}"
                                         BorderThickness="1">
-                                        <ListBox Name="lstSuggestion"
-                                                 SelectionMode="Multiple"
-                                                 HorizontalContentAlignment="Stretch">
-                                            <ListBox.ItemContainerStyle>
-                                                <!--Setting style to bring item into view when selected-->
-                                                <Style TargetType="ListBoxItem"
-                                                       BasedOn="{StaticResource {x:Type ListBoxItem}}">
-                                                    <Setter Property="behavior:ListBoxItemBehavior.IsBroughtIntoViewWhenSelected"
-                                                            Value="True" />
-                                                </Style>
-                                            </ListBox.ItemContainerStyle>
-                                        </ListBox>
+                                    <ListBox Name="lstSuggestion"
+                                             SelectionMode="Multiple"
+                                             HorizontalContentAlignment="Stretch">
+                                        <ListBox.ItemContainerStyle>
+                                            <!--Setting style to bring item into view when selected-->
+                                            <Style TargetType="ListBoxItem"
+                                                   BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                                                <Setter Property="behavior:ListBoxItemBehavior.IsBroughtIntoViewWhenSelected"
+                                                        Value="True" />
+                                                <Setter Property="Margin"
+                                                        Value=".5" />
+                                            </Style>
+                                        </ListBox.ItemContainerStyle>
+                                    </ListBox>
                                 </Border>
                             </Popup>
                         </Grid>
