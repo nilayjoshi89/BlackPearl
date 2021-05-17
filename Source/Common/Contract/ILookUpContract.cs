@@ -1,8 +1,4 @@
-﻿using System;
-
-using BlackPearl.Controls.Extension;
-
-namespace BlackPearl.Controls.Contract
+﻿namespace BlackPearl.Controls.Contract
 {
     /// <summary>
     /// Look-up contract for custom search behavior
@@ -38,5 +34,5 @@ namespace BlackPearl.Controls.Contract
         /// <returns>newly created object</returns>
         object CreateObject(object sender, string searchString);
     }
-    
+
 }

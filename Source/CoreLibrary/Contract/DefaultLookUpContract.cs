@@ -23,7 +23,7 @@ namespace BlackPearl.Controls.CoreLibrary
 
         public bool IsItemMatchingSearchString(object sender, object item, string searchString)
         {
-            if(string.IsNullOrEmpty(searchString))
+            if (string.IsNullOrEmpty(searchString))
             {
                 return true;
             }

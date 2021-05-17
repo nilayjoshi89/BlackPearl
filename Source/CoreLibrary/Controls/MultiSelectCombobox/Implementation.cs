@@ -13,7 +13,7 @@ namespace BlackPearl.Controls.CoreLibrary
     public sealed partial class MultiSelectCombobox
     {
         #region Members
-        private bool areHandlersRegistered = true;
+        private bool isHandlerRegistered = true;
         private readonly object handlerLock = new object();
         #endregion
 
@@ -131,7 +131,7 @@ namespace BlackPearl.Controls.CoreLibrary
                 }
 
                 //Unsubscribe handlers first
-                if (!UnsubscribeHandlers())
+                if (!UnsubscribeHandler())
                 {
                     //Failed to unsubscribe, return
                     return;
@@ -161,19 +161,53 @@ namespace BlackPearl.Controls.CoreLibrary
             finally
             {
                 //Subscribe back
-                SubsribeHandlers();
+                SubsribeHandler();
             }
         }
         #endregion
 
         #region Methods
+
+        #region event handler helper methods
+        private bool IsSelectionProcessCompleted() => !(Keyboard.IsKeyDown(Key.LeftCtrl)
+                                                        || Keyboard.IsKeyDown(Key.RightCtrl)
+                                                        || Keyboard.IsKeyDown(Key.LeftShift)
+                                                        || Keyboard.IsKeyDown(Key.RightShift));
+        private bool IsSelectionProcessAboutToComplete(Key key) => key == Key.LeftCtrl || key == Key.RightCtrl;
+        public bool IsSelectionProcessInProgress() => Keyboard.Modifiers == ModifierKeys.Control
+                                                        || Keyboard.Modifiers == ModifierKeys.Shift;
+        /// <summary>
+        /// Removes all invalid texts from RichTextBox except selected item
+        /// </summary>
+        private void RemoveInvalidTexts()
+        {
+            try
+            {
+                //Unsubscribe handlers first
+                if (!UnsubscribeHandler())
+                {
+                    //Failed to unsubscribe, return
+                    return;
+                }
+
+                RichTextBoxElement.RemoveRunBlocks();
+            }
+            finally
+            {
+                //Subscribe back
+                SubsribeHandler();
+            }
+        }
+        #endregion
+
+        #region Handler subscribe/unsubscribe
         /// <summary>
         /// Subscribes to events for controls
         /// </summary>
-        private void SubsribeHandlers()
+        private void SubsribeHandler()
         {
             //Check handler registration
-            if (areHandlersRegistered)
+            if (isHandlerRegistered)
             {
                 //if already registered, return
                 return;
@@ -183,14 +217,14 @@ namespace BlackPearl.Controls.CoreLibrary
             lock (handlerLock)
             {
                 //double check registration
-                if (areHandlersRegistered)
+                if (isHandlerRegistered)
                 {
                     //race condition, return
                     return;
                 }
 
                 //set handler flag to true
-                areHandlersRegistered = true;
+                isHandlerRegistered = true;
 
                 //subscribe
                 RichTextBoxElement.TextChanged += RichTextBoxElement_TextChanged;
@@ -199,10 +233,10 @@ namespace BlackPearl.Controls.CoreLibrary
         /// <summary>
         /// Unsubscribes to events for controls
         /// </summary>
-        private bool UnsubscribeHandlers()
+        private bool UnsubscribeHandler()
         {
             //Check handler registration
-            if (!areHandlersRegistered)
+            if (!isHandlerRegistered)
             {
                 //If already unsubscribed, return
                 return false;
@@ -212,14 +246,14 @@ namespace BlackPearl.Controls.CoreLibrary
             lock (handlerLock)
             {
                 //double check registration
-                if (!areHandlersRegistered)
+                if (!isHandlerRegistered)
                 {
                     //race condition, return
                     return false;
                 }
 
                 //set handler registration flag
-                areHandlersRegistered = false;
+                isHandlerRegistered = false;
 
                 //unsubscribe
                 RichTextBoxElement.TextChanged -= RichTextBoxElement_TextChanged;
@@ -227,22 +261,46 @@ namespace BlackPearl.Controls.CoreLibrary
                 return true;
             }
         }
-        private bool UpdateSuggestions(string userEnteredText)
+        #endregion
+
+        #region Selection and Index
+        private void HandleKeyboardUpKeyPress()
         {
-            //Get Items to be shown in suggestion drop-down for current text
-            IEnumerable<object> itemsToAdd = ItemSource?.Cast<object>().GetSuggestions(userEnteredText, LookUpContract, this);
+            if (!HasAnySuggestion())
+            {
+                return;
+            }
 
-            //Add suggestion items to suggestion drop-down
-            SuggestionElement.ItemsSource = itemsToAdd;
+            ShowSuggestions();
 
-            return itemsToAdd?.Any() == true;
+            //If multi-selection
+            if (Keyboard.Modifiers == ModifierKeys.Shift)
+            {
+                SuggestionElement.SelectMultiplePreviousItem();
+                return;
+            }
+
+            SuggestionElement.SelectPreviousItem();
         }
-        /// <summary>
-        /// Shows suggestion drop-down
-        /// </summary>
-        private void ShowSuggestions() => PopupElement.Show(HasAnySuggestion, ResetSelectedIndex);
-        private void HideSuggestions(SuggestionCleanupOperation cleanupOperation) => PopupElement.Hide(null, () => PerformSuggestionCleanupOperation(cleanupOperation));
-        private bool HasAnySuggestion() => SuggestionElement.GetItemSource()?.Any() == true;
+        private void HandleKeyboardDownKeyPress()
+        {
+            if (!HasAnySuggestion())
+            {
+                return;
+            }
+
+            ShowSuggestions();
+
+            //If multi-selection
+            if (Keyboard.Modifiers == ModifierKeys.Shift)
+            {
+                SuggestionElement.SelectMultipleNextItem();
+                return;
+            }
+
+            //Increment selected item index in drop-down
+            SuggestionElement.SelectNextItem();
+        }
         /// <summary>
         /// Tries to set item from entered text in RichTextBox
         /// </summary>
@@ -314,6 +372,89 @@ namespace BlackPearl.Controls.CoreLibrary
             RaiseSelectionChangedEvent(new ArrayList(0), new ArrayList(itemsToAdd));
         }
         /// <summary>
+        /// Tries to set item from suggestion drop-down
+        /// </summary>
+        /// <param name="runTagToRemove"></param>
+        /// <param name="itemObject"></param>
+        private void UpdateSelectedItemsFromSuggestionDropdown()
+        {
+            try
+            {
+                //Unsubscribe handlers first
+                if (!UnsubscribeHandler())
+                {
+                    //Failed to unsubscribe, return
+                    return;
+                }
+
+                //Check if drop down is open or has any item selected
+                if (!PopupElement.IsOpen || SuggestionElement.SelectedItems.Count < 1)
+                {
+                    return;
+                }
+
+                //Remove any user entered text if any
+                RichTextBoxElement.RemoveRunBlocks();
+
+                AddSuggestionsToSelectedItems(SuggestionElement.SelectedItems);
+
+                //Hide drop-down
+                HideSuggestions(SuggestionCleanupOperation.ResetIndex | SuggestionCleanupOperation.ClearSelection | SuggestionCleanupOperation.ResetItemSource);
+            }
+            finally
+            {
+                //Subscribe back
+                SubsribeHandler();
+            }
+
+            RichTextBoxElement.TryFocus();
+        }
+        private void ResetSelectedIndex()
+        {
+            suggestionElement.SetSelectionStart(-1);
+            suggestionElement.SetSelectionEnd(-1);
+        }
+        #endregion
+
+        #region Suggestion related methods
+        /// <summary>
+        /// Shows suggestion drop-down
+        /// </summary>
+        private void ShowSuggestions() => PopupElement.Show(HasAnySuggestion, ResetSelectedIndex);
+        private void HideSuggestions(SuggestionCleanupOperation cleanupOperation) => PopupElement.Hide(null, () => PerformSuggestionCleanupOperation(cleanupOperation));
+        private bool HasAnySuggestion() => SuggestionElement.Items.Count > 0;
+        private void ResetSuggestionItemSource() => SuggestionElement.ItemsSource = ItemSource;
+        private bool UpdateSuggestions(string userEnteredText)
+        {
+            //Get Items to be shown in suggestion drop-down for current text
+            IEnumerable<object> itemsToAdd = ItemSource?.Cast<object>().GetSuggestions(userEnteredText, LookUpContract, this);
+
+            //Add suggestion items to suggestion drop-down
+            SuggestionElement.ItemsSource = itemsToAdd;
+
+            return itemsToAdd?.Any() == true;
+        }
+        private void PerformSuggestionCleanupOperation(SuggestionCleanupOperation operation)
+        {
+            if ((operation & SuggestionCleanupOperation.ClearSelection) == SuggestionCleanupOperation.ClearSelection)
+            {
+                SuggestionElement.ClearSelection();
+            }
+
+            if ((operation & SuggestionCleanupOperation.ResetIndex) == SuggestionCleanupOperation.ResetIndex)
+            {
+                ResetSelectedIndex();
+            }
+
+            if ((operation & SuggestionCleanupOperation.ResetItemSource) == SuggestionCleanupOperation.ResetItemSource)
+            {
+                ResetSuggestionItemSource();
+            }
+        }
+        #endregion
+
+        #region UI Element creation
+        /// <summary>
         /// Create RichTextBox document element for given object
         /// </summary>
         /// <param name="objectToDisplay"></param>
@@ -352,137 +493,7 @@ namespace BlackPearl.Controls.CoreLibrary
             }
             catch { }
         }
-        /// <summary>
-        /// Tries to set item from suggestion drop-down
-        /// </summary>
-        /// <param name="runTagToRemove"></param>
-        /// <param name="itemObject"></param>
-        private void UpdateSelectedItemsFromSuggestionDropdown()
-        {
-            try
-            {
-                //Unsubscribe handlers first
-                if (!UnsubscribeHandlers())
-                {
-                    //Failed to unsubscribe, return
-                    return;
-                }
-
-                //Check if drop down is open or has any item selected
-                if (!PopupElement.IsOpen || SuggestionElement.SelectedItems.Count < 1)
-                {
-                    return;
-                }
-
-                //Remove any user entered text if any
-                RichTextBoxElement.RemoveRunBlocks();
-
-                AddSuggestionsToSelectedItems(SuggestionElement.SelectedItems);
-
-                //Hide drop-down
-                HideSuggestions(SuggestionCleanupOperation.ResetIndex | SuggestionCleanupOperation.ClearSelection | SuggestionCleanupOperation.ResetItemSource);
-            }
-            finally
-            {
-                //Subscribe back
-                SubsribeHandlers();
-            }
-
-            RichTextBoxElement.TryFocus();
-        }
-        /// <summary>
-        /// Removes all invalid texts from RichTextBox except selected item
-        /// </summary>
-        private void RemoveInvalidTexts()
-        {
-            try
-            {
-                //Unsubscribe handlers first
-                if (!UnsubscribeHandlers())
-                {
-                    //Failed to unsubscribe, return
-                    return;
-                }
-
-                RichTextBoxElement.RemoveRunBlocks();
-            }
-            finally
-            {
-                //Subscribe back
-                SubsribeHandlers();
-            }
-        }
-        private void HandleKeyboardUpKeyPress()
-        {
-            if (!HasAnySuggestionToShow())
-            {
-                return;
-            }
-
-            ShowSuggestions();
-
-            //If multi-selection
-            if (Keyboard.Modifiers == ModifierKeys.Shift)
-            {
-                //DoUpwardMultiSelection();
-                SuggestionElement.SelectMultiplePreviousItem();
-                return;
-            }
-
-            //Decrement selected item index in drop-down
-            SuggestionElement.SelectPreviousItem();
-        }
-        private void HandleKeyboardDownKeyPress()
-        {
-            if (!HasAnySuggestionToShow())
-            {
-                return;
-            }
-
-            ShowSuggestions();
-
-            //If multi-selection
-            if (Keyboard.Modifiers == ModifierKeys.Shift)
-            {
-                //DoDownwardMultiSelection();
-                SuggestionElement.SelectMultipleNextItem();
-                return;
-            }
-
-            //Increment selected item index in drop-down
-            SuggestionElement.SelectNextItem();
-        }
-        private bool HasAnySuggestionToShow() => SuggestionElement?.GetItemSource()?.Any() == true;
-        private bool IsSelectionProcessCompleted() => !(Keyboard.IsKeyDown(Key.LeftCtrl)
-                                                        || Keyboard.IsKeyDown(Key.RightCtrl)
-                                                        || Keyboard.IsKeyDown(Key.LeftShift)
-                                                        || Keyboard.IsKeyDown(Key.RightShift));
-        private bool IsSelectionProcessAboutToComplete(Key key) => key == Key.LeftCtrl || key == Key.RightCtrl;
-        public bool IsSelectionProcessInProgress() => Keyboard.Modifiers == ModifierKeys.Control
-                                                        || Keyboard.Modifiers == ModifierKeys.Shift;
-        private void PerformSuggestionCleanupOperation(SuggestionCleanupOperation operation)
-        {
-            if ((operation & SuggestionCleanupOperation.ClearSelection) == SuggestionCleanupOperation.ClearSelection)
-            {
-                SuggestionElement.ClearSelection();
-            }
-
-            if ((operation & SuggestionCleanupOperation.ResetIndex) == SuggestionCleanupOperation.ResetIndex)
-            {
-                ResetSelectedIndex();
-            }
-
-            if ((operation & SuggestionCleanupOperation.ResetItemSource) == SuggestionCleanupOperation.ResetItemSource)
-            {
-                ResetSuggestionItemSource();
-            }
-        }
-        private void ResetSelectedIndex()
-        {
-            suggestionElement.SetSelectionStart(-1);
-            suggestionElement.SetSelectionEnd(-1);
-        }
-        private void ResetSuggestionItemSource() => SuggestionElement.ItemsSource = ItemSource;
+        #endregion
         #endregion
 
         internal enum SuggestionCleanupOperation

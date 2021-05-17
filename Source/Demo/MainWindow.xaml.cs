@@ -1,7 +1,4 @@
-﻿using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
-using MahApps.Metro.Controls;
+﻿using MahApps.Metro.Controls;
 
 namespace BlackPearl.Controls.Demo
 {
