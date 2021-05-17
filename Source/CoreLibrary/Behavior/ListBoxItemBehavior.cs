@@ -48,4 +48,23 @@ namespace BlackPearl.Controls.CoreLibrary.Behavior
             }
         }
     }
+
+    public static class ListBoxAttachedProperties
+    {
+        public static readonly DependencyProperty SelectionStartIndexProperty = DependencyProperty.RegisterAttached(
+            name: "SelectionStartIndex",
+            propertyType: typeof(int),
+            ownerType: typeof(ListBoxItemBehavior),
+            defaultMetadata: new UIPropertyMetadata(-1));
+        public static int GetSelectionStartIndex(ListBox listBox) => (int)listBox.GetValue(SelectionStartIndexProperty);
+        public static void SetSelectionStartIndex(ListBox listBox, int value) => listBox.SetValue(SelectionStartIndexProperty, value);
+
+        public static readonly DependencyProperty SelectionEndIndexProperty = DependencyProperty.RegisterAttached(
+            name: "SelectionEndIndex",
+            propertyType: typeof(int),
+            ownerType: typeof(ListBoxItemBehavior),
+            defaultMetadata: new UIPropertyMetadata(-1));
+        public static int GetSelectionEndIndex(ListBox listBox) => (int)listBox.GetValue(SelectionEndIndexProperty);
+        public static void SetSelectioEndtIndex(ListBox listBox, int value) => listBox.SetValue(SelectionEndIndexProperty, value);
+    }
 }

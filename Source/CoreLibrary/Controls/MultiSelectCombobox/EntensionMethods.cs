@@ -5,9 +5,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
-using System.Windows.Input;
 
 using BlackPearl.Controls.Contract;
+using BlackPearl.Controls.CoreLibrary.Behavior;
 
 namespace BlackPearl.Controls.CoreLibrary
 {
@@ -16,24 +16,127 @@ namespace BlackPearl.Controls.CoreLibrary
         #region ListBox
         public static void ClearSelection(this ListBox suggestionList, Func<bool> precondition = null)
         {
-            if(precondition != null
+            if (precondition != null
                 && !precondition())
             {
                 return;
             }
 
-            //if (Keyboard.IsKeyDown(Key.LeftCtrl)
-            //               || Keyboard.IsKeyDown(Key.RightCtrl)
-            //               || Keyboard.IsKeyDown(Key.LeftShift)
-            //               || Keyboard.IsKeyDown(Key.RightShift))
-            //{
-            //    return;
-            //}
-
             suggestionList?.SelectedItems?.Clear();
         }
-        //public static void ClearSelection(this ListBox suggestionList) => suggestionList?.SelectedItems?.Clear();
         public static IEnumerable<object> GetItemSource(this ListBox suggestionList) => suggestionList?.ItemsSource?.Cast<object>();
+        public static void SelectNextItem(this ListBox suggestionList) => suggestionList.SingleItemSelection(1);
+        public static void SelectPreviousItem(this ListBox suggestionList) => suggestionList.SingleItemSelection(-1);
+        public static void SelectMultipleNextItem(this ListBox suggestionList) => suggestionList.SelectMultipleItem(1);
+        public static void SelectMultiplePreviousItem(this ListBox suggestionList) => suggestionList.SelectMultipleItem(-1);
+        public static int GetSelectionStart(this ListBox suggestionList)
+        {
+            if (suggestionList == null)
+            {
+                return -1;
+            }
+
+            return ListBoxAttachedProperties.GetSelectionStartIndex(suggestionList);
+        }
+        public static void SetSelectionStart(this ListBox suggestionList, int index)
+        {
+            if (suggestionList == null)
+            {
+                return;
+            }
+
+            ListBoxAttachedProperties.SetSelectionStartIndex(suggestionList, index);
+        }
+        public static int GetSelectionEnd(this ListBox suggestionList)
+        {
+            if (suggestionList == null)
+            {
+                return -1;
+            }
+
+            return ListBoxAttachedProperties.GetSelectionEndIndex(suggestionList);
+        }
+        public static void SetSelectionEnd(this ListBox suggestionList, int index)
+        {
+            if (suggestionList == null)
+            {
+                return;
+            }
+
+            ListBoxAttachedProperties.SetSelectioEndtIndex(suggestionList, index);
+        }
+
+        private static void SingleItemSelection(this ListBox suggestionList, int delta)
+        {
+            if (suggestionList == null
+                || (suggestionList.SelectedIndex + delta) < 0)
+            {
+                return;
+            }
+
+            suggestionList.SelectedIndex += delta;
+
+            suggestionList.SetSelectionStart(-1);
+            suggestionList.SetSelectionEnd(-1);
+        }
+        private static void SelectMultipleItem(this ListBox suggestionList, int delta)
+        {
+            if (suggestionList == null)
+            {
+                return;
+            }
+
+            ItemCollection suggestionItemSource = suggestionList.Items;
+            int selectionStart = suggestionList.GetSelectionStart();
+            int selectionEnd = suggestionList.GetSelectionEnd();
+            int totalItemsCount = suggestionItemSource.Count;
+
+            //If its first time - Start of selection
+            if (selectionStart == -1 || selectionEnd == -1)
+            {
+                selectionStart = suggestionList.SelectedIndex;
+                selectionEnd = suggestionList.SelectedIndex + delta;
+                selectionEnd = (selectionEnd < 0)
+                                ? 0
+                                : (selectionEnd >= totalItemsCount)
+                                ? totalItemsCount - 1
+                                : selectionEnd;
+
+                suggestionList.SetSelectionStart(selectionStart);
+                suggestionList.SetSelectionEnd(selectionEnd);
+
+                //Add current item to selected items list
+                suggestionList.SelectedItems.Add(suggestionItemSource[selectionEnd]);
+                return;
+            }
+
+
+            int newIndex = selectionEnd + delta;
+            newIndex = (newIndex < 0)
+                               ? 0
+                               : (newIndex >= totalItemsCount)
+                               ? totalItemsCount - 1
+                               : newIndex;
+
+            //If its boundary, return
+            if (selectionEnd == newIndex)
+            {
+                return;
+            }
+
+            //If selection is shrinking then remove previous selected element
+            if ((selectionStart > selectionEnd && newIndex > selectionEnd)
+                || (selectionStart < selectionEnd && newIndex < selectionEnd))
+            {
+                suggestionList.SelectedItems.Remove(suggestionItemSource[selectionEnd]);
+                suggestionList.SetSelectionEnd(newIndex);
+                return;
+            }
+
+            //Otherwise, selection is growing, add current element to selected items list
+            suggestionList.SetSelectionEnd(newIndex);
+            suggestionList.SelectedItems.Add(suggestionItemSource[newIndex]);
+        }
         #endregion
 
         #region RichTextBox
