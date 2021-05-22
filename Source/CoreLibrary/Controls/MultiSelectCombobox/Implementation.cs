@@ -8,6 +8,8 @@ using System.Windows.Input;
 
 using BlackPearl.Controls.Extension;
 
+using EM = BlackPearl.Controls.CoreLibrary.EntensionMethods;
+
 namespace BlackPearl.Controls.CoreLibrary
 {
     public sealed partial class MultiSelectCombobox
@@ -24,15 +26,7 @@ namespace BlackPearl.Controls.CoreLibrary
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void SuggestionElement_PreviewKeyUp(object sender, KeyEventArgs e)
-        {
-            if (!IsSelectionProcessAboutToComplete(e.Key))
-            {
-                return;
-            }
-
-            UpdateSelectedItemsFromSuggestionDropdown();
-        }
+        private void SuggestionElement_PreviewKeyUp(object sender, KeyEventArgs e) => UpdateSelectedItemIfSelectionIsDone(e.Key);
         private void SuggestionDropdown_PreviewMouseDown(object sender, MouseButtonEventArgs e) => SuggestionElement.ClearSelection(IsSelectionProcessCompleted);
         /// <summary>
         /// Suggestion drop down - mouse key up
@@ -40,16 +34,7 @@ namespace BlackPearl.Controls.CoreLibrary
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void SuggestionDropdown_PreviewMouseUp(object sender, MouseButtonEventArgs e)
-        {
-            if ((SuggestionElement?.SelectedItems?.Count ?? 0) == 0
-                || IsSelectionProcessInProgress())
-            {
-                return;
-            }
-
-            UpdateSelectedItemsFromSuggestionDropdown();
-        }
+        private void SuggestionDropdown_PreviewMouseUp(object sender, MouseButtonEventArgs e) => UpdateSelectedItemIfSelectionIsDone();
         private void MultiSelectCombobox_LostFocus(object sender, RoutedEventArgs e)
         {
             try
@@ -64,7 +49,7 @@ namespace BlackPearl.Controls.CoreLibrary
                 RemoveInvalidTexts();
 
                 //Hide drop-down
-                HideSuggestions(SuggestionCleanupOperation.ResetIndex | SuggestionCleanupOperation.ClearSelection);
+                HideSuggestions(EM.SuggestionCleanupOperation.ResetIndex | EM.SuggestionCleanupOperation.ClearSelection);
             }
             catch { }
         }
@@ -74,7 +59,7 @@ namespace BlackPearl.Controls.CoreLibrary
             {
                 //User can remove paragraph reference by 'Select all & delete' in RichTextBox
                 //Following method call with make sure local paragraph remains part of RichTextBox
-                RichTextBoxElement.SetupOrCheckParagraph();
+                RichTextBoxElement.SetParagraphAsFirstBlock();
 
                 switch (e.Key)
                 {
@@ -99,7 +84,7 @@ namespace BlackPearl.Controls.CoreLibrary
                     case Key.Escape:
                         {
                             e.Handled = true;
-                            HideSuggestions(SuggestionCleanupOperation.ResetIndex | SuggestionCleanupOperation.ClearSelection);
+                            HideSuggestions(EM.SuggestionCleanupOperation.ResetIndex | EM.SuggestionCleanupOperation.ClearSelection);
                             RichTextBoxElement.TryFocus();
                         }
                         break;
@@ -115,35 +100,23 @@ namespace BlackPearl.Controls.CoreLibrary
             {
                 //All text entered in Control goes to Run element of RichTextBox
                 string userEnteredText = RichTextBoxElement.GetCurrentText();
-
-                if (string.IsNullOrEmpty(userEnteredText)
-                    || !userEnteredText.EndsWith(ItemSeparator.ToString()))
+                if (!IsEndOfTextDetected(userEnteredText))
                 {
-                    bool hasAnySuggestionToShow = UpdateSuggestions(userEnteredText);
-                    if (hasAnySuggestionToShow)
-                    {
-                        ShowSuggestions();
-                        return;
-                    }
-
-                    HideSuggestions(SuggestionCleanupOperation.ResetIndex | SuggestionCleanupOperation.ClearSelection);
+                    UpdateSuggestionAndShowHideDropDown(userEnteredText);
                     return;
                 }
 
-                //Unsubscribe handlers first
                 if (!UnsubscribeHandler())
                 {
-                    //Failed to unsubscribe, return
                     return;
                 }
 
                 //Hide suggestion drop-down
                 //Reset suggestion drop down list
-                HideSuggestions(SuggestionCleanupOperation.ResetIndex | SuggestionCleanupOperation.ResetItemSource);
+                HideSuggestions(EM.SuggestionCleanupOperation.ResetIndex | EM.SuggestionCleanupOperation.ResetItemSource);
 
                 //User is expecting to complete item selection
-                //Check if current text is blank + separator
-                if (string.IsNullOrWhiteSpace(userEnteredText.Trim(ItemSeparator)))
+                if (IsBlankTextWithItemSeparator(userEnteredText))
                 {
                     //there's nothing to select
                     //set current text to empty
@@ -154,7 +127,6 @@ namespace BlackPearl.Controls.CoreLibrary
                 //User has entered valid text + separator
                 RichTextBoxElement.RemoveRunBlocks();
                 //Try select item from source based on current entered text
-                //Set force-add to true as user is confident about selected text
                 UpdateSelectedItemsFromEnteredText(userEnteredText);
             }
             catch { }
@@ -169,13 +141,40 @@ namespace BlackPearl.Controls.CoreLibrary
         #region Methods
 
         #region event handler helper methods
-        private bool IsSelectionProcessCompleted() => !(Keyboard.IsKeyDown(Key.LeftCtrl)
-                                                        || Keyboard.IsKeyDown(Key.RightCtrl)
-                                                        || Keyboard.IsKeyDown(Key.LeftShift)
-                                                        || Keyboard.IsKeyDown(Key.RightShift));
-        private bool IsSelectionProcessAboutToComplete(Key key) => key == Key.LeftCtrl || key == Key.RightCtrl;
-        public bool IsSelectionProcessInProgress() => Keyboard.Modifiers == ModifierKeys.Control
-                                                        || Keyboard.Modifiers == ModifierKeys.Shift;
+        private bool IsBlankTextWithItemSeparator(string userEnteredText) => string.IsNullOrWhiteSpace(userEnteredText.Trim(ItemSeparator));
+        private bool IsEndOfTextDetected(string userEnteredText) => !string.IsNullOrEmpty(userEnteredText) && userEnteredText.EndsWith(ItemSeparator.ToString());
+        private void UpdateSuggestionAndShowHideDropDown(string userEnteredText)
+        {
+            bool hasAnySuggestionToShow = UpdateSuggestions(userEnteredText);
+            if (hasAnySuggestionToShow)
+            {
+                ShowSuggestions();
+                return;
+            }
+
+            HideSuggestions(EM.SuggestionCleanupOperation.ResetIndex | EM.SuggestionCleanupOperation.ClearSelection);
+            return;
+        }
+        private void UpdateSelectedItemIfSelectionIsDone(Key? key = null)
+        {
+            if (IsSelectionProcessInProgress(key))
+            {
+                return;
+            }
+
+            UpdateSelectedItemsFromSuggestionDropdown();
+        }
+        private bool IsSelectionProcessCompleted() => !IsSelectionProcessInProgress();
+        private bool IsSelectionProcessInProgress(Key? keyUp = null)
+        {
+            if (!keyUp.HasValue)
+            {
+                return Keyboard.Modifiers == ModifierKeys.Control
+                        || Keyboard.Modifiers == ModifierKeys.Shift;
+            }
+
+            return keyUp != Key.LeftCtrl && keyUp != Key.RightCtrl;
+        }
         /// <summary>
         /// Removes all invalid texts from RichTextBox except selected item
         /// </summary>
@@ -310,37 +309,12 @@ namespace BlackPearl.Controls.CoreLibrary
         {
             itemString = itemString.Trim(ItemSeparator, ' ');
 
-            //Default LookUpContract implementation does not support item creation
-
-            //If LookUpContract does not supports creation of new item
-            //And Entered text does not have any valid suggestion
-
-            IEnumerable<object> controlItemSource = ItemSource?.Cast<object>();
-
-            if ((LookUpContract?.SupportsNewObjectCreation != true)
-                && !controlItemSource.HasAnyExactMatch(itemString, LookUpContract, this))
+            if (IsItemAlreadySelected(itemString))
             {
-                //Not a valid item, return
                 return;
             }
 
-            //item text is a valid in ItemSource or can be created using LookUpContract
-            //Check if item is already selected or not
-            if (SelectedItems?.Cast<object>().HasAnyExactMatch(itemString, LookUpContract, this) != false)
-            {
-                //already selected, return
-                return;
-            }
-
-            //Try to get item from source based on itemString
-            object itemToAdd = controlItemSource.GetExactMatch(itemString, LookUpContract, this);
-
-            if (itemToAdd == null && LookUpContract?.SupportsNewObjectCreation == true)
-            {
-                //If item is not found in ItemSource look-up and LookUpContract supports creation of new item
-                itemToAdd = LookUpContract.CreateObject(this, itemString);
-            }
-
+            object itemToAdd = GetItemToAdd(itemString);
             //If item is not available
             if (itemToAdd == null)
             {
@@ -349,6 +323,19 @@ namespace BlackPearl.Controls.CoreLibrary
 
             AddToSelectedItems(itemToAdd);
             RaiseSelectionChangedEvent(new ArrayList(0), new[] { itemToAdd });
+        }
+        private bool IsItemAlreadySelected(string itemString) => SelectedItems?.Cast<object>()?.HasAnyExactMatch(itemString, LookUpContract, this) == true;
+        private object GetItemToAdd(string itemString)
+        {
+            IEnumerable<object> controlItemSource = ItemSource?.Cast<object>();
+
+            bool hasAnyMatch = controlItemSource.HasAnyExactMatch(itemString, LookUpContract, this);
+            object itemToAdd = hasAnyMatch  //Check if any match
+                                ? controlItemSource.GetExactMatch(itemString, LookUpContract, this) //Exact match is found
+                                : (LookUpContract?.SupportsNewObjectCreation == true)   //Check if new object creation is supported by LookUpContract
+                                    ? LookUpContract.CreateObject(this, itemString)     //Create new object using LookUpContract
+                                    : null;                                             //cant create new item. return
+            return itemToAdd;
         }
         private void AddToSelectedItems(object itemToAdd)
         {
@@ -399,7 +386,7 @@ namespace BlackPearl.Controls.CoreLibrary
                 AddSuggestionsToSelectedItems(SuggestionElement.SelectedItems);
 
                 //Hide drop-down
-                HideSuggestions(SuggestionCleanupOperation.ResetIndex | SuggestionCleanupOperation.ClearSelection | SuggestionCleanupOperation.ResetItemSource);
+                HideSuggestions(EM.SuggestionCleanupOperation.ResetIndex | EM.SuggestionCleanupOperation.ClearSelection | EM.SuggestionCleanupOperation.ResetItemSource);
             }
             finally
             {
@@ -409,21 +396,15 @@ namespace BlackPearl.Controls.CoreLibrary
 
             RichTextBoxElement.TryFocus();
         }
-        private void ResetSelectedIndex()
-        {
-            suggestionElement.SetSelectionStart(-1);
-            suggestionElement.SetSelectionEnd(-1);
-        }
         #endregion
 
         #region Suggestion related methods
         /// <summary>
         /// Shows suggestion drop-down
         /// </summary>
-        private void ShowSuggestions() => PopupElement.Show(HasAnySuggestion, ResetSelectedIndex);
-        private void HideSuggestions(SuggestionCleanupOperation cleanupOperation) => PopupElement.Hide(null, () => PerformSuggestionCleanupOperation(cleanupOperation));
+        private void ShowSuggestions() => PopupElement.Show(HasAnySuggestion, () => SuggestionElement.CleanOperation(EM.SuggestionCleanupOperation.ResetIndex, ItemSource));
+        private void HideSuggestions(EM.SuggestionCleanupOperation cleanupOperation) => PopupElement.Hide(null, () => SuggestionElement.CleanOperation(cleanupOperation, ItemSource));
         private bool HasAnySuggestion() => SuggestionElement.Items.Count > 0;
-        private void ResetSuggestionItemSource() => SuggestionElement.ItemsSource = ItemSource;
         private bool UpdateSuggestions(string userEnteredText)
         {
             //Get Items to be shown in suggestion drop-down for current text
@@ -433,23 +414,6 @@ namespace BlackPearl.Controls.CoreLibrary
             SuggestionElement.ItemsSource = itemsToAdd;
 
             return itemsToAdd?.Any() == true;
-        }
-        private void PerformSuggestionCleanupOperation(SuggestionCleanupOperation operation)
-        {
-            if ((operation & SuggestionCleanupOperation.ClearSelection) == SuggestionCleanupOperation.ClearSelection)
-            {
-                SuggestionElement.ClearSelection();
-            }
-
-            if ((operation & SuggestionCleanupOperation.ResetIndex) == SuggestionCleanupOperation.ResetIndex)
-            {
-                ResetSelectedIndex();
-            }
-
-            if ((operation & SuggestionCleanupOperation.ResetItemSource) == SuggestionCleanupOperation.ResetItemSource)
-            {
-                ResetSuggestionItemSource();
-            }
         }
         #endregion
 
@@ -495,12 +459,5 @@ namespace BlackPearl.Controls.CoreLibrary
         }
         #endregion
         #endregion
-
-        internal enum SuggestionCleanupOperation
-        {
-            ResetIndex = 1,
-            ClearSelection = 2,
-            ResetItemSource = 4
-        };
     }
 }

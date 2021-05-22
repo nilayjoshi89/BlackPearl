@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -64,6 +65,24 @@ namespace BlackPearl.Controls.CoreLibrary
             }
 
             ListBoxAttachedProperties.SetSelectioEndtIndex(suggestionList, index);
+        }
+        public static void CleanOperation(this ListBox suggestionList, SuggestionCleanupOperation operation, IEnumerable goldenItemSource)
+        {
+            if ((operation & SuggestionCleanupOperation.ClearSelection) == SuggestionCleanupOperation.ClearSelection)
+            {
+                suggestionList.ClearSelection();
+            }
+
+            if ((operation & SuggestionCleanupOperation.ResetIndex) == SuggestionCleanupOperation.ResetIndex)
+            {
+                suggestionList.SetSelectionStart(-1);
+                suggestionList.SetSelectionEnd(-1);
+            }
+
+            if ((operation & SuggestionCleanupOperation.ResetItemSource) == SuggestionCleanupOperation.ResetItemSource)
+            {
+                suggestionList.ItemsSource = goldenItemSource;
+            }
         }
 
         private static void SingleItemSelection(this ListBox suggestionList, int delta)
@@ -137,6 +156,13 @@ namespace BlackPearl.Controls.CoreLibrary
             suggestionList.SetSelectionEnd(newIndex);
             suggestionList.SelectedItems.Add(suggestionItemSource[newIndex]);
         }
+
+        internal enum SuggestionCleanupOperation
+        {
+            ResetIndex = 1,
+            ClearSelection = 2,
+            ResetItemSource = 4
+        };
         #endregion
 
         #region RichTextBox
@@ -181,7 +207,7 @@ namespace BlackPearl.Controls.CoreLibrary
             }
             catch { }
         }
-        public static void SetupOrCheckParagraph(this RichTextBox richTextBox)
+        public static void SetParagraphAsFirstBlock(this RichTextBox richTextBox)
         {
             try
             {

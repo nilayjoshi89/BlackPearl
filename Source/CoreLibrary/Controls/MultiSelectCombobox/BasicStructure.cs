@@ -50,7 +50,7 @@ namespace BlackPearl.Controls.CoreLibrary
 
                 if (richTextBoxElement != null)
                 {
-                    richTextBoxElement.SetupOrCheckParagraph();
+                    richTextBoxElement.SetParagraphAsFirstBlock();
 
                     //Add all selected items
                     foreach (object item in SelectedItems)
