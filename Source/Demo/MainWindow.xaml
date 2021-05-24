@@ -69,6 +69,8 @@
                                FontWeight="Bold" />
                     <TextBlock Text="LookUpContract = AdvanceLookUpContract"
                                FontWeight="Bold" />
+                    <TextBlock Text="Create InputFormat= {Name} , {Company} , {ZipCode};"
+                               FontWeight="Bold" />
                 </StackPanel>
                 <controls:MultiSelectCombobox ItemSource="{Binding Source, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                               SelectedItems="{Binding SelectedItems2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
