@@ -3,7 +3,9 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Input;
-using BlackPearl.Controls.Library;
+
+using BlackPearl.Controls.Contract;
+
 using Prism.Commands;
 using Prism.Mvvm;
 
@@ -23,12 +25,12 @@ namespace BlackPearl.Controls.Demo
         public List<Person> SelectedItems { get; set; }
         public List<Person> SelectedItems2 { get; set; }
         public ICommand ShowSelectedItemCommand { get; set; }
-        public MultiSelectCombobox.ILookUpContract AdvanceLookUpContract { get; }
+        public ILookUpContract AdvanceLookUpContract { get; }
         private void ShowSelectedItemCommandAction(IList<Person> data)
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            var stringBuilder = new StringBuilder();
 
-            foreach (var p in data)
+            foreach (Person p in data)
             {
                 stringBuilder.AppendLine(p.Name);
             }
