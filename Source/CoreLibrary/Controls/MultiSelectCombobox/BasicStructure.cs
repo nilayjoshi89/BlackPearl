@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,7 +11,7 @@ namespace BlackPearl.Controls.CoreLibrary
     [TemplatePart(Name = "rtxt", Type = typeof(RichTextBox))]
     [TemplatePart(Name = "popup", Type = typeof(Popup))]
     [TemplatePart(Name = "lstSuggestion", Type = typeof(ListBox))]
-    public sealed partial class MultiSelectCombobox : Control, INotifyPropertyChanged
+    public sealed partial class MultiSelectCombobox : Control
     {
         #region Constructor
         static MultiSelectCombobox()
@@ -172,9 +171,6 @@ namespace BlackPearl.Controls.CoreLibrary
             {
                 multiChoiceControl?.RichTextBoxElement?.AddToParagraph(item, multiChoiceControl.CreateInlineUIElement);
             }
-
-            //Notify UI of these changes
-            //multiChoiceControl.NotifyPropertyChanged(string.Empty);
         }
         /// <summary>
         /// When ItemSource property is changed
@@ -230,11 +226,6 @@ namespace BlackPearl.Controls.CoreLibrary
         /// <param name="removedItems">removed items</param>
         /// <param name="addedItems">added items</param>
         private void RaiseSelectionChangedEvent(IList removedItems, IList addedItems) => RaiseEvent(new SelectionChangedEventArgs(SelectionChangedEvent, removedItems, addedItems));
-        #endregion
-
-        #region INotifyPropertyChanged implementation
-        private void NotifyPropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        public event PropertyChangedEventHandler PropertyChanged;
         #endregion
     }
 }
