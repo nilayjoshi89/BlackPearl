@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package>
   <metadata>
-    <id>BlackPearl.Controls.CoreLibrary</id>
+    <id>BlackPearl.Controls.Library</id>
     <version>2.0.0.0</version>
     <title>WPF control library</title>
     <authors>nilayjoshi89@gmail.com</authors>
