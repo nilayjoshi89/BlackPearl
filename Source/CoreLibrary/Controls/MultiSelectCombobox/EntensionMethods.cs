@@ -125,7 +125,7 @@ namespace BlackPearl.Controls.CoreLibrary
                 suggestionList.SetSelectionEnd(selectionEnd);
 
                 //Add current item to selected items list
-                suggestionList.SelectedItems.Add(suggestionItemSource[selectionEnd]);
+                suggestionList.SelectedItems?.Add(suggestionItemSource[selectionEnd]);
                 return;
             }
 
@@ -147,14 +147,14 @@ namespace BlackPearl.Controls.CoreLibrary
             if ((selectionStart > selectionEnd && newIndex > selectionEnd)
                 || (selectionStart < selectionEnd && newIndex < selectionEnd))
             {
-                suggestionList.SelectedItems.Remove(suggestionItemSource[selectionEnd]);
+                suggestionList.SelectedItems?.Remove(suggestionItemSource[selectionEnd]);
                 suggestionList.SetSelectionEnd(newIndex);
                 return;
             }
 
             //Otherwise, selection is growing, add current element to selected items list
             suggestionList.SetSelectionEnd(newIndex);
-            suggestionList.SelectedItems.Add(suggestionItemSource[newIndex]);
+            suggestionList.SelectedItems?.Add(suggestionItemSource[newIndex]);
         }
 
         internal enum SuggestionCleanupOperation
