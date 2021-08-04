@@ -51,10 +51,13 @@ namespace BlackPearl.Controls.CoreLibrary
                 {
                     richTextBoxElement.SetParagraphAsFirstBlock();
 
-                    //Add all selected items
-                    foreach (object item in SelectedItems)
+                    if (SelectedItems != null)
                     {
-                        richTextBoxElement.AddToParagraph(item, CreateInlineUIElement);
+                        //Add all selected items
+                        foreach (object item in SelectedItems)
+                        {
+                            richTextBoxElement.AddToParagraph(item, CreateInlineUIElement);
+                        }
                     }
 
                     richTextBoxElement.TextChanged += RichTextBoxElement_TextChanged;
