@@ -3,6 +3,7 @@
 [![NuGet BlackPearl](https://img.shields.io/nuget/v/BlackPearl.Controls.Library.svg?label=NuGet%20BlackPearl.Controls.Library)](https://www.nuget.org/packages/BlackPearl.Controls.Library/)
 [![NuGet BlackPearl](https://img.shields.io/nuget/dt/BlackPearl.Controls.Library.svg?style=flat-square)](https://www.nuget.org/packages/BlackPearl.Controls.Library/)
 ![GitHub](https://img.shields.io/github/license/nilayjoshi89/BlackPearl)
+[![Gitter](https://badges.gitter.im/BlackPearl-WPF-Control-Library/community.svg)](https://gitter.im/BlackPearl-WPF-Control-Library/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 ***
 
 # About repository
