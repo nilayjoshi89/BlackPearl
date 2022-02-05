@@ -249,7 +249,11 @@ namespace BlackPearl.Controls.CoreLibrary
             }
             catch { }
         }
-        public static void ClearParagraph(this RichTextBox richTextBox) => richTextBox?.GetParagraph()?.Inlines?.Clear();
+        public static void ClearParagraph(this RichTextBox richTextBox)
+        {
+            richTextBox?.GetParagraph()?.Inlines?.Clear();
+            richTextBox?.SetParagraphAsFirstBlock();
+        }
 
         private static Run GetCurrentRunBlock(this RichTextBox richTextBox) => richTextBox?.CaretPosition?.Parent as Run;
         private static Paragraph GetParagraph(this RichTextBox richTextBox) => richTextBox?.Document?.Blocks?.FirstBlock as Paragraph;

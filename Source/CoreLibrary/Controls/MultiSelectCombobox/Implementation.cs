@@ -234,6 +234,11 @@ namespace BlackPearl.Controls.CoreLibrary
         /// </summary>
         private bool UnsubscribeHandler()
         {
+            if (RichTextBoxElement == null)
+            {
+                return true;
+            }
+
             //Check handler registration
             if (!isHandlerRegistered)
             {

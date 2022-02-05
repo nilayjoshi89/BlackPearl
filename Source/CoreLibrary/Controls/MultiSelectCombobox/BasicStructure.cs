@@ -166,13 +166,27 @@ namespace BlackPearl.Controls.CoreLibrary
                 return;
             }
 
-            //Clear everything in RichTextBox
-            multiChoiceControl.RichTextBoxElement?.ClearParagraph();
-
-            //Add all selected items
-            foreach (object item in selectedItems)
+            try
             {
-                multiChoiceControl?.RichTextBoxElement?.AddToParagraph(item, multiChoiceControl.CreateInlineUIElement);
+                //Unsubscribe handlers first
+                if (!multiChoiceControl.UnsubscribeHandler())
+                {
+                    //Failed to unsubscribe, return
+                    return;
+                }
+
+                //Clear everything in RichTextBox
+                multiChoiceControl.RichTextBoxElement?.ClearParagraph();
+
+                //Add all selected items
+                foreach (object item in selectedItems)
+                {
+                    multiChoiceControl?.RichTextBoxElement?.AddToParagraph(item, multiChoiceControl.CreateInlineUIElement);
+                }
+            }
+            finally
+            {
+                multiChoiceControl.SubsribeHandler();
             }
         }
         /// <summary>
