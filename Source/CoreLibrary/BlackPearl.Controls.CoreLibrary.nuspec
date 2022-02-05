@@ -2,12 +2,12 @@
 <package>
   <metadata>
     <id>BlackPearl.Controls.Library</id>
-    <version>2.0.1.0</version>
+    <version>2.0.2.0</version>
     <title>WPF control library</title>
     <authors>nilayjoshi89@gmail.com</authors>
     <owners>nilayjoshi89@gmail.com</owners>
     <description>WPF control library</description>
-    <releaseNotes>Release notes</releaseNotes>
+    <releaseNotes>Minor bug fix.</releaseNotes>
     <copyright>Copyright 2021</copyright>
     <tags>WPF MultiSelectCombobox ComboBox MultiSelectDropDown</tags>
 
