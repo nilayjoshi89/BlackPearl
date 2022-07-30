@@ -33,13 +33,7 @@ steps:
 
 - task: NuGetCommand@2
   inputs:
-    command: 'pack'
-    packagesToPack: '**/BlackPearl.Controls.CoreLibrary.nuspec'
-    versioningScheme: 'off'
-
-- task: NuGetCommand@2
-  inputs:
     command: 'push'
-    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
+    packagesToPush: '$**/*.nupkg'
     nuGetFeedType: 'external'
     publishFeedCredentials: 'NuGet_Publish'
