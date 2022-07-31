@@ -43,6 +43,7 @@ namespace BlackPearl.Controls.CoreLibrary
                 if (richTextBoxElement != null)
                 {
                     richTextBoxElement.TextChanged -= RichTextBoxElement_TextChanged;
+                    DataObject.RemovePastingHandler(richTextBoxElement, PasteHandler);
                 }
 
                 richTextBoxElement = value;
@@ -61,6 +62,7 @@ namespace BlackPearl.Controls.CoreLibrary
                     }
 
                     richTextBoxElement.TextChanged += RichTextBoxElement_TextChanged;
+                    DataObject.AddPastingHandler(richTextBoxElement, PasteHandler);
                 }
             }
         }

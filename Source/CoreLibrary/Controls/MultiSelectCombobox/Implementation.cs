@@ -20,6 +20,59 @@ namespace BlackPearl.Controls.CoreLibrary
         #endregion
 
         #region Control Event Handlers
+
+        private void PasteHandler(object sender, DataObjectPastingEventArgs e)
+        {
+            try
+            {
+                string clipboard = GetClipboardTextWithCommandCancelled(e);
+
+                if (string.IsNullOrWhiteSpace(clipboard))
+                    return;
+
+                if (!UnsubscribeHandler())
+                {
+                    return;
+                }
+
+                //User can remove paragraph reference by 'Select all & delete' in RichTextBox
+                //Following method call with make sure local paragraph remains part of RichTextBox
+                RichTextBoxElement.SetParagraphAsFirstBlock();
+
+                //Single item paste
+                if (!clipboard.Contains(ItemSeparator))
+                {
+                    richTextBoxElement.AddToParagraph(clipboard, CreateRunElement);
+                    return;
+                }
+
+                //User has entered valid text + separator
+                RichTextBoxElement.RemoveRunBlocks();
+
+                int i;
+                string[] multipleTexts = clipboard.Split(ItemSeparator);
+                for (i = 0; i < multipleTexts.Length - 1; i++)
+                {
+                    if (string.IsNullOrWhiteSpace(multipleTexts[i]))
+                        continue;
+
+                    //Try select item from source based on current entered text
+                    UpdateSelectedItemsFromEnteredText(multipleTexts[i]);
+                }
+
+                if (!string.IsNullOrWhiteSpace(multipleTexts[i]))
+                {
+                    richTextBoxElement.AddToParagraph(multipleTexts[i], CreateRunElement);
+                }
+            }
+            catch { }
+            finally
+            {
+                //Subscribe back
+                SubsribeHandler();
+            }
+        }
+
         /// <summary>
         /// Suggestion drop down - key board key up
         /// Forces control to update selected item based on selection in suggestion drop down
@@ -196,6 +249,16 @@ namespace BlackPearl.Controls.CoreLibrary
                 //Subscribe back
                 SubsribeHandler();
             }
+        }
+        private static string GetClipboardTextWithCommandCancelled(DataObjectPastingEventArgs e)
+        {
+            string clipboard = e?.DataObject?.GetData(typeof(string)) as string;
+            clipboard = clipboard?.Replace("\r", "")
+                                    ?.Replace("\t", "")
+                                    ?.Replace("\n", "");
+            e.CancelCommand();
+            e.Handled = true;
+            return clipboard;
         }
         #endregion
 
@@ -441,6 +504,37 @@ namespace BlackPearl.Controls.CoreLibrary
             tb.Unloaded += Tb_Unloaded;
             return new InlineUIContainer(tb);
         }
+
+        /// <summary>
+        /// Create RichTextBox document element for given object
+        /// </summary>
+        /// <param name="objectToDisplay"></param>
+        /// <returns></returns>
+        private Inline CreateRunElement(object text)
+        {
+            var runElement = richTextBoxElement.GetCurrentRunBlock();
+
+            if (runElement == null)
+            {
+                runElement = richTextBoxElement.GetParagraph().Inlines.LastOrDefault(i => i is Run) as Run;
+            }
+
+            if (runElement != null)
+            {
+                runElement.Text = text.ToString();
+                return runElement;
+            }
+
+            var re = new Run()
+            {
+                Text = text?.ToString(),
+                Language = System.Windows.Markup.XmlLanguage.GetLanguage(System.Globalization.CultureInfo.CurrentCulture.IetfLanguageTag)
+            };
+
+            return re;
+        }
+
+
         /// <summary>
         /// Event to handle scenario where User removes selected item from UI
         /// </summary>
