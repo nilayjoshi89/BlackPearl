@@ -1,3 +1,31 @@
+### Version 2.0.3
+
+**Release type:** Bug fix release
+
+**Release Notes:** This release contains bug fixes. Please refer to issues list for detail.
+
+**Issues/Enhancements:**
+* [Popup placement issue](https://github.com/nilayjoshi89/BlackPearl/issues/22)
+* [Copy/Paste issue](https://github.com/nilayjoshi89/BlackPearl/issues/23)
+
+### Version 2.0.2
+
+**Release type:** Bug fix release
+
+**Release Notes:** This release contains bug fixes. Please refer to issues list for detail.
+
+**Issues/Enhancements:**
+* [Setting SelectedItems after load changes Popup visibility](https://github.com/nilayjoshi89/BlackPearl/issues/20)
+
+### Version 2.0.1
+
+**Release type:** Bug fix release
+
+**Release Notes:** This release contains bug fixes. Please refer to issues list for detail.
+
+**Issues/Enhancements:**
+* [NullRefException if selected items is set to null](https://github.com/nilayjoshi89/BlackPearl/issues/18)
+
 ### Version 2.0.0
 
 **Release type:** Enhancement release
