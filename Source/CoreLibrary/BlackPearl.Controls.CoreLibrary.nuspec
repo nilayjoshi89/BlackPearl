@@ -19,6 +19,10 @@
         <reference file="BlackPearl.Controls.Common.dll" />
         <reference file="BlackPearl.Controls.CoreLibrary.dll" />
       </group>
+      <group targetFramework="net48">
+        <reference file="BlackPearl.Controls.Common.dll" />
+        <reference file="BlackPearl.Controls.CoreLibrary.dll" />
+      </group>
       <group targetFramework="net5.0-windows7.0">
         <reference file="BlackPearl.Controls.Common.dll" />
         <reference file="BlackPearl.Controls.CoreLibrary.dll" />
@@ -28,30 +32,36 @@
         <reference file="BlackPearl.Controls.CoreLibrary.dll" />
       </group>
     </references>
-	<frameworkReferences>
-		<group targetFramework="netcoreapp3.1">
-			<frameworkReference name="Microsoft.WindowsDesktop.App.WPF" />
-		</group>
-		<group targetFramework="net5.0-windows7.0">
-			<frameworkReference name="Microsoft.WindowsDesktop.App.WPF" />
-		</group>
-		<group targetFramework="net461" />
-	</frameworkReferences>
-	<dependencies>
-		<group targetFramework="netcoreapp3.1"/>
-		<group targetFramework="net5.0-windows7.0"/>
-		<group targetFramework="net461" />
-	</dependencies>
+	  <frameworkReferences>
+		  <group targetFramework="netcoreapp3.1">
+			  <frameworkReference name="Microsoft.WindowsDesktop.App.WPF" />
+		  </group>
+		  <group targetFramework="net5.0-windows7.0">
+			  <frameworkReference name="Microsoft.WindowsDesktop.App.WPF" />
+		  </group>
+		  <group targetFramework="net461" />
+		  <group targetFramework="net48" />
+	  </frameworkReferences>
+	  <dependencies>
+		  <group targetFramework="netcoreapp3.1"/>
+		  <group targetFramework="net5.0-windows7.0"/>
+		  <group targetFramework="net461" />
+		  <group targetFramework="net48" />
+	  </dependencies>
   </metadata>
   <files>
     <file src="bin\release\net461\BlackPearl.Controls.Common.dll" target="ref\net461" />
     <file src="bin\release\net461\BlackPearl.Controls.CoreLibrary.dll" target="ref\net461" />
+    <file src="bin\release\net48\BlackPearl.Controls.Common.dll" target="ref\net48" />
+    <file src="bin\release\net48\BlackPearl.Controls.CoreLibrary.dll" target="ref\net48" />
     <file src="bin\release\net5.0-windows7.0\BlackPearl.Controls.Common.dll" target="ref\net5.0-windows7.0" />
     <file src="bin\release\net5.0-windows7.0\BlackPearl.Controls.CoreLibrary.dll" target="ref\net5.0-windows7.0" />
     <file src="bin\release\netcoreapp3.1\BlackPearl.Controls.Common.dll" target="ref\netcoreapp3.1" />
     <file src="bin\release\netcoreapp3.1\BlackPearl.Controls.CoreLibrary.dll" target="ref\netcoreapp3.1" />
     <file src="bin\release\net461\BlackPearl.Controls.Common.dll" target="lib\net461" />
     <file src="bin\release\net461\BlackPearl.Controls.CoreLibrary.dll" target="lib\net461" />
+    <file src="bin\release\net48\BlackPearl.Controls.Common.dll" target="lib\net48" />
+    <file src="bin\release\net48\BlackPearl.Controls.CoreLibrary.dll" target="lib\net48" />
     <file src="bin\release\net5.0-windows7.0\BlackPearl.Controls.Common.dll" target="lib\net5.0-windows7.0" />
     <file src="bin\release\net5.0-windows7.0\BlackPearl.Controls.CoreLibrary.dll" target="lib\net5.0-windows7.0" />
     <file src="bin\release\netcoreapp3.1\BlackPearl.Controls.Common.dll" target="lib\netcoreapp3.1" />
