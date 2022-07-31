@@ -189,6 +189,17 @@ namespace BlackPearl.Controls.CoreLibrary
                 SubsribeHandler();
             }
         }
+        private void RichTextBoxElement_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (!PopupElement.IsOpen)
+            {
+                return;
+            }
+
+            var offset = PopupElement.HorizontalOffset;
+            PopupElement.HorizontalOffset = offset + 1;
+            PopupElement.HorizontalOffset = offset;
+        }
         #endregion
 
         #region Methods
