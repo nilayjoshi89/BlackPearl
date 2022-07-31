@@ -222,7 +222,7 @@ namespace BlackPearl.Controls.CoreLibrary
             }
             catch { }
         }
-        public static void AddToParagraph(this RichTextBox richTextBox, object itemToAdd, Func<object, InlineUIContainer> createInlineElementFunct)
+        public static void AddToParagraph(this RichTextBox richTextBox, object itemToAdd, Func<object, Inline> createInlineElementFunct)
         {
             try
             {
@@ -232,7 +232,7 @@ namespace BlackPearl.Controls.CoreLibrary
                     return;
                 }
 
-                InlineUIContainer elementToAdd = createInlineElementFunct(itemToAdd);
+                Inline elementToAdd = createInlineElementFunct(itemToAdd);
 
                 if (paragraph.Inlines.FirstInline == null)
                 {
@@ -255,8 +255,8 @@ namespace BlackPearl.Controls.CoreLibrary
             richTextBox?.SetParagraphAsFirstBlock();
         }
 
-        private static Run GetCurrentRunBlock(this RichTextBox richTextBox) => richTextBox?.CaretPosition?.Parent as Run;
-        private static Paragraph GetParagraph(this RichTextBox richTextBox) => richTextBox?.Document?.Blocks?.FirstBlock as Paragraph;
+        public static Run GetCurrentRunBlock(this RichTextBox richTextBox) => richTextBox?.CaretPosition?.Parent as Run;
+        public static Paragraph GetParagraph(this RichTextBox richTextBox) => richTextBox?.Document?.Blocks?.FirstBlock as Paragraph;
         #endregion
 
         #region Popup
