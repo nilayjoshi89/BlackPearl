@@ -3,7 +3,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-
+using System.Windows.Input;
 using BlackPearl.Controls.Contract;
 
 namespace BlackPearl.Controls.CoreLibrary
@@ -45,7 +45,7 @@ namespace BlackPearl.Controls.CoreLibrary
                     richTextBoxElement.TextChanged -= RichTextBoxElement_TextChanged;
                     richTextBoxElement.SizeChanged -= RichTextBoxElement_SizeChanged;
                     DataObject.RemovePastingHandler(richTextBoxElement, PasteHandler);
-                    DataObject.RemovePastingHandler(RichTextBoxElement, SetClipboardTextWithCommandCancelled);
+                    richTextBoxElement.RemoveHandler(CommandManager.PreviewExecutedEvent, new ExecutedRoutedEventHandler(SetClipboardTextWithCommandCancelled));
                 }
 
                 richTextBoxElement = value;
@@ -66,7 +66,7 @@ namespace BlackPearl.Controls.CoreLibrary
                     richTextBoxElement.TextChanged += RichTextBoxElement_TextChanged;
                     richTextBoxElement.SizeChanged += RichTextBoxElement_SizeChanged;
                     DataObject.AddPastingHandler(richTextBoxElement, PasteHandler);
-                    DataObject.AddCopyingHandler(RichTextBoxElement, SetClipboardTextWithCommandCancelled);
+                    richTextBoxElement.AddHandler(CommandManager.PreviewExecutedEvent, new ExecutedRoutedEventHandler(SetClipboardTextWithCommandCancelled));
                 }
             }
         }

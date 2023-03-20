@@ -105,7 +105,7 @@ namespace BlackPearl.Controls.CoreLibrary
                     RemoveInvalidTexts();
                 }
                 //Remove all invalid texts from
-               
+
 
                 //Hide drop-down
                 HideSuggestions(EM.SuggestionCleanupOperation.ResetIndex | EM.SuggestionCleanupOperation.ClearSelection);
@@ -123,30 +123,30 @@ namespace BlackPearl.Controls.CoreLibrary
                 switch (e.Key)
                 {
                     case Key.Down:
-                        {
-                            e.Handled = true;
-                            HandleKeyboardDownKeyPress();
-                        }
-                        break;
+                    {
+                        e.Handled = true;
+                        HandleKeyboardDownKeyPress();
+                    }
+                    break;
                     case Key.Up:
-                        {
-                            e.Handled = true;
-                            HandleKeyboardUpKeyPress();
-                        }
-                        break;
+                    {
+                        e.Handled = true;
+                        HandleKeyboardUpKeyPress();
+                    }
+                    break;
                     case Key.Enter:
-                        {
-                            e.Handled = true;
-                            UpdateSelectedItemsFromSuggestionDropdown();
-                        }
-                        break;
+                    {
+                        e.Handled = true;
+                        UpdateSelectedItemsFromSuggestionDropdown();
+                    }
+                    break;
                     case Key.Escape:
-                        {
-                            e.Handled = true;
-                            HideSuggestions(EM.SuggestionCleanupOperation.ResetIndex | EM.SuggestionCleanupOperation.ClearSelection);
-                            RichTextBoxElement.TryFocus();
-                        }
-                        break;
+                    {
+                        e.Handled = true;
+                        HideSuggestions(EM.SuggestionCleanupOperation.ResetIndex | EM.SuggestionCleanupOperation.ClearSelection);
+                        RichTextBoxElement.TryFocus();
+                    }
+                    break;
                     default:
                         break;
                 }
@@ -278,29 +278,20 @@ namespace BlackPearl.Controls.CoreLibrary
             return clipboard;
         }
 
-        private void SetClipboardTextWithCommandCancelled(object sender, DataObjectEventArgs e)
+        private void SetClipboardTextWithCommandCancelled(object sender, ExecutedRoutedEventArgs e)
         {
-            string CurentSelectionText = string.Empty;
-            foreach (Inline inline in RichTextBoxElement.GetParagraph().Inlines)
+            if (e.Command == ApplicationCommands.Copy)
             {
-                if (inline.ContentStart.CompareTo(RichTextBoxElement.Selection.Start) >= 0 && inline.ContentEnd.CompareTo(RichTextBoxElement.Selection.End) <= 0)
-                {
-                    InlineUIContainer inlineUIContainer = inline as InlineUIContainer;
-                    if (inlineUIContainer is null)
-                    {
-                        continue;
-                    }
-                    UIElement uiElement = inlineUIContainer.Child;
-                    if (uiElement is TextBlock textBlock)
-                    {
-                        CurentSelectionText += textBlock.Text;
-                    }
-                }
+                Clipboard.SetText(RichTextBoxElement.GetSelectedText());
+                e.Handled = true;
             }
-            Debug.WriteLine(CurentSelectionText);
-            Clipboard.SetText(CurentSelectionText);
-            e.Handled = true;
-            e.CancelCommand();
+            else if (e.Command == ApplicationCommands.Cut)
+            {
+                Clipboard.SetText(RichTextBoxElement.GetSelectedText());
+                RichTextBoxElement.Selection.Text = "";
+                e.Handled = true;
+            }
+
         }
         #endregion
 

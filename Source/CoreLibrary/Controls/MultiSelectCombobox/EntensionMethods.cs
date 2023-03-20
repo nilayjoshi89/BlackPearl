@@ -257,6 +257,30 @@ namespace BlackPearl.Controls.CoreLibrary
 
         public static Run GetCurrentRunBlock(this RichTextBox richTextBox) => richTextBox?.CaretPosition?.Parent as Run;
         public static Paragraph GetParagraph(this RichTextBox richTextBox) => richTextBox?.Document?.Blocks?.FirstBlock as Paragraph;
+
+        public static string GetSelectedText(this RichTextBox richTextBox)
+        {
+            string CurentSelectionText = string.Empty;
+
+            foreach (Inline inline in richTextBox.GetParagraph().Inlines)
+            {
+                //check if inline is inside the selection
+                if (inline.ContentStart.CompareTo(richTextBox.Selection.Start) >= 0 && inline.ContentEnd.CompareTo(richTextBox.Selection.End) <= 0)
+                {
+                    InlineUIContainer inlineUIContainer = inline as InlineUIContainer;
+                    if (inlineUIContainer is null)
+                    {
+                        continue;
+                    }
+                    UIElement uiElement = inlineUIContainer.Child;
+                    if (uiElement is TextBlock textBlock)
+                    {
+                        CurentSelectionText += textBlock.Text;
+                    }
+                }
+            }
+            return CurentSelectionText;
+        }
         #endregion
 
         #region Popup
