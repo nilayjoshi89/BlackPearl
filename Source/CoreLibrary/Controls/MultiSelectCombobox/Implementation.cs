@@ -1,13 +1,12 @@
-﻿using System.Collections;
+﻿using BlackPearl.Controls.Extension;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
-
-using BlackPearl.Controls.Extension;
-
 using EM = BlackPearl.Controls.CoreLibrary.EntensionMethods;
 
 namespace BlackPearl.Controls.CoreLibrary
@@ -98,8 +97,15 @@ namespace BlackPearl.Controls.CoreLibrary
                     return;
                 }
 
+                string CurrentText = RichTextBoxElement.GetCurrentText();
+                if (!string.IsNullOrEmpty(CurrentText))
+                {
+                    //try to add element on leave if valid
+                    UpdateSelectedItemsFromEnteredText(CurrentText);
+                    RemoveInvalidTexts();
+                }
                 //Remove all invalid texts from
-                RemoveInvalidTexts();
+               
 
                 //Hide drop-down
                 HideSuggestions(EM.SuggestionCleanupOperation.ResetIndex | EM.SuggestionCleanupOperation.ClearSelection);
@@ -271,6 +277,31 @@ namespace BlackPearl.Controls.CoreLibrary
             e.Handled = true;
             return clipboard;
         }
+
+        private void SetClipboardTextWithCommandCancelled(object sender, DataObjectEventArgs e)
+        {
+            string CurentSelectionText = string.Empty;
+            foreach (Inline inline in RichTextBoxElement.GetParagraph().Inlines)
+            {
+                if (inline.ContentStart.CompareTo(RichTextBoxElement.Selection.Start) >= 0 && inline.ContentEnd.CompareTo(RichTextBoxElement.Selection.End) <= 0)
+                {
+                    InlineUIContainer inlineUIContainer = inline as InlineUIContainer;
+                    if (inlineUIContainer is null)
+                    {
+                        continue;
+                    }
+                    UIElement uiElement = inlineUIContainer.Child;
+                    if (uiElement is TextBlock textBlock)
+                    {
+                        CurentSelectionText += textBlock.Text;
+                    }
+                }
+            }
+            Debug.WriteLine(CurentSelectionText);
+            Clipboard.SetText(CurentSelectionText);
+            e.Handled = true;
+            e.CancelCommand();
+        }
         #endregion
 
         #region Handler subscribe/unsubscribe
@@ -384,24 +415,25 @@ namespace BlackPearl.Controls.CoreLibrary
         /// </summary>
         /// <param name="itemString">entered text</param>
         /// <param name="forceAdd">Allows creation of new item</param>
-        private void UpdateSelectedItemsFromEnteredText(string itemString)
+        private bool UpdateSelectedItemsFromEnteredText(string itemString)
         {
             itemString = itemString.Trim(ItemSeparator, ' ');
 
             if (IsItemAlreadySelected(itemString))
             {
-                return;
+                return false;
             }
 
             object itemToAdd = GetItemToAdd(itemString);
             //If item is not available
             if (itemToAdd == null)
             {
-                return;
+                return false;
             }
 
             AddToSelectedItems(itemToAdd);
             RaiseSelectionChangedEvent(new ArrayList(0), new[] { itemToAdd });
+            return true;
         }
         private bool IsItemAlreadySelected(string itemString) => SelectedItems?.Cast<object>()?.HasAnyExactMatch(itemString, LookUpContract, this) == true;
         private object GetItemToAdd(string itemString)
