@@ -39,7 +39,7 @@ namespace BlackPearl.Controls.CoreLibrary
                 RichTextBoxElement.SetParagraphAsFirstBlock();
 
                 //Single item paste
-                if (!clipboard.Contains(ItemSeparator))
+                if (clipboard.IndexOfAny(GetSeparators()) == -1)
                 {
                     richTextBoxElement.AddToParagraph(clipboard, CreateRunElement);
                     return;
@@ -49,7 +49,7 @@ namespace BlackPearl.Controls.CoreLibrary
                 RichTextBoxElement.RemoveRunBlocks();
 
                 int i;
-                string[] multipleTexts = clipboard.Split(ItemSeparator);
+                string[] multipleTexts = clipboard.Split(GetSeparators());
                 for (i = 0; i < multipleTexts.Length - 1; i++)
                 {
                     if (string.IsNullOrWhiteSpace(multipleTexts[i]))
@@ -105,7 +105,6 @@ namespace BlackPearl.Controls.CoreLibrary
                     RemoveInvalidTexts();
                 }
                 //Remove all invalid texts from
-
 
                 //Hide drop-down
                 HideSuggestions(EM.SuggestionCleanupOperation.ResetIndex | EM.SuggestionCleanupOperation.ClearSelection);
@@ -211,8 +210,21 @@ namespace BlackPearl.Controls.CoreLibrary
         #region Methods
 
         #region event handler helper methods
-        private bool IsBlankTextWithItemSeparator(string userEnteredText) => string.IsNullOrWhiteSpace(userEnteredText.Trim(ItemSeparator));
-        private bool IsEndOfTextDetected(string userEnteredText) => !string.IsNullOrEmpty(userEnteredText) && userEnteredText.EndsWith(ItemSeparator.ToString());
+        private bool IsBlankTextWithItemSeparator(string userEnteredText) => string.IsNullOrWhiteSpace(userEnteredText.Trim(GetSeparators()));
+        private bool IsEndOfTextDetected(string userEnteredText)
+        {
+            if (!string.IsNullOrWhiteSpace(userEnteredText))
+            {
+                foreach (char c in GetSeparators())
+                {
+                    if (userEnteredText.EndsWith(c.ToString()))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
         private void UpdateSuggestionAndShowHideDropDown(string userEnteredText)
         {
             bool hasAnySuggestionToShow = UpdateSuggestions(userEnteredText);
@@ -291,7 +303,6 @@ namespace BlackPearl.Controls.CoreLibrary
                 RichTextBoxElement.Selection.Text = "";
                 e.Handled = true;
             }
-
         }
         #endregion
 
@@ -408,7 +419,7 @@ namespace BlackPearl.Controls.CoreLibrary
         /// <param name="forceAdd">Allows creation of new item</param>
         private bool UpdateSelectedItemsFromEnteredText(string itemString)
         {
-            itemString = itemString.Trim(ItemSeparator, ' ');
+            itemString = itemString.Trim(GetSeparators()).Trim(' ');
 
             if (IsItemAlreadySelected(itemString))
             {
@@ -546,7 +557,7 @@ namespace BlackPearl.Controls.CoreLibrary
         /// <returns></returns>
         private Inline CreateRunElement(object text)
         {
-            var runElement = richTextBoxElement.GetCurrentRunBlock();
+            Run runElement = richTextBoxElement.GetCurrentRunBlock();
 
             if (runElement == null)
             {
@@ -567,7 +578,6 @@ namespace BlackPearl.Controls.CoreLibrary
 
             return re;
         }
-
 
         /// <summary>
         /// Event to handle scenario where User removes selected item from UI
@@ -591,6 +601,22 @@ namespace BlackPearl.Controls.CoreLibrary
             catch { }
         }
         #endregion
+
+        #region Mist
+
+        public char[] GetSeparators()
+        {
+            char[] array = new char[1] { ItemSeparator };
+            if (AdditionalItemSeparators == null)
+            {
+                return array;
+            }
+            //Array.Append not available in net 461
+            return array.Concat(AdditionalItemSeparators).ToArray();
+        }
+
+        #endregion
+
         #endregion
     }
 }

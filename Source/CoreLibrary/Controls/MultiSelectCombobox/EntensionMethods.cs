@@ -129,7 +129,6 @@ namespace BlackPearl.Controls.CoreLibrary
                 return;
             }
 
-
             int newIndex = selectionEnd + delta;
             newIndex = (newIndex < 0)
                                ? 0
@@ -179,7 +178,7 @@ namespace BlackPearl.Controls.CoreLibrary
         }
         public static void RemoveRunBlocks(this RichTextBox richTextBox)
         {
-            var paragraph = richTextBox?.Document?.Blocks?.FirstBlock as Paragraph;
+            Paragraph paragraph = richTextBox?.Document?.Blocks?.FirstBlock as Paragraph;
             if (paragraph == null)
             {
                 return;

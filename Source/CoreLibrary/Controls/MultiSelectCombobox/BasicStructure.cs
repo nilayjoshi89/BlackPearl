@@ -132,6 +132,17 @@ namespace BlackPearl.Controls.CoreLibrary
         {
             get => (char)GetValue(ItemSeparatorProperty);
             set => SetValue(ItemSeparatorProperty, value);
+        }  
+        
+        /// <summary>
+        /// Char value that separates two selected items. Default value is ';'
+        /// </summary>
+        public static readonly DependencyProperty AdditionalItemSeparatorsProperty =
+            DependencyProperty.Register(nameof(AdditionalItemSeparators), typeof(char[]), typeof(MultiSelectCombobox), new PropertyMetadata(new char[0]));
+        public char[] AdditionalItemSeparators
+        {
+            get => (char[])GetValue(AdditionalItemSeparatorsProperty);
+            set => SetValue(AdditionalItemSeparatorsProperty, value);
         }
 
         /// <summary>
@@ -146,7 +157,7 @@ namespace BlackPearl.Controls.CoreLibrary
         }
 
         /// <summary>
-        /// ILookUpContract - implementation for custom behavior of Look-up and create. 
+        /// ILookUpContract - implementation for custom behavior of Look-up and create.
         /// If not set, default behavior will be set.
         /// </summary>
         public static readonly DependencyProperty LookUpContractProperty =

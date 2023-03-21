@@ -29,7 +29,10 @@ namespace BlackPearl.Controls.Demo
         private void ShowSelectedItemCommandAction(IList<Person> data)
         {
             var stringBuilder = new StringBuilder();
-
+            if (data is null)
+            {
+                return;
+            }
             foreach (Person p in data)
             {
                 stringBuilder.AppendLine(p.Name);
