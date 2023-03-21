@@ -1,7 +1,3 @@
-# What's new in this forks
-* Copy to clipboard support
-* If the element is valid when leaving the field, it is added to the list even if it does not end with a ";"
-
 # BlackPearl WPF Control Library
 [![Build Status](https://nilayjoshi89.visualstudio.com/BlackPearl%202.0/_apis/build/status/nilayjoshi89.BlackPearl?branchName=master)](https://nilayjoshi89.visualstudio.com/BlackPearl%202.0/_build/latest?definitionId=5&branchName=master)
 [![NuGet BlackPearl](https://img.shields.io/nuget/v/BlackPearl.Controls.Library.svg?label=NuGet%20BlackPearl.Controls.Library)](https://www.nuget.org/packages/BlackPearl.Controls.Library/)

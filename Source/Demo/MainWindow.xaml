@@ -103,7 +103,7 @@
                     </Grid.ColumnDefinitions>
                     <Grid.Resources>
                         <!--/Don't forget to add « xmlns:sys="clr-namespace:System;assembly=mscorlib" » /-->
-                        <x:Array Type="sys:Char" x:Key="AdditionalChar">
+                        <x:Array Type="sys:Char" x:Key="AdditionalCharArray">
                             <sys:Char>,</sys:Char>
                             <sys:Char>/</sys:Char>
                             <sys:Char>-</sys:Char>
@@ -123,7 +123,7 @@
                                               DisplayMemberPath="Name"
                                               ItemSeparator=";"
                                               Grid.Row="2"
-                                              AdditionalItemSeparators="{StaticResource ResourceKey=AdditionalChar}" />
+                                              AdditionalItemSeparators="{StaticResource ResourceKey=AdditionalCharArray}" />
                     <Button Content="Show selected"
                         Command="{Binding ShowSelectedItemCommand}"
                         CommandParameter="{Binding SelectedItems2}"
