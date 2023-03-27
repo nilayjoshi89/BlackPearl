@@ -75,6 +75,7 @@ namespace BlackPearl.Controls.CoreLibrary
             try
             {
                 string clipboard = GetClipboardTextWithCommandCancelled(e);
+                RichTextBoxElement.Selection.Text = string.Empty;
                 InsertElementsFromString(clipboard);
             }
             catch { }
@@ -305,6 +306,12 @@ namespace BlackPearl.Controls.CoreLibrary
                 //Following method call with make sure local paragraph remains part of RichTextBox
                 RichTextBoxElement.SetParagraphAsFirstBlock();
 
+                //Single item paste
+                if (values.IndexOfAny(GetSeparators()) == -1)
+                {
+                    richTextBoxElement.AddToParagraph(values, CreateRunElement);
+                    return;
+                }
                 //User has entered valid text + separator
                 RichTextBoxElement.RemoveRunBlocks();
 
@@ -514,7 +521,7 @@ namespace BlackPearl.Controls.CoreLibrary
             int? InsertIndex = RichTextBoxElement.AddToParagraph(itemToAdd, CreateInlineUIElement);
 
             //Add item to Selected Item list
-            if (InsertIndex is null)
+            if (InsertIndex is null || SelectedItems?.Count < (int)InsertIndex + 1)
             {
                 SelectedItems?.Add(itemToAdd);
             }
