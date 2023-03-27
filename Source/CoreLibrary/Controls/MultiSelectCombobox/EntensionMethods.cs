@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -67,6 +66,7 @@ namespace BlackPearl.Controls.CoreLibrary
 
             ListBoxAttachedProperties.SetSelectioEndtIndex(suggestionList, index);
         }
+
         public static void CleanOperation(this ListBox suggestionList, SuggestionCleanupOperation operation, IEnumerable goldenItemSource)
         {
             if ((operation & SuggestionCleanupOperation.ClearSelection) == SuggestionCleanupOperation.ClearSelection)
@@ -157,8 +157,10 @@ namespace BlackPearl.Controls.CoreLibrary
             suggestionList.SelectedItems?.Add(suggestionItemSource[newIndex]);
         }
 
+        [Flags]
         internal enum SuggestionCleanupOperation
         {
+            None = 0,
             ResetIndex = 1,
             ClearSelection = 2,
             ResetItemSource = 4
@@ -179,8 +181,7 @@ namespace BlackPearl.Controls.CoreLibrary
         }
         public static void RemoveRunBlocks(this RichTextBox richTextBox)
         {
-            Paragraph paragraph = richTextBox?.Document?.Blocks?.FirstBlock as Paragraph;
-            if (paragraph == null)
+            if (!(richTextBox?.Document?.Blocks?.FirstBlock is Paragraph paragraph))
             {
                 return;
             }
@@ -223,7 +224,6 @@ namespace BlackPearl.Controls.CoreLibrary
             catch { }
         }
 
-
         public static int? AddToParagraph(this RichTextBox richTextBox, object itemToAdd, Func<object, Inline> createInlineElementFunct)
         {
             try
@@ -238,7 +238,7 @@ namespace BlackPearl.Controls.CoreLibrary
                 if (paragraph.Inlines.FirstInline == null)
                 {
                     //First element to insert
-                    paragraph.Inlines.Add(elementToAdd); 
+                    paragraph.Inlines.Add(elementToAdd);
                     richTextBox.CaretPosition = richTextBox.CaretPosition.DocumentEnd;
                 }
                 else
@@ -311,11 +311,20 @@ namespace BlackPearl.Controls.CoreLibrary
             return CurentSelectionText;
         }
 
+        public static string GetText(this RichTextBox richTextBox)
+        {
+            string CurentSelectionText = string.Empty;
+
+            foreach (Inline inline in richTextBox.GetParagraph().Inlines)
+            {
+                CurentSelectionText += inline.GetText();
+            }
+            return CurentSelectionText;
+        }
 
         public static string GetText(this Inline inline)
         {
-            InlineUIContainer inlineUIContainer = inline as InlineUIContainer;
-            if (!(inlineUIContainer is null))
+            if (inline is InlineUIContainer inlineUIContainer)
             {
                 UIElement uiElement = inlineUIContainer.Child;
                 if (uiElement is TextBlock textBlock)
@@ -325,7 +334,6 @@ namespace BlackPearl.Controls.CoreLibrary
             }
             return string.Empty;
         }
-
 
         #endregion
 
@@ -354,7 +362,6 @@ namespace BlackPearl.Controls.CoreLibrary
             }
             catch { }
         }
-
 
         #endregion
 

@@ -1,9 +1,7 @@
 ﻿using BlackPearl.Controls.Extension;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -18,7 +16,8 @@ namespace BlackPearl.Controls.CoreLibrary
         private bool isHandlerRegistered = true;
         private readonly object handlerLock = new object();
 
-        private static RichTextBox DragRichTextBoxValueSource = null;
+        private static RichTextBox DragRichTextBoxValueSource;
+        private string LastRichTextBoxValue;
         #endregion
 
         #region Control Event Handlers
@@ -33,24 +32,31 @@ namespace BlackPearl.Controls.CoreLibrary
             {
                 e.Effects = DragDropEffects.None;
             }
-
         }
 
         private void OnDragDrop(object sender, DragEventArgs e)
         {
-            if (!e.Data.GetDataPresent(typeof(System.String))){
+            if (!e.Data.GetDataPresent(typeof(string)))
+            {
                 return;
             }
-            object DragValue = e.Data.GetData(typeof(System.String));
+
+            object DragValue = e.Data.GetData(typeof(string));
             if (DragValue != null)
             {
-                Debug.WriteLine(DragValue.ToString());
-                if (!(DragRichTextBoxValueSource is null)) {
+                if (DragRichTextBoxValueSource != null && DragRichTextBoxValueSource != RichTextBoxElement)
+                {
                     DragRichTextBoxValueSource.Selection.Text = string.Empty;
                     RichTextBoxElement.Focus();
                     DragRichTextBoxValueSource = null;
                 }
-                InsertElementsFromString(RichTextBoxElement, DragValue.ToString());
+                else if (!string.IsNullOrEmpty(LastRichTextBoxValue) && string.IsNullOrWhiteSpace(DragValue.ToString()) && string.IsNullOrWhiteSpace(RichTextBoxElement.GetText()))
+                {
+                    DragValue = LastRichTextBoxValue;
+                }
+
+                InsertElementsFromString(DragValue.ToString());
+                LastRichTextBoxValue = null;
             }
         }
 
@@ -58,25 +64,21 @@ namespace BlackPearl.Controls.CoreLibrary
         {
             if (e.IsDragDrop)
             {
-                //DragValue = richTextBoxElement.GetSelectedText();
                 DragRichTextBoxValueSource = richTextBoxElement;
+                LastRichTextBoxValue = richTextBoxElement.GetSelectedText();
                 DragDrop.DoDragDrop(richTextBoxElement, richTextBoxElement.GetSelectedText(), DragDropEffects.Move);
             }
         }
-
 
         private void PasteHandler(object sender, DataObjectPastingEventArgs e)
         {
             try
             {
                 string clipboard = GetClipboardTextWithCommandCancelled(e);
-                InsertElementsFromString(RichTextBoxElement, clipboard);
+                InsertElementsFromString(clipboard);
             }
             catch { }
         }
-
-
-
 
         /// <summary>
         /// Suggestion drop down - key board key up
@@ -254,7 +256,7 @@ namespace BlackPearl.Controls.CoreLibrary
             UpdateSelectedItemsFromSuggestionDropdown();
         }
         private bool IsSelectionProcessCompleted() => !IsSelectionProcessInProgress();
-        private bool IsSelectionProcessInProgress(Key? keyUp = null)
+        private static bool IsSelectionProcessInProgress(Key? keyUp = null)
         {
             if (!keyUp.HasValue)
             {
@@ -287,7 +289,7 @@ namespace BlackPearl.Controls.CoreLibrary
             }
         }
 
-        public void InsertElementsFromString(RichTextBox richTextBox, string values)
+        public void InsertElementsFromString(string values)
         {
             try
             {
@@ -514,12 +516,10 @@ namespace BlackPearl.Controls.CoreLibrary
             //Add item to Selected Item list
             if (InsertIndex is null)
             {
-
                 SelectedItems?.Add(itemToAdd);
             }
             else
             {
-                Debug.WriteLine("INSERT INDEX " + InsertIndex);
                 SelectedItems?.Insert((int)InsertIndex + 1, itemToAdd);
             }
         }
@@ -649,8 +649,7 @@ namespace BlackPearl.Controls.CoreLibrary
         {
             try
             {
-                if (!IsLoaded
-                    || !(sender is TextBlock tb))
+                if (!IsLoaded || !(sender is TextBlock tb))
                 {
                     return;
                 }

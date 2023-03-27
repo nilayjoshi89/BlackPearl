@@ -71,8 +71,6 @@ namespace BlackPearl.Controls.CoreLibrary
                     richTextBoxElement.DragEnter += OnDragEnter;
                     richTextBoxElement.Drop += OnDragDrop;
                     richTextBoxElement.AllowDrop = true;
-
-
                 }
             }
         }
@@ -138,13 +136,13 @@ namespace BlackPearl.Controls.CoreLibrary
         {
             get => (char)GetValue(ItemSeparatorProperty);
             set => SetValue(ItemSeparatorProperty, value);
-        }  
-        
+        }
+
         /// <summary>
         /// Char value that separates two selected items. Default value is ';'
         /// </summary>
         public static readonly DependencyProperty AdditionalItemSeparatorsProperty =
-            DependencyProperty.Register(nameof(AdditionalItemSeparators), typeof(char[]), typeof(MultiSelectCombobox), new PropertyMetadata(new char[0]));
+            DependencyProperty.Register(nameof(AdditionalItemSeparators), typeof(char[]), typeof(MultiSelectCombobox), new PropertyMetadata(System.Array.Empty<char>()));
         public char[] AdditionalItemSeparators
         {
             get => (char[])GetValue(AdditionalItemSeparatorsProperty);
@@ -254,7 +252,7 @@ namespace BlackPearl.Controls.CoreLibrary
             routingStrategy: RoutingStrategy.Bubble,
             handlerType: typeof(SelectionChangedEventHandler), ownerType:
             typeof(MultiSelectCombobox));
-        public event SelectionChangedEventHandler SelectionChanged
+        public event System.EventHandler<SelectionChangedEventArgs> SelectionChanged
         {
             add { AddHandler(SelectionChangedEvent, value); }
             remove { RemoveHandler(SelectionChangedEvent, value); }
