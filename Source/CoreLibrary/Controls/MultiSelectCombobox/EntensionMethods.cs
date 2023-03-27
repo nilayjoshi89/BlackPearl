@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -221,32 +222,46 @@ namespace BlackPearl.Controls.CoreLibrary
             }
             catch { }
         }
-        public static void AddToParagraph(this RichTextBox richTextBox, object itemToAdd, Func<object, Inline> createInlineElementFunct)
+
+
+        public static int? AddToParagraph(this RichTextBox richTextBox, object itemToAdd, Func<object, Inline> createInlineElementFunct)
         {
             try
             {
                 Paragraph paragraph = richTextBox?.GetParagraph();
                 if (paragraph == null)
                 {
-                    return;
+                    return null;
                 }
 
                 Inline elementToAdd = createInlineElementFunct(itemToAdd);
-
                 if (paragraph.Inlines.FirstInline == null)
                 {
                     //First element to insert
-                    paragraph.Inlines.Add(elementToAdd);
+                    paragraph.Inlines.Add(elementToAdd); 
+                    richTextBox.CaretPosition = richTextBox.CaretPosition.DocumentEnd;
                 }
                 else
                 {
-                    //Insert at the end
-                    paragraph.Inlines.InsertAfter(paragraph.Inlines.LastInline, elementToAdd);
-                }
+                    //Insert at the cusor position
+                    int InsertIndex = richTextBox.GetLastInlineIndexBeforeCaret();
+                    if (InsertIndex >= 0)
+                    {
+                        Inline LastInlineBeforeCaret = richTextBox?.GetParagraph().Inlines.ElementAtOrDefault(InsertIndex);
+                        paragraph.Inlines.InsertAfter(LastInlineBeforeCaret, elementToAdd);
+                    }
+                    else
+                    {
+                        Inline FirstInlineAfterCaret = richTextBox?.GetParagraph().Inlines.ElementAtOrDefault(0);
+                        paragraph.Inlines.InsertBefore(FirstInlineAfterCaret, elementToAdd);
+                    }
 
-                richTextBox.CaretPosition = richTextBox.CaretPosition.DocumentEnd;
+                    richTextBox.CaretPosition = richTextBox.CaretPosition.GetPositionAtOffset(2, LogicalDirection.Forward);
+                    return InsertIndex;
+                }
             }
             catch { }
+            return null;
         }
         public static void ClearParagraph(this RichTextBox richTextBox)
         {
@@ -257,6 +272,30 @@ namespace BlackPearl.Controls.CoreLibrary
         public static Run GetCurrentRunBlock(this RichTextBox richTextBox) => richTextBox?.CaretPosition?.Parent as Run;
         public static Paragraph GetParagraph(this RichTextBox richTextBox) => richTextBox?.Document?.Blocks?.FirstBlock as Paragraph;
 
+        public static int GetLastInlineIndexBeforeCaret(this RichTextBox richTextBox)
+        {
+            if (richTextBox.CaretPosition.IsAtLineStartPosition)
+            {
+                return -1;
+            }
+
+            Paragraph paragraph = richTextBox?.GetParagraph();
+            //foreach (Inline inline in paragraph.Inlines)
+            for (int i = 0; i < paragraph.Inlines.Count; i++)
+            {
+                Inline inline = paragraph.Inlines.ElementAtOrDefault(i);
+                var start = inline.ContentEnd;
+                var here = richTextBox.CaretPosition;
+                var range = new TextRange(start, here);
+                int indexInText = range.Text.Length;
+                if (indexInText == 0)
+                {
+                    return i;
+                }
+            }
+            return paragraph.Inlines.Count;
+        }
+
         public static string GetSelectedText(this RichTextBox richTextBox)
         {
             string CurentSelectionText = string.Empty;
@@ -266,20 +305,28 @@ namespace BlackPearl.Controls.CoreLibrary
                 //check if inline is inside the selection
                 if (inline.ContentStart.CompareTo(richTextBox.Selection.Start) >= 0 && inline.ContentEnd.CompareTo(richTextBox.Selection.End) <= 0)
                 {
-                    InlineUIContainer inlineUIContainer = inline as InlineUIContainer;
-                    if (inlineUIContainer is null)
-                    {
-                        continue;
-                    }
-                    UIElement uiElement = inlineUIContainer.Child;
-                    if (uiElement is TextBlock textBlock)
-                    {
-                        CurentSelectionText += textBlock.Text;
-                    }
+                    CurentSelectionText += inline.GetText();
                 }
             }
             return CurentSelectionText;
         }
+
+
+        public static string GetText(this Inline inline)
+        {
+            InlineUIContainer inlineUIContainer = inline as InlineUIContainer;
+            if (!(inlineUIContainer is null))
+            {
+                UIElement uiElement = inlineUIContainer.Child;
+                if (uiElement is TextBlock textBlock)
+                {
+                    return textBlock.Text;
+                }
+            }
+            return string.Empty;
+        }
+
+
         #endregion
 
         #region Popup
@@ -307,6 +354,8 @@ namespace BlackPearl.Controls.CoreLibrary
             }
             catch { }
         }
+
+
         #endregion
 
         #region Lookup Contract

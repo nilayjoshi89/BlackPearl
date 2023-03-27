@@ -66,7 +66,13 @@ namespace BlackPearl.Controls.CoreLibrary
                     richTextBoxElement.TextChanged += RichTextBoxElement_TextChanged;
                     richTextBoxElement.SizeChanged += RichTextBoxElement_SizeChanged;
                     DataObject.AddPastingHandler(richTextBoxElement, PasteHandler);
+                    DataObject.AddCopyingHandler(richTextBoxElement, OnSelectionStartDrag);
                     richTextBoxElement.AddHandler(CommandManager.PreviewExecutedEvent, new ExecutedRoutedEventHandler(SetClipboardTextWithCommandCancelled));
+                    richTextBoxElement.DragEnter += OnDragEnter;
+                    richTextBoxElement.Drop += OnDragDrop;
+                    richTextBoxElement.AllowDrop = true;
+
+
                 }
             }
         }

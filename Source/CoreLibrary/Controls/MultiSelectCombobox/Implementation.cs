@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -16,61 +17,66 @@ namespace BlackPearl.Controls.CoreLibrary
         #region Members
         private bool isHandlerRegistered = true;
         private readonly object handlerLock = new object();
+
+        private static RichTextBox DragRichTextBoxValueSource = null;
         #endregion
 
         #region Control Event Handlers
+
+        private void OnDragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.Text))
+            {
+                e.Effects = DragDropEffects.Move;
+            }
+            else
+            {
+                e.Effects = DragDropEffects.None;
+            }
+
+        }
+
+        private void OnDragDrop(object sender, DragEventArgs e)
+        {
+            if (!e.Data.GetDataPresent(typeof(System.String))){
+                return;
+            }
+            object DragValue = e.Data.GetData(typeof(System.String));
+            if (DragValue != null)
+            {
+                Debug.WriteLine(DragValue.ToString());
+                if (!(DragRichTextBoxValueSource is null)) {
+                    DragRichTextBoxValueSource.Selection.Text = string.Empty;
+                    RichTextBoxElement.Focus();
+                    DragRichTextBoxValueSource = null;
+                }
+                InsertElementsFromString(RichTextBoxElement, DragValue.ToString());
+            }
+        }
+
+        private void OnSelectionStartDrag(object sender, DataObjectCopyingEventArgs e)
+        {
+            if (e.IsDragDrop)
+            {
+                //DragValue = richTextBoxElement.GetSelectedText();
+                DragRichTextBoxValueSource = richTextBoxElement;
+                DragDrop.DoDragDrop(richTextBoxElement, richTextBoxElement.GetSelectedText(), DragDropEffects.Move);
+            }
+        }
+
 
         private void PasteHandler(object sender, DataObjectPastingEventArgs e)
         {
             try
             {
                 string clipboard = GetClipboardTextWithCommandCancelled(e);
-
-                if (string.IsNullOrWhiteSpace(clipboard))
-                    return;
-
-                if (!UnsubscribeHandler())
-                {
-                    return;
-                }
-
-                //User can remove paragraph reference by 'Select all & delete' in RichTextBox
-                //Following method call with make sure local paragraph remains part of RichTextBox
-                RichTextBoxElement.SetParagraphAsFirstBlock();
-
-                //Single item paste
-                if (clipboard.IndexOfAny(GetSeparators()) == -1)
-                {
-                    richTextBoxElement.AddToParagraph(clipboard, CreateRunElement);
-                    return;
-                }
-
-                //User has entered valid text + separator
-                RichTextBoxElement.RemoveRunBlocks();
-
-                int i;
-                string[] multipleTexts = clipboard.Split(GetSeparators());
-                for (i = 0; i < multipleTexts.Length - 1; i++)
-                {
-                    if (string.IsNullOrWhiteSpace(multipleTexts[i]))
-                        continue;
-
-                    //Try select item from source based on current entered text
-                    UpdateSelectedItemsFromEnteredText(multipleTexts[i]);
-                }
-
-                if (!string.IsNullOrWhiteSpace(multipleTexts[i]))
-                {
-                    richTextBoxElement.AddToParagraph(multipleTexts[i], CreateRunElement);
-                }
+                InsertElementsFromString(RichTextBoxElement, clipboard);
             }
             catch { }
-            finally
-            {
-                //Subscribe back
-                SubsribeHandler();
-            }
         }
+
+
+
 
         /// <summary>
         /// Suggestion drop down - key board key up
@@ -158,6 +164,7 @@ namespace BlackPearl.Controls.CoreLibrary
             {
                 //All text entered in Control goes to Run element of RichTextBox
                 string userEnteredText = RichTextBoxElement.GetCurrentText();
+
                 if (!IsEndOfTextDetected(userEnteredText))
                 {
                     UpdateSuggestionAndShowHideDropDown(userEnteredText);
@@ -279,6 +286,50 @@ namespace BlackPearl.Controls.CoreLibrary
                 SubsribeHandler();
             }
         }
+
+        public void InsertElementsFromString(RichTextBox richTextBox, string values)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(values))
+                    return;
+
+                if (!UnsubscribeHandler())
+                {
+                    return;
+                }
+
+                //User can remove paragraph reference by 'Select all & delete' in RichTextBox
+                //Following method call with make sure local paragraph remains part of RichTextBox
+                RichTextBoxElement.SetParagraphAsFirstBlock();
+
+                //User has entered valid text + separator
+                RichTextBoxElement.RemoveRunBlocks();
+
+                int i;
+                string[] multipleTexts = values.Split(GetSeparators());
+                for (i = 0; i < multipleTexts.Length - 1; i++)
+                {
+                    if (string.IsNullOrWhiteSpace(multipleTexts[i]))
+                        continue;
+
+                    //Try select item from source based on current entered text
+                    UpdateSelectedItemsFromEnteredText(multipleTexts[i]);
+                }
+
+                if (!string.IsNullOrWhiteSpace(multipleTexts[i]))
+                {
+                    richTextBoxElement.AddToParagraph(multipleTexts[i], CreateRunElement);
+                }
+            }
+            catch { }
+            finally
+            {
+                //Subscribe back
+                SubsribeHandler();
+            }
+        }
+
         private static string GetClipboardTextWithCommandCancelled(DataObjectPastingEventArgs e)
         {
             string clipboard = e?.DataObject?.GetData(typeof(string)) as string;
@@ -457,10 +508,20 @@ namespace BlackPearl.Controls.CoreLibrary
                 return;
             }
 
-            //Add item to Selected Item list
-            SelectedItems?.Add(itemToAdd);
             //Add item in RichTextBox UI
-            RichTextBoxElement.AddToParagraph(itemToAdd, CreateInlineUIElement);
+            int? InsertIndex = RichTextBoxElement.AddToParagraph(itemToAdd, CreateInlineUIElement);
+
+            //Add item to Selected Item list
+            if (InsertIndex is null)
+            {
+
+                SelectedItems?.Add(itemToAdd);
+            }
+            else
+            {
+                Debug.WriteLine("INSERT INDEX " + InsertIndex);
+                SelectedItems?.Insert((int)InsertIndex + 1, itemToAdd);
+            }
         }
         private void AddSuggestionsToSelectedItems(IList itemsToAdd)
         {
