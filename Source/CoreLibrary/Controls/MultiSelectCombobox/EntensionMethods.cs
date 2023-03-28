@@ -255,8 +255,15 @@ namespace BlackPearl.Controls.CoreLibrary
                         Inline FirstInlineAfterCaret = richTextBox?.GetParagraph().Inlines.ElementAtOrDefault(0);
                         paragraph.Inlines.InsertBefore(FirstInlineAfterCaret, elementToAdd);
                     }
-
-                    richTextBox.CaretPosition = richTextBox.CaretPosition.GetPositionAtOffset(2, LogicalDirection.Forward);
+                    TextPointer NewCaretPosition = richTextBox.CaretPosition.GetPositionAtOffset(2, LogicalDirection.Forward);
+                    if (NewCaretPosition != null)
+                    {
+                        richTextBox.CaretPosition = NewCaretPosition;
+                    }
+                    else
+                    {
+                        richTextBox.CaretPosition = richTextBox.CaretPosition.DocumentEnd;
+                    }
                     return InsertIndex;
                 }
             }
