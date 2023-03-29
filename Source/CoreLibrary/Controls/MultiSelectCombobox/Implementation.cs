@@ -18,6 +18,7 @@ namespace BlackPearl.Controls.CoreLibrary
 
         private static RichTextBox DragRichTextBoxValueSource;
         private string LastRichTextBoxValue;
+        private bool IsMoveCursorEnabled = true;
         #endregion
 
         #region Control Event Handlers
@@ -50,12 +51,13 @@ namespace BlackPearl.Controls.CoreLibrary
                     RichTextBoxElement.Focus();
                     DragRichTextBoxValueSource = null;
                 }
-                else if (!string.IsNullOrEmpty(LastRichTextBoxValue) && string.IsNullOrWhiteSpace(DragValue.ToString()) && string.IsNullOrWhiteSpace(RichTextBoxElement.GetText()))
+                else if (!string.IsNullOrEmpty(LastRichTextBoxValue) && string.IsNullOrWhiteSpace(DragValue.ToString()))
                 {
                     DragValue = LastRichTextBoxValue;
                 }
-
+                IsMoveCursorEnabled = false;
                 InsertElementsFromString(DragValue.ToString());
+                IsMoveCursorEnabled = true;
                 LastRichTextBoxValue = null;
             }
         }
@@ -76,7 +78,9 @@ namespace BlackPearl.Controls.CoreLibrary
             {
                 string clipboard = GetClipboardTextWithCommandCancelled(e);
                 RichTextBoxElement.Selection.Text = string.Empty;
+                IsMoveCursorEnabled = false;
                 InsertElementsFromString(clipboard);
+                IsMoveCursorEnabled = true;
             }
             catch { }
         }
@@ -310,6 +314,7 @@ namespace BlackPearl.Controls.CoreLibrary
                 if (values.IndexOfAny(GetSeparators()) == -1)
                 {
                     richTextBoxElement.AddToParagraph(values, CreateRunElement);
+                    richTextBoxElement.MoveCursor();
                     return;
                 }
                 //User has entered valid text + separator
@@ -519,7 +524,10 @@ namespace BlackPearl.Controls.CoreLibrary
 
             //Add item in RichTextBox UI
             int? InsertIndex = RichTextBoxElement.AddToParagraph(itemToAdd, CreateInlineUIElement);
-
+            if (IsMoveCursorEnabled)
+            {
+                richTextBoxElement.MoveCursor();
+            }
             //Add item to Selected Item list
             if (InsertIndex is null || SelectedItems?.Count < (int)InsertIndex + 1)
             {

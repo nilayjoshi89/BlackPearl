@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -224,6 +225,19 @@ namespace BlackPearl.Controls.CoreLibrary
             catch { }
         }
 
+        public static void MoveCursor(this RichTextBox richTextBox, int NumberOfTimes = 2)
+        {
+            TextPointer NewCaretPosition = richTextBox.CaretPosition.GetPositionAtOffset(NumberOfTimes, LogicalDirection.Forward);
+            if (NewCaretPosition != null)
+            {
+                richTextBox.CaretPosition = NewCaretPosition;
+            }
+            else
+            {
+                richTextBox.CaretPosition = richTextBox.CaretPosition.DocumentEnd;
+            }
+        }
+
         public static int? AddToParagraph(this RichTextBox richTextBox, object itemToAdd, Func<object, Inline> createInlineElementFunct)
         {
             try
@@ -255,15 +269,6 @@ namespace BlackPearl.Controls.CoreLibrary
                         Inline FirstInlineAfterCaret = richTextBox?.GetParagraph().Inlines.ElementAtOrDefault(0);
                         paragraph.Inlines.InsertBefore(FirstInlineAfterCaret, elementToAdd);
                     }
-                    TextPointer NewCaretPosition = richTextBox.CaretPosition.GetPositionAtOffset(2, LogicalDirection.Forward);
-                    if (NewCaretPosition != null)
-                    {
-                        richTextBox.CaretPosition = NewCaretPosition;
-                    }
-                    else
-                    {
-                        richTextBox.CaretPosition = richTextBox.CaretPosition.DocumentEnd;
-                    }
                     return InsertIndex;
                 }
             }
@@ -287,7 +292,6 @@ namespace BlackPearl.Controls.CoreLibrary
             }
 
             Paragraph paragraph = richTextBox?.GetParagraph();
-            //foreach (Inline inline in paragraph.Inlines)
             for (int i = 0; i < paragraph.Inlines.Count; i++)
             {
                 Inline inline = paragraph.Inlines.ElementAtOrDefault(i);
