@@ -26,7 +26,7 @@ namespace BlackPearl.Controls.CoreLibrary
         {
             PreviewKeyDown += MultiSelectCombobox_PreviewKeyDown;
             LostFocus += MultiSelectCombobox_LostFocus;
-            //DelayedTextEnterFilter.Elapsed += DelayedTextEnterFilter_Elapsed;
+            DelayedTextEnterFilter.Elapsed += DelayedTextEnterFilter_Elapsed;
         }
 
         #endregion

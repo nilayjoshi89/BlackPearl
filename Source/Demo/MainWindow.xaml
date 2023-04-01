@@ -110,14 +110,14 @@
                         <TextBlock Text="ItemSeparator = [';', ',', '/', '-']" />
                     </StackPanel>
                     <controls:MultiSelectCombobox ItemSource="{Binding Source, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                              SelectedItems="{Binding SelectedItems2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                              SelectedItems="{Binding SelectedItems3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                               DisplayMemberPath="Name"
                                               ItemSeparator=";"
                                               Grid.Row="2"
                                               AdditionalItemSeparators="{StaticResource ResourceKey=AdditionalCharArray}" />
                     <Button Content="Show selected"
                         Command="{Binding ShowSelectedItemCommand}"
-                        CommandParameter="{Binding SelectedItems2}"
+                        CommandParameter="{Binding SelectedItems3}"
                         Grid.Row="2"
                         Grid.Column="1" />
                 </Grid>
@@ -146,13 +146,13 @@
                         <TextBlock Text="ItemSeparator = ;" />
                     </StackPanel>
                     <controls:MultiSelectCombobox ItemSource="{Binding Source, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                              SelectedItems="{Binding SelectedItems2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                              SelectedItems="{Binding SelectedItems4, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                               DisplayMemberPath="Name"
                                               ItemSeparator=";"
                                               Grid.Row="2" DoDeleteInvalidEntry="False" ShowCreateNewItem="True" />
                     <Button Content="Show selected"
                         Command="{Binding ShowSelectedItemCommand}"
-                        CommandParameter="{Binding SelectedItems2}"
+                        CommandParameter="{Binding SelectedItems4}"
                         Grid.Row="2"
                         Grid.Column="1" />
                 </Grid>
@@ -180,7 +180,7 @@
                         <TextBlock Text="ItemSeparator = ;" />
                     </StackPanel>
                     <controls:MultiSelectCombobox ItemSource="{Binding Source, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                  SelectedItems="{Binding SelectedItems2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                  SelectedItems="{Binding SelectedItems5, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                   DisplayMemberPath="Name"
                                                   ItemSeparator=";"
                                                   Grid.Row="2" 
@@ -190,7 +190,7 @@
                                                   />
                     <Button Content="Show selected"
                         Command="{Binding ShowSelectedItemCommand}"
-                        CommandParameter="{Binding SelectedItems2}"
+                        CommandParameter="{Binding SelectedItems5}"
                         Grid.Row="2"
                         Grid.Column="1" />
                 </Grid>

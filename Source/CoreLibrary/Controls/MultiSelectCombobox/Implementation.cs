@@ -24,7 +24,8 @@ namespace BlackPearl.Controls.CoreLibrary
         private static RichTextBox DragRichTextBoxValueSource;
         private string LastRichTextBoxValue;
         private bool IsMoveCursorEnabled = true;
-        //private readonly System.Timers.Timer DelayedTextEnterFilter = new System.Timers.Timer(150);
+
+        private readonly System.Timers.Timer DelayedTextEnterFilter = new System.Timers.Timer(150);
         #endregion
 
         #region Control Event Handlers
@@ -65,6 +66,7 @@ namespace BlackPearl.Controls.CoreLibrary
                 InsertElementsFromString(DragValue.ToString());
                 IsMoveCursorEnabled = true;
                 LastRichTextBoxValue = null;
+                DelayedTextEnterFilter.Enabled = false;
             }
         }
 
@@ -91,16 +93,16 @@ namespace BlackPearl.Controls.CoreLibrary
             catch { }
         }
 
-        //private async void DelayedTextEnterFilter_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        //{
-        //    await Task.Run(async () =>
-        //    {
-        //        await Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-        //        {
-        //            TextChanged();
-        //        }, null);
-        //    });
-        //}
+        private async void DelayedTextEnterFilter_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            await Task.Run(async () =>
+            {
+                await Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+                {
+                    TextChanged();
+                }, null);
+            });
+        }
 
         /// <summary>
         /// Suggestion drop down - key board key up
@@ -211,11 +213,9 @@ namespace BlackPearl.Controls.CoreLibrary
 
         private void RichTextBoxElement_TextChanged(object sender, TextChangedEventArgs e)
         {
-            TextChanged();
-            //Removed Delay search, cause drag and drop issues. Need to be fix (maybe delayed on key down and not textchanged
-            //DelayedTextEnterFilter.Stop();
-            //DelayedTextEnterFilter.AutoReset = false;
-            //DelayedTextEnterFilter.Enabled = true;
+            DelayedTextEnterFilter.Stop();
+            DelayedTextEnterFilter.AutoReset = false;
+            DelayedTextEnterFilter.Enabled = true;
         }
 
         private void RichTextBoxElement_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -325,17 +325,17 @@ namespace BlackPearl.Controls.CoreLibrary
                 //User can remove paragraph reference by 'Select all & delete' in RichTextBox
                 //Following method call with make sure local paragraph remains part of RichTextBox
                 RichTextBoxElement.SetParagraphAsFirstBlock();
-
                 //Single item paste
                 if (values.IndexOfAny(GetSeparators()) == -1)
                 {
-                    richTextBoxElement.AddToParagraph(values, CreateRunElement);
+                    richTextBoxElement.AddToParagraph(values, CreateRunElement); 
+                    TextChanged();
                     richTextBoxElement.MoveCursor();
                     return;
                 }
                 //User has entered valid text + separator
                 RichTextBoxElement.RemoveRunBlocks();
-
+                TextChanged();
                 int i;
                 string[] multipleTexts = values.Split(GetSeparators());
                 for (i = 0; i < multipleTexts.Length - 1; i++)
@@ -344,12 +344,14 @@ namespace BlackPearl.Controls.CoreLibrary
                         continue;
 
                     //Try select item from source based on current entered text
-                    UpdateSelectedItemsFromEnteredText(multipleTexts[i]);
+                    UpdateSelectedItemsFromEnteredText(multipleTexts[i]); 
+                    TextChanged();
                 }
 
                 if (!string.IsNullOrWhiteSpace(multipleTexts[i]))
                 {
-                    richTextBoxElement.AddToParagraph(multipleTexts[i], CreateRunElement);
+                    richTextBoxElement.AddToParagraph(multipleTexts[i], CreateRunElement); 
+                    TextChanged();
                 }
             }
             catch { }
@@ -357,6 +359,7 @@ namespace BlackPearl.Controls.CoreLibrary
             {
                 //Subscribe back
                 SubsribeHandler();
+                HideSuggestions(EM.SuggestionCleanupOperation.ResetItemSource);
             }
         }
 
@@ -382,6 +385,7 @@ namespace BlackPearl.Controls.CoreLibrary
             {
                 Clipboard.SetText(RichTextBoxElement.GetSelectedText());
                 RichTextBoxElement.Selection.Text = "";
+                TextChanged();
                 e.Handled = true;
             }
         }
@@ -392,7 +396,6 @@ namespace BlackPearl.Controls.CoreLibrary
             {
                 //All text entered in Control goes to Run element of RichTextBox
                 string userEnteredText = RichTextBoxElement.GetCurrentText();
-
                 if (!IsEndOfTextDetected(userEnteredText))
                 {
                     UpdateSuggestionAndShowHideDropDown(userEnteredText);
@@ -564,7 +567,8 @@ namespace BlackPearl.Controls.CoreLibrary
                 return false;
             }
 
-            AddToSelectedItems(itemToAdd);
+            AddToSelectedItems(itemToAdd); 
+            TextChanged();
             RaiseSelectionChangedEvent(new ArrayList(0), new[] { itemToAdd });
             return true;
         }
@@ -651,7 +655,9 @@ namespace BlackPearl.Controls.CoreLibrary
             else
             {
                 SelectedItems?.Insert((int)InsertIndex + 1, itemToAdd);
+                
             }
+            TextChanged();
         }
         private void AddSuggestionsToSelectedItems(IList itemsToAdd)
         {
@@ -706,7 +712,13 @@ namespace BlackPearl.Controls.CoreLibrary
         /// <summary>
         /// Shows suggestion drop-down
         /// </summary>
-        private void ShowSuggestions() => PopupElement.Show(HasAnySuggestion, () => SuggestionElement.CleanOperation(EM.SuggestionCleanupOperation.ResetIndex, ItemSource));
+        private void ShowSuggestions() { 
+            if (!RichTextBoxElement.IsKeyboardFocusWithin)
+            {
+                return ;
+            }
+            PopupElement.Show(HasAnySuggestion, () => SuggestionElement.CleanOperation(EM.SuggestionCleanupOperation.ResetIndex, ItemSource)); 
+        }
         private void HideSuggestions(EM.SuggestionCleanupOperation cleanupOperation) => PopupElement.Hide(null, () => SuggestionElement.CleanOperation(cleanupOperation, ItemSource));
         private bool HasAnySuggestion() => SuggestionElement.Items.Count > 0;
         private bool UpdateSuggestions(string userEnteredText)
