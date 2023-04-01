@@ -2,7 +2,7 @@
 
 namespace BlackPearl.Controls.Extension
 {
-    public static class ReflectionExntension
+    public static class ReflectionExtension
     {
         public static object GetPropertyValue(this object obj, string path)
         {

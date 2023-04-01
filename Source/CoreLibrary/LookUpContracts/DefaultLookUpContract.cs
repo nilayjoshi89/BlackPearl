@@ -1,5 +1,4 @@
 ﻿using System;
-
 using BlackPearl.Controls.Contract;
 using BlackPearl.Controls.Extension;
 
