@@ -29,12 +29,9 @@
                     </Grid.ColumnDefinitions>
 
                     <Label Content="Simple Example" />
-                    <StackPanel Grid.Row="1"
-                            Margin="5,0,5,0">
-                        <TextBlock Text="DisplayMemberPath = Name"
-                               FontWeight="Bold" />
-                        <TextBlock Text="ItemSeparator = ;"
-                               FontWeight="Bold" />
+                    <StackPanel Grid.Row="1" Margin="5,0,5,0">
+                        <TextBlock Text="DisplayMemberPath = Name"/>
+                        <TextBlock Text="ItemSeparator = ;"/>
                     </StackPanel>
                     <controls:MultiSelectCombobox ItemSource="{Binding Source, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                               SelectedItems="{Binding SelectedItems, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -65,14 +62,10 @@
                     <Label Content="Advance look-up contract Example" />
                     <StackPanel Grid.Row="1"
                             Margin="5,0,5,0">
-                        <TextBlock Text="DisplayMemberPath = Info"
-                               FontWeight="Bold" />
-                        <TextBlock Text="ItemSeparator = ;"
-                               FontWeight="Bold" />
-                        <TextBlock Text="LookUpContract = AdvanceLookUpContract"
-                               FontWeight="Bold" />
-                        <TextBlock Text="Create InputFormat= {Name} , {Company} , {ZipCode};"
-                               FontWeight="Bold" />
+                        <TextBlock Text="DisplayMemberPath = Info"/>
+                        <TextBlock Text="ItemSeparator = ;" />
+                        <TextBlock Text="LookUpContract = AdvanceLookUpContract" />
+                        <TextBlock Text="Create InputFormat= {Name} , {Company} , {ZipCode};" />
                     </StackPanel>
                     <controls:MultiSelectCombobox ItemSource="{Binding Source, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                               SelectedItems="{Binding SelectedItems2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -113,10 +106,8 @@
                     <Label Content="Simple Example with aditional ItemSeparator" />
                     <StackPanel Grid.Row="1"
                             Margin="5,0,5,0">
-                        <TextBlock Text="DisplayMemberPath = Name"
-                               FontWeight="Bold" />
-                        <TextBlock Text="ItemSeparator = [';', ',', '/', '-']"
-                               FontWeight="Bold" />
+                        <TextBlock Text="DisplayMemberPath = Name" />
+                        <TextBlock Text="ItemSeparator = [';', ',', '/', '-']" />
                     </StackPanel>
                     <controls:MultiSelectCombobox ItemSource="{Binding Source, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                               SelectedItems="{Binding SelectedItems2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -124,6 +115,79 @@
                                               ItemSeparator=";"
                                               Grid.Row="2"
                                               AdditionalItemSeparators="{StaticResource ResourceKey=AdditionalCharArray}" />
+                    <Button Content="Show selected"
+                        Command="{Binding ShowSelectedItemCommand}"
+                        CommandParameter="{Binding SelectedItems2}"
+                        Grid.Row="2"
+                        Grid.Column="1" />
+                </Grid>
+            </Border>
+
+
+            <Border BorderBrush="Black"
+                BorderThickness="1"
+                Margin="5">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Label Content="Simple Example" />
+                    <StackPanel Grid.Row="1"
+                            Margin="5,0,5,0">
+                        <TextBlock Text="with invalid text not remove and suggestion button to add item if possible  (with DefaultLookUpContract and SupportsNewObjectCreation set to false)" TextWrapping="Wrap" />
+                        <TextBlock Text="DisplayMemberPath = Name" />
+                        <TextBlock Text="ItemSeparator = ;" />
+                    </StackPanel>
+                    <controls:MultiSelectCombobox ItemSource="{Binding Source, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                              SelectedItems="{Binding SelectedItems2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                              DisplayMemberPath="Name"
+                                              ItemSeparator=";"
+                                              Grid.Row="2" DoDeleteInvalidEntry="False" ShowCreateNewItem="True" />
+                    <Button Content="Show selected"
+                        Command="{Binding ShowSelectedItemCommand}"
+                        CommandParameter="{Binding SelectedItems2}"
+                        Grid.Row="2"
+                        Grid.Column="1" />
+                </Grid>
+            </Border>
+
+            <Border BorderBrush="Black"
+                BorderThickness="1"
+                Margin="5">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Label Content="Simple Example" />
+                    <StackPanel Grid.Row="1"
+                            Margin="5,0,5,0">
+                        <TextBlock Text="suggestion button to add item if possible (with SimpleLookUpContract and SupportsNewObjectCreation set to true)" TextWrapping="Wrap" />
+                        <TextBlock Text="DisplayMemberPath = Name" />
+                        <TextBlock Text="ItemSeparator = ;" />
+                    </StackPanel>
+                    <controls:MultiSelectCombobox ItemSource="{Binding Source, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                  SelectedItems="{Binding SelectedItems2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                  DisplayMemberPath="Name"
+                                                  ItemSeparator=";"
+                                                  Grid.Row="2" 
+                                                  DoDeleteInvalidEntry="False" 
+                                                  ShowCreateNewItem="True" 
+                                                  LookUpContract="{Binding SimpleLookUpContract}"
+                                                  />
                     <Button Content="Show selected"
                         Command="{Binding ShowSelectedItemCommand}"
                         CommandParameter="{Binding SelectedItems2}"

@@ -1,18 +1,21 @@
-﻿using System;
-
-using BlackPearl.Controls.Contract;
+﻿using BlackPearl.Controls.Contract;
+using BlackPearl.Controls.CoreLibrary;
 using BlackPearl.Controls.Extension;
+using System;
 
-namespace BlackPearl.Controls.CoreLibrary
+namespace BlackPearl.Controls.Demo
 {
-    /// <summary>
-    /// Default LookUpContract implementation
-    /// </summary>
-    public class DefaultLookUpContract : ILookUpContract
+    public class SimpleLookUpContract : ILookUpContract
     {
-        public bool SupportsNewObjectCreation => false;
+        public bool SupportsNewObjectCreation => true;
 
-        public object CreateObject(object sender, string searchString) => throw new NotImplementedException();
+        public object CreateObject(object sender, string searchString)
+        {
+            return new Person()
+            {
+                Name = searchString
+            };
+        }
 
         public bool IsItemEqualToString(object sender, object item, string seachString)
         {
@@ -43,7 +46,7 @@ namespace BlackPearl.Controls.CoreLibrary
         {
             return value1 != null
                 && value2 != null
-                && string.Compare(value1.ToString(), value2, StringComparison.InvariantCultureIgnoreCase) == 0;
+                && string.Equals(value1, value2, StringComparison.InvariantCultureIgnoreCase);
         }
     }
 }

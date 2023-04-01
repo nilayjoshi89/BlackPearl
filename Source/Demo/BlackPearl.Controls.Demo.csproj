@@ -72,8 +72,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="AdvanceLookUpContract.cs" />
+    <Compile Include="LookUpContracts\AdvanceLookUpContract.cs" />
+    <Compile Include="LookUpContracts\SimpleLookUpContract.cs" />
     <Compile Include="PersonDataProvider.cs" />
+    <Compile Include="Resources\Converters.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

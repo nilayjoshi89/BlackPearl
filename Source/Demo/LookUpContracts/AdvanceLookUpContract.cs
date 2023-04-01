@@ -32,8 +32,7 @@ namespace BlackPearl.Controls.Demo
             {
                 return false;
             }
-
-            return string.Compare(seachString, std.Name, StringComparison.InvariantCultureIgnoreCase) == 0;
+            return string.Equals(seachString, std.Name, StringComparison.InvariantCultureIgnoreCase);
         }
 
         public bool IsItemMatchingSearchString(object sender, object item, string searchString)
@@ -49,7 +48,7 @@ namespace BlackPearl.Controls.Demo
             }
 
             return person.Name?.ToLower()?.Contains(searchString?.ToLower()) == true
-                || person.Company.ToString().ToLower()?.Contains(searchString?.ToLower()) == true
+                || person.Company.ToLower()?.Contains(searchString?.ToLower()) == true
                 || person.Zip?.ToLower()?.Contains(searchString?.ToLower()) == true;
         }
     }
