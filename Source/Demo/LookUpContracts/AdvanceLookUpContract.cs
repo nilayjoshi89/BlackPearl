@@ -32,7 +32,7 @@ namespace BlackPearl.Controls.Demo
             {
                 return false;
             }
-            return string.Equals(seachString, std.Name, StringComparison.InvariantCultureIgnoreCase);
+            return string.Compare(seachString, std.Name, System.StringComparison.InvariantCultureIgnoreCase) == 0;
         }
 
         public bool IsItemMatchingSearchString(object sender, object item, string searchString)

@@ -45,8 +45,8 @@ namespace BlackPearl.Controls.Demo
         private static bool StringEqualsPredicate(string value1, string value2)
         {
             return value1 != null
-                && value2 != null
-                && string.Equals(value1, value2, StringComparison.InvariantCultureIgnoreCase);
+               && value2 != null
+               && string.Compare(value1.ToString(), value2, StringComparison.InvariantCultureIgnoreCase) == 0;
         }
     }
 }

@@ -24,7 +24,7 @@ namespace BlackPearl.Controls.CoreLibrary
         private static RichTextBox DragRichTextBoxValueSource;
         private string LastRichTextBoxValue;
         private bool IsMoveCursorEnabled = true;
-        private readonly System.Timers.Timer DelayedTextEnterFilter = new System.Timers.Timer(150);
+        //private readonly System.Timers.Timer DelayedTextEnterFilter = new System.Timers.Timer(150);
         #endregion
 
         #region Control Event Handlers
@@ -91,16 +91,16 @@ namespace BlackPearl.Controls.CoreLibrary
             catch { }
         }
 
-        private async void DelayedTextEnterFilter_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            await Task.Run(async () =>
-            {
-                await Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-                {
-                    TextChanged();
-                }, null);
-            });
-        }
+        //private async void DelayedTextEnterFilter_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        //{
+        //    await Task.Run(async () =>
+        //    {
+        //        await Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+        //        {
+        //            TextChanged();
+        //        }, null);
+        //    });
+        //}
 
         /// <summary>
         /// Suggestion drop down - key board key up
@@ -211,9 +211,11 @@ namespace BlackPearl.Controls.CoreLibrary
 
         private void RichTextBoxElement_TextChanged(object sender, TextChangedEventArgs e)
         {
-            DelayedTextEnterFilter.Stop();
-            DelayedTextEnterFilter.AutoReset = false;
-            DelayedTextEnterFilter.Enabled = true;
+            TextChanged();
+            //Removed Delay search, cause drag and drop issues. Need to be fix (maybe delayed on key down and not textchanged
+            //DelayedTextEnterFilter.Stop();
+            //DelayedTextEnterFilter.AutoReset = false;
+            //DelayedTextEnterFilter.Enabled = true;
         }
 
         private void RichTextBoxElement_SizeChanged(object sender, SizeChangedEventArgs e)
