@@ -17,8 +17,8 @@ namespace BlackPearl.Controls.CoreLibrary
         static MultiSelectCombobox()
         {
 #if DEBUG
-        //https://weblogs.asp.net/akjoshi/resolving-un-harmful-binding-errors-in-wpf
-        System.Diagnostics.PresentationTraceSources.DataBindingSource.Switch.Level = System.Diagnostics.SourceLevels.Critical;
+            //https://weblogs.asp.net/akjoshi/resolving-un-harmful-binding-errors-in-wpf
+            System.Diagnostics.PresentationTraceSources.DataBindingSource.Switch.Level = System.Diagnostics.SourceLevels.Critical;
 #endif
             DefaultStyleKeyProperty.OverrideMetadata(typeof(MultiSelectCombobox), new FrameworkPropertyMetadata(typeof(MultiSelectCombobox)));
         }

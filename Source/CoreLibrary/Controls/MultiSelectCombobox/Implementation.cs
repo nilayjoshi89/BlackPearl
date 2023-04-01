@@ -546,7 +546,7 @@ namespace BlackPearl.Controls.CoreLibrary
         {
             if (string.IsNullOrWhiteSpace(itemString))
             {
-                return false ;
+                return false;
             }
             itemString = itemString.Trim(GetSeparators()).Trim(' ');
 
