@@ -273,6 +273,14 @@ namespace BlackPearl.Controls.CoreLibrary
                                 .Where(inline => (inline.ContentStart.CompareTo(richTextBox.Selection.Start) >= 0 && inline.ContentEnd.CompareTo(richTextBox.Selection.End) <= 0))
                                 .Select(inline => inline.GetText()));
 
+        public static object[] GetSelectedObjects(this RichTextBox richTextBox)
+            => richTextBox.GetParagraph().Inlines
+                                .Where(inline => (inline.ContentStart.CompareTo(richTextBox.Selection.Start) >= 0 && inline.ContentEnd.CompareTo(richTextBox.Selection.End) <= 0))
+                                .Select(inline => inline.GetObject())
+                                .Where(i => i != null).ToArray();
+        public static object GetObject(this Inline inline)
+           => ((inline as InlineUIContainer)?.Child as TextBlock)?.Tag;
+
         public static string GetText(this RichTextBox richTextBox)
             => string.Join(string.Empty,
                     richTextBox.GetParagraph().Inlines.Select(inline => inline.GetText()));

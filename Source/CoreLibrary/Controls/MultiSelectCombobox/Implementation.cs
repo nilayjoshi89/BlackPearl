@@ -24,9 +24,15 @@ namespace BlackPearl.Controls.CoreLibrary
 
         private void OnDragEnter(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(DataFormats.Text))
+            if (e.Data.GetDataPresent("Object"))
             {
-                e.Effects = DragDropEffects.Move;
+                e.Effects = e.KeyStates.HasFlag(DragDropKeyStates.ControlKey)
+                    ? DragDropEffects.Copy
+                    : DragDropEffects.Move;
+            }
+            else if (e.Data.GetDataPresent(DataFormats.Text))
+            {
+                e.Effects = DragDropEffects.Copy;
             }
             else
             {
@@ -34,31 +40,80 @@ namespace BlackPearl.Controls.CoreLibrary
             }
         }
 
+        private object DragDropGetData(DragEventArgs e)
+        {
+            object data = null;
+            if (e.Data.GetDataPresent("Object"))
+            {
+                data = e.Data.GetData("Object");
+                if (data == null)
+                {
+                    return null;
+                }
+                e.Effects = e.KeyStates.HasFlag(DragDropKeyStates.ControlKey)
+               ? DragDropEffects.Copy
+               : DragDropEffects.Move;
+            }
+            else if (e.Data.GetDataPresent(DataFormats.Text))
+            {
+                data = e.Data.GetData(DataFormats.Text);
+                if (string.IsNullOrWhiteSpace(data.ToString()))
+                {
+                    return null;
+                }
+                e.Effects = DragDropEffects.Copy;
+            }
+            return data;
+        }
+
+
         private void OnDragDrop(object sender, DragEventArgs e)
         {
-            if (!e.Data.GetDataPresent(typeof(string)))
+            try
             {
                 e.Effects = DragDropEffects.None;
-                return;
+                TextPointer textPointer = RichTextBoxElement.GetPositionFromPoint(e.GetPosition(this), true);
+                int EndOffset = new TextRange(textPointer, RichTextBoxElement.Selection.End).Text.Length;
+                int StartOffset = new TextRange(textPointer, RichTextBoxElement.Selection.Start).Text.Length;
+                if ((EndOffset == 0 || StartOffset == 0) && RichTextBoxElement.Selection.Text.Length > 0)
+                {
+                    return;
+                }
+                //Removal of the drag and drop element to be able to move it
+                RichTextBoxElement.Selection.Text = "";
+                RichTextBoxElement.CaretPosition = textPointer;
+                RichTextBoxElement.Focus();
+
+                object data = DragDropGetData(e);
+                if (data == null)
+                {
+                    return;
+                }
+
+                if (data.GetType() == typeof(string))
+                {
+                    PasteHandler(data.ToString());
+                }
+                else if (data.GetType() == typeof(object[]))
+                {
+                    if (!UnsubscribeHandler())
+                    {
+                        e.Effects = DragDropEffects.None;
+                        return;
+                    }
+
+                    foreach (var obj in data as object[])
+                    {
+                        AddToSelectedItems(obj);
+                    }
+                }
             }
-
-            string dragValueString = e.Data.GetData(typeof(string)).ToString();
-
-            TextPointer textPointer = RichTextBoxElement.GetPositionFromPoint(e.GetPosition(this), true);
-            //Check if drag position is different than actual one to avoid blink effect
-            int EndOffset = new TextRange(textPointer, RichTextBoxElement.Selection.End).Text.Length;
-            int StartOffset = new TextRange(textPointer, RichTextBoxElement.Selection.Start).Text.Length;
-            //if EndOffset == 0 && StartOffset == 0 then we are in a another RichTextBox
-            if ((EndOffset == 0 || StartOffset == 0) && !(EndOffset == 0 && StartOffset == 0))
+            catch { }
+            finally
             {
-                e.Effects = DragDropEffects.None;
-                return;
+                //Subscribe back
+                SubsribeHandler();
             }
-
-            //Removal of the drag and drop element to be able to move it
-            RichTextBoxElement.Selection.Text = "";
-            RichTextBoxElement.CaretPosition = textPointer;
-            PasteHandler(dragValueString);
         }
 
         private void OnSelectionStartDrag(object sender, DataObjectCopyingEventArgs e)
@@ -67,13 +122,22 @@ namespace BlackPearl.Controls.CoreLibrary
             {
                 return;
             }
+            var objectsToBeSent = richTextBoxElement.GetSelectedObjects();
+            if ((objectsToBeSent?.Length ?? 0) == 0)
+                return;
 
-            if (DragDrop.DoDragDrop(richTextBoxElement, richTextBoxElement.GetSelectedText(), DragDropEffects.Move) != DragDropEffects.None)
+            DataObject data = new DataObject();
+            data.SetData("Object", objectsToBeSent);
+            //added string to work with other text input
+            data.SetText(richTextBoxElement.GetSelectedText());
+            var dropResult = DragDrop.DoDragDrop(richTextBoxElement, data, DragDropEffects.Move | DragDropEffects.Copy);
+            if (dropResult == DragDropEffects.Move)
             {
                 //If the original RichTextbox is not the same as the one where the drag and drop was performed, then we delete the old text
-                richTextBoxElement.Selection.Text = string.Empty;
+                RichTextBoxElement.Selection.Text = "";
             }
         }
+
 
         private void PasteHandler(object sender, DataObjectPastingEventArgs e)
         {
