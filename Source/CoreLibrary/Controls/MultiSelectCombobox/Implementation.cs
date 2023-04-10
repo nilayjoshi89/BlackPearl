@@ -34,7 +34,6 @@ namespace BlackPearl.Controls.CoreLibrary
             }
         }
 
-
         private void OnDragDrop(object sender, DragEventArgs e)
         {
             if (!e.Data.GetDataPresent(typeof(string)))
@@ -45,11 +44,13 @@ namespace BlackPearl.Controls.CoreLibrary
 
             object dragValueObject = e.Data.GetData(typeof(string));
             string dragValueString = dragValueObject.ToString();
+
             if (string.IsNullOrWhiteSpace(dragValueString))
             {
                 e.Effects = DragDropEffects.None;
                 return;
             }
+            //Removal of the drag and drop element to be able to move it
             RichTextBoxElement.Selection.Text = "";
             RichTextBoxElement.CaretPosition = RichTextBoxElement.GetPositionFromPoint(e.GetPosition(this), true);
             PasteHandler(dragValueString);
@@ -61,8 +62,10 @@ namespace BlackPearl.Controls.CoreLibrary
             {
                 return;
             }
+
             if (DragDrop.DoDragDrop(richTextBoxElement, richTextBoxElement.GetSelectedText(), DragDropEffects.Move) != DragDropEffects.None)
             {
+                //If the original RichTextbox is not the same as the one where the drag and drop was performed, then we delete the old text
                 richTextBoxElement.Selection.Text = string.Empty;
             }
         }
@@ -336,6 +339,8 @@ namespace BlackPearl.Controls.CoreLibrary
             else if (e.Command == ApplicationCommands.Cut)
             {
                 Clipboard.SetText(RichTextBoxElement.GetSelectedText());
+
+                //Cut the text = set selection to empty (CTRL + X)
                 RichTextBoxElement.Selection.Text = "";
                 e.Handled = true;
             }
