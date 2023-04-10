@@ -22,7 +22,7 @@
                 Value="14" />
     </Style>
 
-    <Style TargetType="controls:CustomRichTextBox" BasedOn="{StaticResource {x:Type RichTextBox}}"></Style>
+    <Style TargetType="controls:MultiselectInternalRichTextBox" BasedOn="{StaticResource {x:Type RichTextBox}}"></Style>
     
     <!--<Style TargetType="Button"
            BasedOn="{StaticResource {x:Type Button}}">

@@ -8,7 +8,7 @@ using BlackPearl.Controls.Contract;
 
 namespace BlackPearl.Controls.CoreLibrary
 {
-    public class CustomRichTextBox : RichTextBox
+    public class MultiselectInternalRichTextBox : RichTextBox
     {
         protected override void OnDrop(DragEventArgs e)
         {
@@ -17,7 +17,7 @@ namespace BlackPearl.Controls.CoreLibrary
         }
     }
 
-    [TemplatePart(Name = "rtxt", Type = typeof(CustomRichTextBox))]
+    [TemplatePart(Name = "rtxt", Type = typeof(MultiselectInternalRichTextBox))]
     [TemplatePart(Name = "popup", Type = typeof(Popup))]
     [TemplatePart(Name = "lstSuggestion", Type = typeof(ListBox))]
     public sealed partial class MultiSelectCombobox : Control
@@ -39,13 +39,13 @@ namespace BlackPearl.Controls.CoreLibrary
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            RichTextBoxElement = GetTemplateChild("rtxt") as CustomRichTextBox;
+            RichTextBoxElement = GetTemplateChild("rtxt") as MultiselectInternalRichTextBox;
             PopupElement = GetTemplateChild("popup") as Popup;
             SuggestionElement = GetTemplateChild("lstSuggestion") as ListBox;
         }
 
-        private CustomRichTextBox richTextBoxElement;
-        private CustomRichTextBox RichTextBoxElement
+        private MultiselectInternalRichTextBox richTextBoxElement;
+        private MultiselectInternalRichTextBox RichTextBoxElement
         {
             get => richTextBoxElement;
             set

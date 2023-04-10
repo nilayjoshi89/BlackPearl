@@ -85,18 +85,18 @@
                         <!--Main Grid-->
                         <Grid>
                             <!--Rich TextBox bound to document-->
-                            <local:CustomRichTextBox x:Name="rtxt"
+                            <local:MultiselectInternalRichTextBox x:Name="rtxt"
                                          IsDocumentEnabled="False"
                                          AcceptsReturn="False"
                                          VerticalContentAlignment="Center"
                                          FontSize="{Binding FontSize, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}">
-                                <local:CustomRichTextBox.Resources>
+                                <local:MultiselectInternalRichTextBox.Resources>
                                     <Style TargetType="TextBlock"
                                            BasedOn="{StaticResource BlackPearl.MultiselectCombobox.SelectedTextBlockStyle}" />
                                     <Style TargetType="Run"
                                            BasedOn="{StaticResource BlackPearl.MultiselectCombobox.RunStyle}" />
-                                </local:CustomRichTextBox.Resources>
-                            </local:CustomRichTextBox>
+                                </local:MultiselectInternalRichTextBox.Resources>
+                            </local:MultiselectInternalRichTextBox>
 
                             <!--Suggestion Drop-Down -->
                             <Popup Name="popup"
