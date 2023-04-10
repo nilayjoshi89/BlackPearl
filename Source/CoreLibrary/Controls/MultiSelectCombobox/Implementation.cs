@@ -47,8 +47,9 @@ namespace BlackPearl.Controls.CoreLibrary
             TextPointer textPointer = RichTextBoxElement.GetPositionFromPoint(e.GetPosition(this), true);
             //Check if drag position is different than actual one to avoid blink effect
             int EndOffset = new TextRange(textPointer, RichTextBoxElement.Selection.End).Text.Length;
-            int StartOffset = new TextRange(textPointer, RichTextBoxElement.Selection.End).Text.Length;
-            if (EndOffset == 0 || StartOffset == 0)
+            int StartOffset = new TextRange(textPointer, RichTextBoxElement.Selection.Start).Text.Length;
+            //if EndOffset == 0 && StartOffset == 0 then we are in a another RichTextBox
+            if ((EndOffset == 0 || StartOffset == 0) && !(EndOffset == 0 && StartOffset == 0))
             {
                 e.Effects = DragDropEffects.None;
                 return;
