@@ -1,16 +1,13 @@
-﻿using BlackPearl.Controls.Contract;
-using BlackPearl.Controls.Extension;
+﻿using BlackPearl.Controls.Extension;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Threading;
 using EM = BlackPearl.Controls.CoreLibrary.EntensionMethods;
 
 namespace BlackPearl.Controls.CoreLibrary
@@ -21,11 +18,6 @@ namespace BlackPearl.Controls.CoreLibrary
         private bool isHandlerRegistered = true;
         private readonly object handlerLock = new object();
 
-        private static RichTextBox DragRichTextBoxValueSource;
-        private string LastRichTextBoxValue;
-        private bool IsMoveCursorEnabled = true;
-
-        private readonly System.Timers.Timer DelayedTextEnterFilter = new System.Timers.Timer(150);
         #endregion
 
         #region Control Event Handlers
@@ -42,41 +34,36 @@ namespace BlackPearl.Controls.CoreLibrary
             }
         }
 
+
         private void OnDragDrop(object sender, DragEventArgs e)
         {
             if (!e.Data.GetDataPresent(typeof(string)))
             {
+                e.Effects = DragDropEffects.None;
                 return;
             }
 
-            object DragValue = e.Data.GetData(typeof(string));
-            if (DragValue != null)
+            object dragValueObject = e.Data.GetData(typeof(string));
+            string dragValueString = dragValueObject.ToString();
+            if (string.IsNullOrWhiteSpace(dragValueString))
             {
-                if (DragRichTextBoxValueSource != null && DragRichTextBoxValueSource != RichTextBoxElement)
-                {
-                    DragRichTextBoxValueSource.Selection.Text = string.Empty;
-                    RichTextBoxElement.Focus();
-                    DragRichTextBoxValueSource = null;
-                }
-                else if (!string.IsNullOrEmpty(LastRichTextBoxValue) && string.IsNullOrWhiteSpace(DragValue.ToString()))
-                {
-                    DragValue = LastRichTextBoxValue;
-                }
-                IsMoveCursorEnabled = false;
-                InsertElementsFromString(DragValue.ToString());
-                IsMoveCursorEnabled = true;
-                LastRichTextBoxValue = null;
-                DelayedTextEnterFilter.Enabled = false;
+                e.Effects = DragDropEffects.None;
+                return;
             }
+            RichTextBoxElement.Selection.Text = "";
+            RichTextBoxElement.CaretPosition = RichTextBoxElement.GetPositionFromPoint(e.GetPosition(this), true);
+            PasteHandler(dragValueString);
         }
 
         private void OnSelectionStartDrag(object sender, DataObjectCopyingEventArgs e)
         {
-            if (e.IsDragDrop)
+            if (!e.IsDragDrop)
             {
-                DragRichTextBoxValueSource = richTextBoxElement;
-                LastRichTextBoxValue = richTextBoxElement.GetSelectedText();
-                DragDrop.DoDragDrop(richTextBoxElement, richTextBoxElement.GetSelectedText(), DragDropEffects.Move);
+                return;
+            }
+            if (DragDrop.DoDragDrop(richTextBoxElement, richTextBoxElement.GetSelectedText(), DragDropEffects.Move) != DragDropEffects.None)
+            {
+                richTextBoxElement.Selection.Text = string.Empty;
             }
         }
 
@@ -86,22 +73,9 @@ namespace BlackPearl.Controls.CoreLibrary
             {
                 string clipboard = GetClipboardTextWithCommandCancelled(e);
                 RichTextBoxElement.Selection.Text = string.Empty;
-                IsMoveCursorEnabled = false;
-                InsertElementsFromString(clipboard);
-                IsMoveCursorEnabled = true;
+                PasteHandler(clipboard);
             }
             catch { }
-        }
-
-        private async void DelayedTextEnterFilter_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            await Task.Run(async () =>
-            {
-                await Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-                {
-                    TextChanged();
-                }, null);
-            });
         }
 
         /// <summary>
@@ -129,23 +103,14 @@ namespace BlackPearl.Controls.CoreLibrary
                     return;
                 }
 
-                string CurrentText = RichTextBoxElement.GetCurrentText();
-                if (!string.IsNullOrEmpty(CurrentText))
-                {
-                    //try to add element on leave if valid
-                    if (UpdateSelectedItemsFromEnteredText(CurrentText) || DoDeleteInvalidEntry)
-                    {
-                        RemoveInvalidTexts();
-                    }
-                }
                 //Remove all invalid texts from
+                RemoveInvalidTexts();
 
                 //Hide drop-down
                 HideSuggestions(EM.SuggestionCleanupOperation.ResetIndex | EM.SuggestionCleanupOperation.ClearSelection);
             }
             catch { }
         }
-
         private void MultiSelectCombobox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             try
@@ -171,11 +136,6 @@ namespace BlackPearl.Controls.CoreLibrary
                     case Key.Enter:
                     {
                         e.Handled = true;
-                        if (CheckIfSuggestionActionButton(SuggestionElement.SelectedItems))
-                        {
-                            TryCreateItemForSuggestedAction(RichTextBoxElement);
-                            break;
-                        }
                         UpdateSelectedItemsFromSuggestionDropdown();
                     }
                     break;
@@ -186,38 +146,55 @@ namespace BlackPearl.Controls.CoreLibrary
                         RichTextBoxElement.TryFocus();
                     }
                     break;
+                    default:
+                        break;
                 }
             }
             catch { }
         }
-
-        private static bool CheckIfSuggestionActionButton(IList element)
-        {
-            if (element.Count != 1)
-            {
-                return false;
-            }
-            if (!(element[0] is UIElement Uielement))
-            {
-                return false;
-            }
-            if (Uielement is ListBoxItem listBoxItem)
-            {
-                if (listBoxItem.Name == "CreateNewItemSuggestion")
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
         private void RichTextBoxElement_TextChanged(object sender, TextChangedEventArgs e)
         {
-            DelayedTextEnterFilter.Stop();
-            DelayedTextEnterFilter.AutoReset = false;
-            DelayedTextEnterFilter.Enabled = true;
-        }
+            try
+            {
+                //All text entered in Control goes to Run element of RichTextBox
+                string userEnteredText = RichTextBoxElement.GetCurrentText();
 
+                if (!IsEndOfTextDetected(userEnteredText))
+                {
+                    UpdateSuggestionAndShowHideDropDown(userEnteredText);
+                    return;
+                }
+
+                if (!UnsubscribeHandler())
+                {
+                    return;
+                }
+
+                //Hide suggestion drop-down
+                //Reset suggestion drop down list
+                HideSuggestions(EM.SuggestionCleanupOperation.ResetIndex | EM.SuggestionCleanupOperation.ResetItemSource);
+
+                //User is expecting to complete item selection
+                if (IsBlankTextWithItemSeparator(userEnteredText))
+                {
+                    //there's nothing to select
+                    //set current text to empty
+                    RichTextBoxElement.ResetCurrentText();
+                    return;
+                }
+
+                //User has entered valid text + separator
+                RichTextBoxElement.RemoveRunBlocks();
+                //Try select item from source based on current entered text
+                UpdateSelectedItemsFromEnteredText(userEnteredText);
+            }
+            catch { }
+            finally
+            {
+                //Subscribe back
+                SubsribeHandler();
+            }
+        }
         private void RichTextBoxElement_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             if (!PopupElement.IsOpen)
@@ -234,33 +211,15 @@ namespace BlackPearl.Controls.CoreLibrary
         #region Methods
 
         #region event handler helper methods
-
         private bool IsBlankTextWithItemSeparator(string userEnteredText) => string.IsNullOrWhiteSpace(userEnteredText.Trim(GetSeparators()));
         private bool IsEndOfTextDetected(string userEnteredText)
-        {
-            if (!string.IsNullOrWhiteSpace(userEnteredText))
-            {
-                foreach (char c in GetSeparators())
-                {
-                    if (userEnteredText.EndsWith(c.ToString()))
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
+            => !string.IsNullOrEmpty(userEnteredText) && GetSeparators().Any(s => userEnteredText.EndsWith(s.ToString()));
         private void UpdateSuggestionAndShowHideDropDown(string userEnteredText)
         {
             bool hasAnySuggestionToShow = UpdateSuggestions(userEnteredText);
             if (hasAnySuggestionToShow)
             {
                 ShowSuggestions();
-                return;
-            }
-            else if (ShowCreateNewItem)
-            {
-                ShowPopupElementNoSuggestion();
                 return;
             }
 
@@ -309,8 +268,7 @@ namespace BlackPearl.Controls.CoreLibrary
                 SubsribeHandler();
             }
         }
-
-        public void InsertElementsFromString(string values)
+        private void PasteHandler(string values)
         {
             try
             {
@@ -325,17 +283,16 @@ namespace BlackPearl.Controls.CoreLibrary
                 //User can remove paragraph reference by 'Select all & delete' in RichTextBox
                 //Following method call with make sure local paragraph remains part of RichTextBox
                 RichTextBoxElement.SetParagraphAsFirstBlock();
+
                 //Single item paste
                 if (values.IndexOfAny(GetSeparators()) == -1)
                 {
-                    richTextBoxElement.AddToParagraph(values, CreateRunElement); 
-                    TextChanged();
-                    richTextBoxElement.MoveCursor();
+                    richTextBoxElement.AddToParagraph(values, CreateRunElement);
                     return;
                 }
                 //User has entered valid text + separator
                 RichTextBoxElement.RemoveRunBlocks();
-                TextChanged();
+
                 int i;
                 string[] multipleTexts = values.Split(GetSeparators());
                 for (i = 0; i < multipleTexts.Length - 1; i++)
@@ -344,14 +301,12 @@ namespace BlackPearl.Controls.CoreLibrary
                         continue;
 
                     //Try select item from source based on current entered text
-                    UpdateSelectedItemsFromEnteredText(multipleTexts[i]); 
-                    TextChanged();
+                    UpdateSelectedItemsFromEnteredText(multipleTexts[i]);
                 }
 
                 if (!string.IsNullOrWhiteSpace(multipleTexts[i]))
                 {
-                    richTextBoxElement.AddToParagraph(multipleTexts[i], CreateRunElement); 
-                    TextChanged();
+                    richTextBoxElement.AddToParagraph(multipleTexts[i], CreateRunElement);
                 }
             }
             catch { }
@@ -359,10 +314,8 @@ namespace BlackPearl.Controls.CoreLibrary
             {
                 //Subscribe back
                 SubsribeHandler();
-                HideSuggestions(EM.SuggestionCleanupOperation.ResetItemSource);
             }
         }
-
         private static string GetClipboardTextWithCommandCancelled(DataObjectPastingEventArgs e)
         {
             string clipboard = e?.DataObject?.GetData(typeof(string)) as string;
@@ -373,7 +326,6 @@ namespace BlackPearl.Controls.CoreLibrary
             e.Handled = true;
             return clipboard;
         }
-
         private void SetClipboardTextWithCommandCancelled(object sender, ExecutedRoutedEventArgs e)
         {
             if (e.Command == ApplicationCommands.Copy)
@@ -385,51 +337,7 @@ namespace BlackPearl.Controls.CoreLibrary
             {
                 Clipboard.SetText(RichTextBoxElement.GetSelectedText());
                 RichTextBoxElement.Selection.Text = "";
-                TextChanged();
                 e.Handled = true;
-            }
-        }
-
-        private void TextChanged()
-        {
-            try
-            {
-                //All text entered in Control goes to Run element of RichTextBox
-                string userEnteredText = RichTextBoxElement.GetCurrentText();
-                if (!IsEndOfTextDetected(userEnteredText))
-                {
-                    UpdateSuggestionAndShowHideDropDown(userEnteredText);
-                    return;
-                }
-
-                if (!UnsubscribeHandler())
-                {
-                    return;
-                }
-
-                //Hide suggestion drop-down
-                //Reset suggestion drop down list
-                HideSuggestions(EM.SuggestionCleanupOperation.ResetIndex | EM.SuggestionCleanupOperation.ResetItemSource);
-
-                //User is expecting to complete item selection
-                if (IsBlankTextWithItemSeparator(userEnteredText))
-                {
-                    //there's nothing to select
-                    //set current text to empty
-                    RichTextBoxElement.ResetCurrentText();
-                    return;
-                }
-
-                //User has entered valid text + separator
-                RichTextBoxElement.RemoveRunBlocks();
-                //Try select item from source based on current entered text
-                UpdateSelectedItemsFromEnteredText(userEnteredText);
-            }
-            catch { }
-            finally
-            {
-                //Subscribe back
-                SubsribeHandler();
             }
         }
         #endregion
@@ -507,7 +415,6 @@ namespace BlackPearl.Controls.CoreLibrary
         {
             if (!HasAnySuggestion())
             {
-                ShowPopupElementNoSuggestion();
                 return;
             }
 
@@ -526,7 +433,6 @@ namespace BlackPearl.Controls.CoreLibrary
         {
             if (!HasAnySuggestion())
             {
-                ShowPopupElementNoSuggestion();
                 return;
             }
 
@@ -547,80 +453,25 @@ namespace BlackPearl.Controls.CoreLibrary
         /// </summary>
         /// <param name="itemString">entered text</param>
         /// <param name="forceAdd">Allows creation of new item</param>
-        private bool UpdateSelectedItemsFromEnteredText(string itemString)
+        private void UpdateSelectedItemsFromEnteredText(string itemString)
         {
-            if (string.IsNullOrWhiteSpace(itemString))
-            {
-                return false;
-            }
             itemString = itemString.Trim(GetSeparators()).Trim(' ');
 
             if (IsItemAlreadySelected(itemString))
             {
-                return false;
+                return;
             }
 
             object itemToAdd = GetItemToAdd(itemString);
             //If item is not available
             if (itemToAdd == null)
             {
-                return false;
+                return;
             }
 
-            AddToSelectedItems(itemToAdd); 
-            TextChanged();
+            AddToSelectedItems(itemToAdd);
             RaiseSelectionChangedEvent(new ArrayList(0), new[] { itemToAdd });
-            return true;
         }
-
-        private void TryCreateItemForSuggestedAction(RichTextBox richTextBox)
-        {
-            if (UpdateSelectedItemsFromEnteredText(richTextBox.GetCurrentText()))
-            {
-                richTextBoxElement.RemoveRunBlocks();
-                richTextBoxElement.MoveCursor();
-            }
-        }
-
-        public CompositeCollection GetItemSource(RichTextBox richTextBox, IEnumerable<object> itemsToAdd, ILookUpContract contract, bool ShowCreateNewItem)
-        {
-            var compositeCollection = new CompositeCollection();
-            string CurrentQueryText = richTextBox.GetCurrentText();
-            if (ShowCreateNewItem && contract?.SupportsNewObjectCreation == true && !string.IsNullOrWhiteSpace(CurrentQueryText))
-            {
-                var collectionContainer = new CollectionContainer { Collection = itemsToAdd };
-                compositeCollection.Add(collectionContainer);
-
-                var btn = new Button { Content = " + " + CurrentQueryText, HorizontalAlignment = HorizontalAlignment.Center };
-                var listBoxItem = new ListBoxItem
-                {
-                    Focusable = false,
-                    IsSelected = false,
-                    Content = btn,
-                    Margin = new Thickness(0),
-                    Padding = new Thickness(0),
-                    BorderThickness = new Thickness(0),
-                    Name = "CreateNewItemSuggestion"
-                };
-                listBoxItem.PreviewMouseLeftButtonDown += (o, e) =>
-                {
-                    e.Handled = true;
-                    TryCreateItemForSuggestedAction(richTextBox);
-                };
-
-                compositeCollection.Add(listBoxItem);
-            }
-            else
-            {
-                foreach (object item in itemsToAdd)
-                {
-                    compositeCollection.Add(item);
-                }
-            }
-
-            return compositeCollection;
-        }
-
         private bool IsItemAlreadySelected(string itemString) => SelectedItems?.Cast<object>()?.HasAnyExactMatch(itemString, LookUpContract, this) == true;
         private object GetItemToAdd(string itemString)
         {
@@ -634,6 +485,7 @@ namespace BlackPearl.Controls.CoreLibrary
                                     : null;                                             //cant create new item. return
             return itemToAdd;
         }
+
         private void AddToSelectedItems(object itemToAdd)
         {
             if (SelectedItems?.Contains(itemToAdd) == true)
@@ -642,23 +494,19 @@ namespace BlackPearl.Controls.CoreLibrary
             }
 
             //Add item in RichTextBox UI
-            int? InsertIndex = RichTextBoxElement.AddToParagraph(itemToAdd, CreateInlineUIElement);
-            if (IsMoveCursorEnabled)
-            {
-                richTextBoxElement.MoveCursor();
-            }
-            //Add item to Selected Item list
-            if (InsertIndex is null || SelectedItems?.Count < (int)InsertIndex + 1)
+            RichTextBoxElement.AddToParagraph(itemToAdd, CreateInlineUIElement);
+
+            var nextItemTag = richTextBoxElement.GetNextItemTag();
+
+            if (nextItemTag == null || SelectedItems?.Contains(nextItemTag) != true)
             {
                 SelectedItems?.Add(itemToAdd);
+                return;
             }
-            else
-            {
-                SelectedItems?.Insert((int)InsertIndex + 1, itemToAdd);
-                
-            }
-            TextChanged();
+
+            SelectedItems?.Insert(SelectedItems.IndexOf(nextItemTag), itemToAdd);
         }
+
         private void AddSuggestionsToSelectedItems(IList itemsToAdd)
         {
             foreach (object item in itemsToAdd)
@@ -712,31 +560,18 @@ namespace BlackPearl.Controls.CoreLibrary
         /// <summary>
         /// Shows suggestion drop-down
         /// </summary>
-        private void ShowSuggestions() { 
-            if (!RichTextBoxElement.IsKeyboardFocusWithin)
-            {
-                return ;
-            }
-            PopupElement.Show(HasAnySuggestion, () => SuggestionElement.CleanOperation(EM.SuggestionCleanupOperation.ResetIndex, ItemSource)); 
-        }
+        private void ShowSuggestions() => PopupElement.Show(HasAnySuggestion, () => SuggestionElement.CleanOperation(EM.SuggestionCleanupOperation.ResetIndex, ItemSource));
         private void HideSuggestions(EM.SuggestionCleanupOperation cleanupOperation) => PopupElement.Hide(null, () => SuggestionElement.CleanOperation(cleanupOperation, ItemSource));
         private bool HasAnySuggestion() => SuggestionElement.Items.Count > 0;
         private bool UpdateSuggestions(string userEnteredText)
         {
             //Get Items to be shown in suggestion drop-down for current text
             IEnumerable<object> itemsToAdd = ItemSource?.Cast<object>().GetSuggestions(userEnteredText, LookUpContract, this);
+
             //Add suggestion items to suggestion drop-down
-            SuggestionElement.ItemsSource = GetItemSource(richTextBoxElement, itemsToAdd, LookUpContract, ShowCreateNewItem);
+            SuggestionElement.ItemsSource = itemsToAdd;
 
             return itemsToAdd?.Any() == true;
-        }
-
-        private void ShowPopupElementNoSuggestion()
-        {
-            if (!string.IsNullOrWhiteSpace(RichTextBoxElement.GetCurrentText()))
-            {
-                PopupElement.Show(() => true, () => SuggestionElement.CleanOperation(EM.SuggestionCleanupOperation.ResetIndex, ItemSource));
-            }
         }
         #endregion
 

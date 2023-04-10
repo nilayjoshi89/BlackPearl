@@ -8,7 +8,16 @@ using BlackPearl.Controls.Contract;
 
 namespace BlackPearl.Controls.CoreLibrary
 {
-    [TemplatePart(Name = "rtxt", Type = typeof(RichTextBox))]
+    public class CustomRichTextBox : RichTextBox
+    {
+        protected override void OnDrop(DragEventArgs e)
+        {
+            //disable default OnDrop event witch give " " strings...
+            //base.OnDrop(e);
+        }
+    }
+
+    [TemplatePart(Name = "rtxt", Type = typeof(CustomRichTextBox))]
     [TemplatePart(Name = "popup", Type = typeof(Popup))]
     [TemplatePart(Name = "lstSuggestion", Type = typeof(ListBox))]
     public sealed partial class MultiSelectCombobox : Control
@@ -16,17 +25,12 @@ namespace BlackPearl.Controls.CoreLibrary
         #region Constructor
         static MultiSelectCombobox()
         {
-#if DEBUG
-            //https://weblogs.asp.net/akjoshi/resolving-un-harmful-binding-errors-in-wpf
-            System.Diagnostics.PresentationTraceSources.DataBindingSource.Switch.Level = System.Diagnostics.SourceLevels.Critical;
-#endif
             DefaultStyleKeyProperty.OverrideMetadata(typeof(MultiSelectCombobox), new FrameworkPropertyMetadata(typeof(MultiSelectCombobox)));
         }
         public MultiSelectCombobox()
         {
             PreviewKeyDown += MultiSelectCombobox_PreviewKeyDown;
             LostFocus += MultiSelectCombobox_LostFocus;
-            DelayedTextEnterFilter.Elapsed += DelayedTextEnterFilter_Elapsed;
         }
 
         #endregion
@@ -35,13 +39,13 @@ namespace BlackPearl.Controls.CoreLibrary
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            RichTextBoxElement = GetTemplateChild("rtxt") as RichTextBox;
+            RichTextBoxElement = GetTemplateChild("rtxt") as CustomRichTextBox;
             PopupElement = GetTemplateChild("popup") as Popup;
             SuggestionElement = GetTemplateChild("lstSuggestion") as ListBox;
         }
 
-        private RichTextBox richTextBoxElement;
-        private RichTextBox RichTextBoxElement
+        private CustomRichTextBox richTextBoxElement;
+        private CustomRichTextBox RichTextBoxElement
         {
             get => richTextBoxElement;
             set
@@ -51,7 +55,10 @@ namespace BlackPearl.Controls.CoreLibrary
                     richTextBoxElement.TextChanged -= RichTextBoxElement_TextChanged;
                     richTextBoxElement.SizeChanged -= RichTextBoxElement_SizeChanged;
                     DataObject.RemovePastingHandler(richTextBoxElement, PasteHandler);
+                    DataObject.RemoveCopyingHandler(richTextBoxElement, OnSelectionStartDrag);
                     richTextBoxElement.RemoveHandler(CommandManager.PreviewExecutedEvent, new ExecutedRoutedEventHandler(SetClipboardTextWithCommandCancelled));
+                    richTextBoxElement.DragEnter -= OnDragEnter;
+                    richTextBoxElement.Drop -= OnDragDrop;
                 }
 
                 richTextBoxElement = value;
@@ -98,7 +105,7 @@ namespace BlackPearl.Controls.CoreLibrary
 
                 suggestionElement = value;
                 suggestionElement.DisplayMemberPath = DisplayMemberPath;
-                suggestionElement.ItemsSource = GetItemSource(richTextBoxElement, (System.Collections.Generic.IEnumerable<object>)ItemSource, LookUpContract, ShowCreateNewItem);
+                suggestionElement.ItemsSource = ItemSource;
 
                 if (suggestionElement != null)
                 {
@@ -154,28 +161,6 @@ namespace BlackPearl.Controls.CoreLibrary
         {
             get => (char[])GetValue(AdditionalItemSeparatorsProperty);
             set => SetValue(AdditionalItemSeparatorsProperty, value);
-        }
-
-        /// <summary>
-        /// Do delete empty values. Default value is true
-        /// </summary>
-        public static readonly DependencyProperty DoDeleteInvalidEntryProperty =
-            DependencyProperty.Register(nameof(DoDeleteInvalidEntry), typeof(bool), typeof(MultiSelectCombobox), new PropertyMetadata(true));
-        public bool DoDeleteInvalidEntry
-        {
-            get => (bool)GetValue(DoDeleteInvalidEntryProperty);
-            set => SetValue(DoDeleteInvalidEntryProperty, value);
-        }
-
-        /// <summary>
-        /// Show add item. Default value is false
-        /// </summary>
-        public static readonly DependencyProperty ShowCreateNewItemProperty =
-            DependencyProperty.Register(nameof(ShowCreateNewItem), typeof(bool), typeof(MultiSelectCombobox), new PropertyMetadata(false));
-        public bool ShowCreateNewItem
-        {
-            get => (bool)GetValue(ShowCreateNewItemProperty);
-            set => SetValue(ShowCreateNewItemProperty, value);
         }
 
         /// <summary>
@@ -256,7 +241,7 @@ namespace BlackPearl.Controls.CoreLibrary
                 return;
             }
 
-            multiChoiceControl.SuggestionElement.ItemsSource = multiChoiceControl.GetItemSource(multiChoiceControl.richTextBoxElement, (e.NewValue as IEnumerable)?.Cast<object>(), multiChoiceControl.LookUpContract, multiChoiceControl.ShowCreateNewItem);
+            multiChoiceControl.SuggestionElement.ItemsSource = (e.NewValue as IEnumerable)?.Cast<object>();
         }
 
         /// <summary>
@@ -282,7 +267,7 @@ namespace BlackPearl.Controls.CoreLibrary
             routingStrategy: RoutingStrategy.Bubble,
             handlerType: typeof(SelectionChangedEventHandler), ownerType:
             typeof(MultiSelectCombobox));
-        public event System.EventHandler<SelectionChangedEventArgs> SelectionChanged
+        public event SelectionChangedEventHandler SelectionChanged
         {
             add { AddHandler(SelectionChangedEvent, value); }
             remove { RemoveHandler(SelectionChangedEvent, value); }

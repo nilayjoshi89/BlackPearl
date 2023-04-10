@@ -149,7 +149,7 @@
                                               SelectedItems="{Binding SelectedItems4, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                               DisplayMemberPath="Name"
                                               ItemSeparator=";"
-                                              Grid.Row="2" DoDeleteInvalidEntry="False" ShowCreateNewItem="True" />
+                                              Grid.Row="2"/>
                     <Button Content="Show selected"
                         Command="{Binding ShowSelectedItemCommand}"
                         CommandParameter="{Binding SelectedItems4}"
@@ -184,8 +184,6 @@
                                                   DisplayMemberPath="Name"
                                                   ItemSeparator=";"
                                                   Grid.Row="2" 
-                                                  DoDeleteInvalidEntry="False" 
-                                                  ShowCreateNewItem="True" 
                                                   LookUpContract="{Binding SimpleLookUpContract}"
                                                   />
                     <Button Content="Show selected"

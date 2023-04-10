@@ -60,6 +60,7 @@
         <Setter Property="FontWeight"
                 Value="SemiBold" />
     </Style>
+    
     <Style TargetType="Run"
            x:Key="BlackPearl.MultiselectCombobox.RunStyle">
         <!--<Setter Property=""
@@ -73,7 +74,7 @@
         <Setter Property="FontWeight"
                 Value="SemiBold" />
     </Style>
-
+    
     <Style TargetType="{x:Type local:MultiSelectCombobox}">
         <Setter Property="Template">
             <Setter.Value>
@@ -84,18 +85,18 @@
                         <!--Main Grid-->
                         <Grid>
                             <!--Rich TextBox bound to document-->
-                            <RichTextBox Name="rtxt"
+                            <local:CustomRichTextBox x:Name="rtxt"
                                          IsDocumentEnabled="False"
                                          AcceptsReturn="False"
                                          VerticalContentAlignment="Center"
                                          FontSize="{Binding FontSize, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}">
-                                <RichTextBox.Resources>
+                                <local:CustomRichTextBox.Resources>
                                     <Style TargetType="TextBlock"
                                            BasedOn="{StaticResource BlackPearl.MultiselectCombobox.SelectedTextBlockStyle}" />
                                     <Style TargetType="Run"
                                            BasedOn="{StaticResource BlackPearl.MultiselectCombobox.RunStyle}" />
-                                </RichTextBox.Resources>
-                            </RichTextBox>
+                                </local:CustomRichTextBox.Resources>
+                            </local:CustomRichTextBox>
 
                             <!--Suggestion Drop-Down -->
                             <Popup Name="popup"

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -226,27 +225,14 @@ namespace BlackPearl.Controls.CoreLibrary
             catch { }
         }
 
-        public static void MoveCursor(this RichTextBox richTextBox, int NumberOfTimes = 2)
-        {
-            TextPointer NewCaretPosition = richTextBox.CaretPosition.GetPositionAtOffset(NumberOfTimes, LogicalDirection.Forward);
-            if (NewCaretPosition != null)
-            {
-                richTextBox.CaretPosition = NewCaretPosition;
-            }
-            else
-            {
-                richTextBox.CaretPosition = richTextBox.CaretPosition.DocumentEnd;
-            }
-        }
-
-        public static int? AddToParagraph(this RichTextBox richTextBox, object itemToAdd, Func<object, Inline> createInlineElementFunct)
+        public static void AddToParagraph(this RichTextBox richTextBox, object itemToAdd, Func<object, Inline> createInlineElementFunct)
         {
             try
             {
                 Paragraph paragraph = richTextBox?.GetParagraph();
                 if (paragraph == null)
                 {
-                    return null;
+                    return;
                 }
 
                 Inline elementToAdd = createInlineElementFunct(itemToAdd);
@@ -255,26 +241,21 @@ namespace BlackPearl.Controls.CoreLibrary
                     //First element to insert
                     paragraph.Inlines.Add(elementToAdd);
                     richTextBox.CaretPosition = richTextBox.CaretPosition.DocumentEnd;
+                    return;
                 }
-                else
+
+                if (richTextBox.CaretPosition.GetAdjacentElement(LogicalDirection.Forward) is Inline inlineToInsertBefore)
                 {
-                    //Insert at the cusor position
-                    int InsertIndex = richTextBox.GetLastInlineIndexBeforeCaret();
-                    if (InsertIndex >= 0)
-                    {
-                        Inline LastInlineBeforeCaret = richTextBox?.GetParagraph().Inlines.ElementAtOrDefault(InsertIndex);
-                        paragraph.Inlines.InsertAfter(LastInlineBeforeCaret, elementToAdd);
-                    }
-                    else
-                    {
-                        Inline FirstInlineAfterCaret = richTextBox?.GetParagraph().Inlines.ElementAtOrDefault(0);
-                        paragraph.Inlines.InsertBefore(FirstInlineAfterCaret, elementToAdd);
-                    }
-                    return InsertIndex;
+                    paragraph.Inlines.InsertBefore(inlineToInsertBefore, elementToAdd);
+                    richTextBox.CaretPosition = elementToAdd.ElementEnd;
+                    return;
                 }
+
+                //Insert at the end
+                paragraph.Inlines.InsertAfter(paragraph.Inlines.LastInline, elementToAdd);
+                richTextBox.CaretPosition = richTextBox.CaretPosition.DocumentEnd;
             }
             catch { }
-            return null;
         }
         public static void ClearParagraph(this RichTextBox richTextBox)
         {
@@ -284,68 +265,21 @@ namespace BlackPearl.Controls.CoreLibrary
 
         public static Run GetCurrentRunBlock(this RichTextBox richTextBox) => richTextBox?.CaretPosition?.Parent as Run;
         public static Paragraph GetParagraph(this RichTextBox richTextBox) => richTextBox?.Document?.Blocks?.FirstBlock as Paragraph;
-
-        public static int GetLastInlineIndexBeforeCaret(this RichTextBox richTextBox)
-        {
-            if (richTextBox.CaretPosition.IsAtLineStartPosition)
-            {
-                return -1;
-            }
-
-            Paragraph paragraph = richTextBox?.GetParagraph();
-            for (int i = 0; i < paragraph.Inlines.Count; i++)
-            {
-                Inline inline = paragraph.Inlines.ElementAtOrDefault(i);
-                var start = inline.ContentEnd;
-                var here = richTextBox.CaretPosition;
-                var range = new TextRange(start, here);
-                int indexInText = range.Text.Length;
-                if (indexInText == 0)
-                {
-                    return i;
-                }
-            }
-            return paragraph.Inlines.Count;
-        }
-
+        public static object GetNextItemTag(this RichTextBox richTextBox) 
+            => ((richTextBox.CaretPosition.GetAdjacentElement(LogicalDirection.Forward) as InlineUIContainer)?.Child as FrameworkElement)?.Tag;
         public static string GetSelectedText(this RichTextBox richTextBox)
-        {
-            string CurentSelectionText = string.Empty;
-
-            foreach (Inline inline in richTextBox.GetParagraph().Inlines)
-            {
-                //check if inline is inside the selection
-                if (inline.ContentStart.CompareTo(richTextBox.Selection.Start) >= 0 && inline.ContentEnd.CompareTo(richTextBox.Selection.End) <= 0)
-                {
-                    CurentSelectionText += inline.GetText();
-                }
-            }
-            return CurentSelectionText;
-        }
+            => string.Join(string.Empty, 
+                    richTextBox.GetParagraph().Inlines
+                                .Where(inline => (inline.ContentStart.CompareTo(richTextBox.Selection.Start) >= 0 && inline.ContentEnd.CompareTo(richTextBox.Selection.End) <= 0))
+                                .Select(inline => inline.GetText()));
 
         public static string GetText(this RichTextBox richTextBox)
-        {
-            string CurentSelectionText = string.Empty;
+            => string.Join(string.Empty,
+                    richTextBox.GetParagraph().Inlines.Select(inline => inline.GetText()));
 
-            foreach (Inline inline in richTextBox.GetParagraph().Inlines)
-            {
-                CurentSelectionText += inline.GetText();
-            }
-            return CurentSelectionText;
-        }
 
         public static string GetText(this Inline inline)
-        {
-            if (inline is InlineUIContainer inlineUIContainer)
-            {
-                UIElement uiElement = inlineUIContainer.Child;
-                if (uiElement is TextBlock textBlock)
-                {
-                    return textBlock.Text;
-                }
-            }
-            return string.Empty;
-        }
+            => ((inline as InlineUIContainer)?.Child as TextBlock)?.Text ?? string.Empty;
 
         #endregion
 
