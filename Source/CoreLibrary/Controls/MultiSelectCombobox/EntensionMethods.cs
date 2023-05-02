@@ -208,20 +208,20 @@ namespace BlackPearl.Controls.CoreLibrary
             }
             catch { }
         }
-        public static void SetParagraphAsFirstBlock(this RichTextBox richTextBox)
+        public static Paragraph SetParagraphAsFirstBlock(this RichTextBox richTextBox)
         {
             try
             {
-                if (richTextBox?.Document?.Blocks?.FirstBlock is Paragraph)
+                if (!(richTextBox?.Document?.Blocks?.FirstBlock is Paragraph))
                 {
-                    return;
+                    var paragraph = new Paragraph() { Style = new Style() };
+                    richTextBox.Document.Blocks.Clear();
+                    richTextBox.Document.Blocks.Add(paragraph);
+                    return paragraph;
                 }
-
-                var paragraph = new Paragraph() { Style = new Style() };
-                richTextBox.Document.Blocks.Clear();
-                richTextBox.Document.Blocks.Add(paragraph);
             }
             catch { }
+            return null;
         }
 
         public static void AddToParagraph(this RichTextBox richTextBox, object itemToAdd, Func<object, Inline> createInlineElementFunct)
@@ -231,7 +231,7 @@ namespace BlackPearl.Controls.CoreLibrary
                 Paragraph paragraph = richTextBox?.GetParagraph();
                 if (paragraph == null)
                 {
-                    return;
+                    paragraph = SetParagraphAsFirstBlock(richTextBox);
                 }
 
                 Inline elementToAdd = createInlineElementFunct(itemToAdd);
