@@ -5,7 +5,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Data;
 using System.Windows.Documents;
 
 using BlackPearl.Controls.Contract;
@@ -265,14 +264,13 @@ namespace BlackPearl.Controls.CoreLibrary
 
         public static Run GetCurrentRunBlock(this RichTextBox richTextBox) => richTextBox?.CaretPosition?.Parent as Run;
         public static Paragraph GetParagraph(this RichTextBox richTextBox) => richTextBox?.Document?.Blocks?.FirstBlock as Paragraph;
-        public static object GetNextItemTag(this RichTextBox richTextBox) 
+        public static object GetNextItemTag(this RichTextBox richTextBox)
             => ((richTextBox.CaretPosition.GetAdjacentElement(LogicalDirection.Forward) as InlineUIContainer)?.Child as FrameworkElement)?.Tag;
         public static string GetSelectedText(this RichTextBox richTextBox)
-            => string.Join(string.Empty, 
+            => string.Join(string.Empty,
                     richTextBox.GetParagraph().Inlines
                                 .Where(inline => (inline.ContentStart.CompareTo(richTextBox.Selection.Start) >= 0 && inline.ContentEnd.CompareTo(richTextBox.Selection.End) <= 0))
                                 .Select(inline => inline.GetText()));
-
         public static object[] GetSelectedObjects(this RichTextBox richTextBox)
             => richTextBox.GetParagraph().Inlines
                                 .Where(inline => (inline.ContentStart.CompareTo(richTextBox.Selection.Start) >= 0 && inline.ContentEnd.CompareTo(richTextBox.Selection.End) <= 0))
@@ -280,12 +278,6 @@ namespace BlackPearl.Controls.CoreLibrary
                                 .Where(i => i != null).ToArray();
         public static object GetObject(this Inline inline)
            => ((inline as InlineUIContainer)?.Child as TextBlock)?.Tag;
-
-        public static string GetText(this RichTextBox richTextBox)
-            => string.Join(string.Empty,
-                    richTextBox.GetParagraph().Inlines.Select(inline => inline.GetText()));
-
-
         public static string GetText(this Inline inline)
             => ((inline as InlineUIContainer)?.Child as TextBlock)?.Text ?? string.Empty;
 

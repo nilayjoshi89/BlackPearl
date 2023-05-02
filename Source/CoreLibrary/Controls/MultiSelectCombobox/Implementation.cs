@@ -23,22 +23,7 @@ namespace BlackPearl.Controls.CoreLibrary
         #region Control Event Handlers
 
         private void OnDragEnter(object sender, DragEventArgs e)
-        {
-            if (e.Data.GetDataPresent("Object"))
-            {
-                e.Effects = e.KeyStates.HasFlag(DragDropKeyStates.ControlKey)
-                    ? DragDropEffects.Copy
-                    : DragDropEffects.Move;
-            }
-            else if (e.Data.GetDataPresent(DataFormats.Text))
-            {
-                e.Effects = DragDropEffects.Copy;
-            }
-            else
-            {
-                e.Effects = DragDropEffects.None;
-            }
-        }
+            => DragDropGetData(e);
 
         private object DragDropGetData(DragEventArgs e)
         {
@@ -65,20 +50,18 @@ namespace BlackPearl.Controls.CoreLibrary
             }
             return data;
         }
-
-
         private void OnDragDrop(object sender, DragEventArgs e)
         {
             try
             {
-                e.Effects = DragDropEffects.None;
                 TextPointer textPointer = RichTextBoxElement.GetPositionFromPoint(e.GetPosition(this), true);
                 int EndOffset = new TextRange(textPointer, RichTextBoxElement.Selection.End).Text.Length;
                 int StartOffset = new TextRange(textPointer, RichTextBoxElement.Selection.Start).Text.Length;
                 if ((EndOffset == 0 || StartOffset == 0) && RichTextBoxElement.Selection.Text.Length > 0)
                 {
                     return;
-                }
+                } 
+
                 //Removal of the drag and drop element to be able to move it
                 RichTextBoxElement.Selection.Text = "";
                 RichTextBoxElement.CaretPosition = textPointer;
@@ -87,13 +70,14 @@ namespace BlackPearl.Controls.CoreLibrary
                 object data = DragDropGetData(e);
                 if (data == null)
                 {
-                    return;
+                    return; 
                 }
 
                 if (data.GetType() == typeof(string))
-                {
+                { 
                     PasteHandler(data.ToString());
-                }
+                }  
+
                 else if (data.GetType() == typeof(object[]))
                 {
                     if (!UnsubscribeHandler())
@@ -102,7 +86,7 @@ namespace BlackPearl.Controls.CoreLibrary
                         return;
                     }
 
-                    foreach (var obj in data as object[])
+                    foreach (var obj in data as object[]) 
                     {
                         AddToSelectedItems(obj);
                     }
@@ -115,7 +99,6 @@ namespace BlackPearl.Controls.CoreLibrary
                 SubsribeHandler();
             }
         }
-
         private void OnSelectionStartDrag(object sender, DataObjectCopyingEventArgs e)
         {
             if (!e.IsDragDrop)
@@ -137,8 +120,6 @@ namespace BlackPearl.Controls.CoreLibrary
                 RichTextBoxElement.Selection.Text = "";
             }
         }
-
-
         private void PasteHandler(object sender, DataObjectPastingEventArgs e)
         {
             try
