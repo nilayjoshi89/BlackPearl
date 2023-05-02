@@ -47,6 +47,10 @@
         </Setter>
     </Style>
 
+    <Style TargetType="{x:Type local:MultiSelectCombobox_CustomRichTextBox}"
+           x:Key="BlackPearl.MultiselectCombobox.RichTextBox" 
+           BasedOn="{StaticResource {x:Type RichTextBox}}"/>
+
     <Style TargetType="TextBlock"
            x:Key="BlackPearl.MultiselectCombobox.SelectedTextBlockStyle">
         <Setter Property="Margin"
@@ -60,7 +64,7 @@
         <Setter Property="FontWeight"
                 Value="SemiBold" />
     </Style>
-    
+
     <Style TargetType="Run"
            x:Key="BlackPearl.MultiselectCombobox.RunStyle">
         <!--<Setter Property=""
@@ -85,18 +89,19 @@
                         <!--Main Grid-->
                         <Grid>
                             <!--Rich TextBox bound to document-->
-                            <local:MultiselectInternalRichTextBox x:Name="rtxt"
+                            <local:MultiSelectCombobox_CustomRichTextBox x:Name="rtxt"
                                          IsDocumentEnabled="False"
                                          AcceptsReturn="False"
                                          VerticalContentAlignment="Center"
-                                         FontSize="{Binding FontSize, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}">
-                                <local:MultiselectInternalRichTextBox.Resources>
+                                         FontSize="{Binding FontSize, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"
+                                         Style="{DynamicResource BlackPearl.MultiselectCombobox.RichTextBox}">
+                                <local:MultiSelectCombobox_CustomRichTextBox.Resources>
                                     <Style TargetType="TextBlock"
                                            BasedOn="{StaticResource BlackPearl.MultiselectCombobox.SelectedTextBlockStyle}" />
                                     <Style TargetType="Run"
                                            BasedOn="{StaticResource BlackPearl.MultiselectCombobox.RunStyle}" />
-                                </local:MultiselectInternalRichTextBox.Resources>
-                            </local:MultiselectInternalRichTextBox>
+                                </local:MultiSelectCombobox_CustomRichTextBox.Resources>
+                            </local:MultiSelectCombobox_CustomRichTextBox>
 
                             <!--Suggestion Drop-Down -->
                             <Popup Name="popup"

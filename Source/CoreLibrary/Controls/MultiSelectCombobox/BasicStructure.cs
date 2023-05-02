@@ -4,20 +4,12 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+
 using BlackPearl.Controls.Contract;
 
 namespace BlackPearl.Controls.CoreLibrary
 {
-    public class MultiselectInternalRichTextBox : RichTextBox
-    {
-        protected override void OnDrop(DragEventArgs e)
-        {
-            //disable default OnDrop event witch give " " strings...
-            //base.OnDrop(e);
-        }
-    }
-
-    [TemplatePart(Name = "rtxt", Type = typeof(MultiselectInternalRichTextBox))]
+    [TemplatePart(Name = "rtxt", Type = typeof(RichTextBox))]
     [TemplatePart(Name = "popup", Type = typeof(Popup))]
     [TemplatePart(Name = "lstSuggestion", Type = typeof(ListBox))]
     public sealed partial class MultiSelectCombobox : Control
@@ -39,13 +31,13 @@ namespace BlackPearl.Controls.CoreLibrary
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            RichTextBoxElement = GetTemplateChild("rtxt") as MultiselectInternalRichTextBox;
+            RichTextBoxElement = GetTemplateChild("rtxt") as RichTextBox;
             PopupElement = GetTemplateChild("popup") as Popup;
             SuggestionElement = GetTemplateChild("lstSuggestion") as ListBox;
         }
 
-        private MultiselectInternalRichTextBox richTextBoxElement;
-        private MultiselectInternalRichTextBox RichTextBoxElement
+        private RichTextBox richTextBoxElement;
+        private RichTextBox RichTextBoxElement
         {
             get => richTextBoxElement;
             set
