@@ -17,6 +17,7 @@ namespace BlackPearl.Controls.CoreLibrary
         #region Members
         private bool isHandlerRegistered = true;
         private readonly object handlerLock = new object();
+        private const string ObjectString = "Object";
 
         #endregion
 
@@ -27,45 +28,36 @@ namespace BlackPearl.Controls.CoreLibrary
 
         private object DragDropGetData(DragEventArgs e)
         {
-            object data = null;
-            if (e.Data.GetDataPresent("Object"))
+            if (e.Data.GetDataPresent(ObjectString))
             {
-                data = e.Data.GetData("Object");
+                var data = e.Data.GetData(ObjectString);
                 if (data == null)
                 {
-                    return null;
+                    return data;
                 }
                 e.Effects = e.KeyStates.HasFlag(DragDropKeyStates.ControlKey)
                ? DragDropEffects.Copy
                : DragDropEffects.Move;
             }
-            else if (e.Data.GetDataPresent(DataFormats.Text))
+            
+            if (e.Data.GetDataPresent(DataFormats.Text))
             {
-                data = e.Data.GetData(DataFormats.Text);
+                var data = e.Data.GetData(DataFormats.Text);
                 if (string.IsNullOrWhiteSpace(data.ToString()))
                 {
                     return null;
                 }
                 e.Effects = DragDropEffects.Copy;
+                return data;
             }
-            return data;
+            
+            return null;
         }
         private void OnDragDrop(object sender, DragEventArgs e)
         {
             try
             {
-                TextPointer textPointer = RichTextBoxElement.GetPositionFromPoint(e.GetPosition(this), true);
-                int EndOffset = new TextRange(textPointer, RichTextBoxElement.Selection.End).Text.Length;
-                int StartOffset = new TextRange(textPointer, RichTextBoxElement.Selection.Start).Text.Length;
-                if ((EndOffset == 0 || StartOffset == 0) && RichTextBoxElement.Selection.Text.Length > 0)
-                {
-                    return;
-                } 
-
-                //Removal of the drag and drop element to be able to move it
-                RichTextBoxElement.Selection.Text = "";
-                RichTextBoxElement.CaretPosition = textPointer;
-                RichTextBoxElement.Focus();
+                RichTextBoxElement.DragDropAdjustSelection(e.GetPosition(this));
 
                 object data = DragDropGetData(e);
                 if (data == null)
@@ -76,9 +68,10 @@ namespace BlackPearl.Controls.CoreLibrary
                 if (data.GetType() == typeof(string))
                 { 
                     PasteHandler(data.ToString());
+                    return;
                 }  
 
-                else if (data.GetType() == typeof(object[]))
+                if (data.GetType() == typeof(object[]))
                 {
                     if (!UnsubscribeHandler())
                     {
@@ -105,15 +98,12 @@ namespace BlackPearl.Controls.CoreLibrary
             {
                 return;
             }
-            var objectsToBeSent = richTextBoxElement.GetSelectedObjects();
-            if ((objectsToBeSent?.Length ?? 0) == 0)
+
+            var dragDropData = richTextBoxElement.GetDragDropObject();
+            if (dragDropData == null)
                 return;
 
-            DataObject data = new DataObject();
-            data.SetData("Object", objectsToBeSent);
-            //added string to work with other text input
-            data.SetText(richTextBoxElement.GetSelectedText());
-            var dropResult = DragDrop.DoDragDrop(richTextBoxElement, data, DragDropEffects.Move | DragDropEffects.Copy);
+            var dropResult = DragDrop.DoDragDrop(richTextBoxElement, dragDropData, DragDropEffects.Move | DragDropEffects.Copy);
             if (dropResult == DragDropEffects.Move)
             {
                 //If the original RichTextbox is not the same as the one where the drag and drop was performed, then we delete the old text
@@ -381,18 +371,17 @@ namespace BlackPearl.Controls.CoreLibrary
         }
         private void SetClipboardTextWithCommandCancelled(object sender, ExecutedRoutedEventArgs e)
         {
-            if (e.Command == ApplicationCommands.Copy)
-            {
-                Clipboard.SetText(RichTextBoxElement.GetSelectedText());
-                e.Handled = true;
-            }
-            else if (e.Command == ApplicationCommands.Cut)
-            {
-                Clipboard.SetText(RichTextBoxElement.GetSelectedText());
+            if (e.Command != ApplicationCommands.Copy
+                && e.Command != ApplicationCommands.Cut)
+                return;
 
+            e.Handled = true;
+            RichTextBoxElement.SetSelectedTextToClipBoard();
+
+            if (e.Command == ApplicationCommands.Cut)
+            {
                 //Cut the text = set selection to empty (CTRL + X)
                 RichTextBoxElement.Selection.Text = "";
-                e.Handled = true;
             }
         }
         #endregion

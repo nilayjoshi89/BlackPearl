@@ -181,7 +181,8 @@ namespace BlackPearl.Controls.CoreLibrary
         }
         public static void RemoveRunBlocks(this RichTextBox richTextBox)
         {
-            if (!(richTextBox?.Document?.Blocks?.FirstBlock is Paragraph paragraph))
+            Paragraph paragraph = richTextBox?.GetParagraph();
+            if (paragraph == null)
             {
                 return;
             }
@@ -208,30 +209,32 @@ namespace BlackPearl.Controls.CoreLibrary
             }
             catch { }
         }
-        public static Paragraph SetParagraphAsFirstBlock(this RichTextBox richTextBox)
+        public static void SetParagraphAsFirstBlock(this RichTextBox richTextBox)
         {
             try
             {
-                if (!(richTextBox?.Document?.Blocks?.FirstBlock is Paragraph))
+                if (richTextBox.GetParagraph() != null)
                 {
-                    var paragraph = new Paragraph() { Style = new Style() };
-                    richTextBox.Document.Blocks.Clear();
-                    richTextBox.Document.Blocks.Add(paragraph);
-                    return paragraph;
+                    return;
                 }
+
+                var paragraph = new Paragraph() { Style = new Style() };
+                richTextBox.Document.Blocks.Clear();
+                richTextBox.Document.Blocks.Add(paragraph);
             }
             catch { }
-            return null;
         }
+
 
         public static void AddToParagraph(this RichTextBox richTextBox, object itemToAdd, Func<object, Inline> createInlineElementFunct)
         {
             try
             {
+                richTextBox?.SetParagraphAsFirstBlock();
                 Paragraph paragraph = richTextBox?.GetParagraph();
                 if (paragraph == null)
                 {
-                    paragraph = SetParagraphAsFirstBlock(richTextBox);
+                    return;
                 }
 
                 Inline elementToAdd = createInlineElementFunct(itemToAdd);
@@ -261,6 +264,33 @@ namespace BlackPearl.Controls.CoreLibrary
             richTextBox?.GetParagraph()?.Inlines?.Clear();
             richTextBox?.SetParagraphAsFirstBlock();
         }
+        public static void DragDropAdjustSelection(this RichTextBox richTextBox, Point position)
+        {
+            TextPointer textPointer = richTextBox.GetPositionFromPoint(position, true);
+            int EndOffset = new TextRange(textPointer, richTextBox.Selection.End).Text.Length;
+            int StartOffset = new TextRange(textPointer, richTextBox.Selection.Start).Text.Length;
+            if ((EndOffset == 0 || StartOffset == 0) && richTextBox.Selection.Text.Length > 0)
+            {
+                return;
+            }
+
+            //Removal of the drag and drop element to be able to move it
+            richTextBox.Selection.Text = "";
+            richTextBox.CaretPosition = textPointer;
+            richTextBox.Focus();
+        }
+        public static DataObject GetDragDropObject(this RichTextBox richTextBox)
+        {
+            var objectToSend = richTextBox.GetSelectedObjects();
+            if ((objectToSend?.Length ?? 0) == 0)
+                return null;
+
+            DataObject data = new DataObject();
+            data.SetData("Object", objectToSend);
+            data.SetText(richTextBox.GetSelectedText());
+            return data;
+        }
+        public static void SetSelectedTextToClipBoard(this RichTextBox richTextBox) => Clipboard.SetText(richTextBox.GetSelectedText());
 
         public static Run GetCurrentRunBlock(this RichTextBox richTextBox) => richTextBox?.CaretPosition?.Parent as Run;
         public static Paragraph GetParagraph(this RichTextBox richTextBox) => richTextBox?.Document?.Blocks?.FirstBlock as Paragraph;
