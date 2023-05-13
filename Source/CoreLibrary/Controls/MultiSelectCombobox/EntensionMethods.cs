@@ -264,20 +264,23 @@ namespace BlackPearl.Controls.CoreLibrary
             richTextBox?.GetParagraph()?.Inlines?.Clear();
             richTextBox?.SetParagraphAsFirstBlock();
         }
-        public static void DragDropAdjustSelection(this RichTextBox richTextBox, Point position)
+
+        public static bool DragDropAdjustSelection(this RichTextBox richTextBox, Point position)
         {
             TextPointer textPointer = richTextBox.GetPositionFromPoint(position, true);
             int EndOffset = new TextRange(textPointer, richTextBox.Selection.End).Text.Length;
             int StartOffset = new TextRange(textPointer, richTextBox.Selection.Start).Text.Length;
             if ((EndOffset == 0 || StartOffset == 0) && richTextBox.Selection.Text.Length > 0)
             {
-                return;
+                //if its on the same richTextBox and the drag and drop position is the same as actual, then we do not perform OnDragDrop.
+                return false;
             }
 
             //Removal of the drag and drop element to be able to move it
             richTextBox.Selection.Text = "";
             richTextBox.CaretPosition = textPointer;
             richTextBox.Focus();
+            return true;
         }
         public static DataObject GetDragDropObject(this RichTextBox richTextBox)
         {

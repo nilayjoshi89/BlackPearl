@@ -33,13 +33,14 @@ namespace BlackPearl.Controls.CoreLibrary
                 var data = e.Data.GetData(ObjectString);
                 if (data == null)
                 {
-                    return data;
+                    return null;
                 }
                 e.Effects = e.KeyStates.HasFlag(DragDropKeyStates.ControlKey)
                ? DragDropEffects.Copy
                : DragDropEffects.Move;
+                return data;
             }
-            
+
             if (e.Data.GetDataPresent(DataFormats.Text))
             {
                 var data = e.Data.GetData(DataFormats.Text);
@@ -50,26 +51,30 @@ namespace BlackPearl.Controls.CoreLibrary
                 e.Effects = DragDropEffects.Copy;
                 return data;
             }
-            
+
             return null;
         }
         private void OnDragDrop(object sender, DragEventArgs e)
         {
             try
             {
-                RichTextBoxElement.DragDropAdjustSelection(e.GetPosition(this));
+                if (!RichTextBoxElement.DragDropAdjustSelection(e.GetPosition(this)))
+                {
+                    //if we get here, that mean that the drag and drop final position is the same as it is now. We cancel OnDragDrop.
+                    return;
+                }
 
                 object data = DragDropGetData(e);
                 if (data == null)
                 {
-                    return; 
+                    return;
                 }
 
                 if (data.GetType() == typeof(string))
-                { 
+                {
                     PasteHandler(data.ToString());
                     return;
-                }  
+                }
 
                 if (data.GetType() == typeof(object[]))
                 {
@@ -79,7 +84,7 @@ namespace BlackPearl.Controls.CoreLibrary
                         return;
                     }
 
-                    foreach (var obj in data as object[]) 
+                    foreach (var obj in data as object[])
                     {
                         AddToSelectedItems(obj);
                     }
