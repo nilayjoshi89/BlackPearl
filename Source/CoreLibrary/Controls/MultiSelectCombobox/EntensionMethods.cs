@@ -329,11 +329,12 @@ namespace BlackPearl.Controls.CoreLibrary
                                 .Select(inline => inline.GetObject())
                                 .Where(i => i != null).ToArray();
 
-
+        public static TextBlock GetTextBlock(this Inline inline)
+        => ((inline as InlineUIContainer)?.Child as TextBlock);
         public static object GetObject(this Inline inline)
-           => ((inline as InlineUIContainer)?.Child as TextBlock)?.Tag;
+           => GetTextBlock(inline)?.Tag;
         public static string GetText(this Inline inline)
-            => ((inline as InlineUIContainer)?.Child as TextBlock)?.Text ?? string.Empty;
+            => GetTextBlock(inline)?.Text ?? string.Empty;
 
         #endregion
 

@@ -322,11 +322,13 @@ namespace BlackPearl.Controls.CoreLibrary
                 {
                     return;
                 }
-                
+                var SavedCaretPosition = RichTextBoxElement.CaretPosition;
+                RemoveSelectedItems(RichTextBoxElement.GetSelectedObjects());
+                RichTextBoxElement.CaretPosition = SavedCaretPosition;
                 //User can remove paragraph reference by 'Select all & delete' in RichTextBox
                 //Following method call with make sure local paragraph remains part of RichTextBox
                 RichTextBoxElement.SetParagraphAsFirstBlock();
-                
+
                 //Single item paste
                 if (values.IndexOfAny(GetSeparators()) == -1)
                 {
@@ -356,6 +358,36 @@ namespace BlackPearl.Controls.CoreLibrary
                 SubsribeHandler();
             }
         }
+        private void RemoveSelectedItems(object[] selectedItems)
+        {
+            foreach (var i in selectedItems)
+            {
+                SelectedItems.Remove(i);
+            }
+            //if the user paste and has a item inside the selection, then we need to replace it with the pasted content.
+            //For that, before removing elements, we need to say that we dont want to remove back the tag if the item is unloaded.
+            //For exemple, if we have a item call "Andréa Müller;" and we select it, and we paste back "Andréa Müller;",
+            //if Tb_Unloaded is call, "Andréa Müller;" is removed from SelectedItems => then Combobox and SelectedItems is not sync
+            foreach (var inline in richTextBoxElement.GetParagraph().Inlines)
+            {
+                var textblock = inline.GetTextBlock();
+                if (textblock != null)
+                {
+                    textblock.Unloaded -= Tb_Unloaded;
+                }
+                
+            }
+
+            richTextBoxElement.GetParagraph().Inlines.Clear();
+
+            //Add all selected items
+            foreach (object item in SelectedItems)
+            {
+                RichTextBoxElement?.AddToParagraph(item, CreateInlineUIElement);
+            }
+        }
+
+
         private static string GetClipboardTextWithCommandCancelled(DataObjectPastingEventArgs e)
         {
             string clipboard = e?.DataObject?.GetData(typeof(string)) as string;
