@@ -153,6 +153,9 @@ namespace BlackPearl.Controls.CoreLibrary
                 //Remove all invalid texts from
                 RemoveInvalidTexts();
 
+                //Deselect text : to fix if we select all, we leave and come back and drag and drop a item
+                RichTextBoxElement.Selection.Select(RichTextBoxElement.CaretPosition, RichTextBoxElement.CaretPosition);
+
                 //Hide drop-down
                 HideSuggestions(EM.SuggestionCleanupOperation.ResetIndex | EM.SuggestionCleanupOperation.ClearSelection);
             }
