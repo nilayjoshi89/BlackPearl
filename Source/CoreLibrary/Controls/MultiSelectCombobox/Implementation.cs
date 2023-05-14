@@ -316,15 +316,15 @@ namespace BlackPearl.Controls.CoreLibrary
             try
             {
                 if (string.IsNullOrWhiteSpace(values))
+                {
                     return;
+                }
 
                 if (!UnsubscribeHandler())
                 {
                     return;
                 }
-                var SavedCaretPosition = RichTextBoxElement.CaretPosition;
-                RemoveSelectedItems(RichTextBoxElement.GetSelectedObjects());
-                RichTextBoxElement.CaretPosition = SavedCaretPosition;
+                RemoveSelectedItems();
                 //User can remove paragraph reference by 'Select all & delete' in RichTextBox
                 //Following method call with make sure local paragraph remains part of RichTextBox
                 RichTextBoxElement.SetParagraphAsFirstBlock();
@@ -358,8 +358,9 @@ namespace BlackPearl.Controls.CoreLibrary
                 SubsribeHandler();
             }
         }
-        private void RemoveSelectedItems(object[] selectedItems)
+        private void RemoveSelectedItems()
         {
+            object[] selectedItems = RichTextBoxElement.GetSelectedObjects();
             foreach (var i in selectedItems)
             {
                 SelectedItems.Remove(i);
@@ -371,20 +372,13 @@ namespace BlackPearl.Controls.CoreLibrary
             foreach (var inline in richTextBoxElement.GetParagraph().Inlines)
             {
                 var textblock = inline.GetTextBlock();
-                if (textblock != null)
+                if (textblock != null && selectedItems.Contains(inline.GetObject()))
                 {
                     textblock.Unloaded -= Tb_Unloaded;
                 }
-                
             }
-
-            richTextBoxElement.GetParagraph().Inlines.Clear();
-
-            //Add all selected items
-            foreach (object item in SelectedItems)
-            {
-                RichTextBoxElement?.AddToParagraph(item, CreateInlineUIElement);
-            }
+            //using richTextBoxElement.Selection.Text to empty has the advantage to keep the cursor position
+            richTextBoxElement.Selection.Text = "";
         }
 
 
