@@ -293,22 +293,43 @@ namespace BlackPearl.Controls.CoreLibrary
             data.SetText(richTextBox.GetSelectedText());
             return data;
         }
-        public static void SetSelectedTextToClipBoard(this RichTextBox richTextBox) => Clipboard.SetText(richTextBox.GetSelectedText());
+        public static void SetSelectedTextToClipBoard(this RichTextBox richTextBox)
+        {
+            try
+            {
+                Clipboard.SetText(richTextBox.GetSelectedText());
+            }
+            catch (System.Runtime.InteropServices.COMException ex)
+            {
+                //Failed to open Clipboard, this occur when user is copying fast multiples times data
+                const uint CLIPBRD_E_CANT_OPEN = 0x800401D0;
+                if ((uint)ex.ErrorCode != CLIPBRD_E_CANT_OPEN) throw;
+            }
+        }
 
         public static Run GetCurrentRunBlock(this RichTextBox richTextBox) => richTextBox?.CaretPosition?.Parent as Run;
         public static Paragraph GetParagraph(this RichTextBox richTextBox) => richTextBox?.Document?.Blocks?.FirstBlock as Paragraph;
         public static object GetNextItemTag(this RichTextBox richTextBox)
             => ((richTextBox.CaretPosition.GetAdjacentElement(LogicalDirection.Forward) as InlineUIContainer)?.Child as FrameworkElement)?.Tag;
         public static string GetSelectedText(this RichTextBox richTextBox)
-            => string.Join(string.Empty,
+        {
+            string SelectedText = string.Join(string.Empty,
                     richTextBox.GetParagraph().Inlines
                                 .Where(inline => (inline.ContentStart.CompareTo(richTextBox.Selection.Start) >= 0 && inline.ContentEnd.CompareTo(richTextBox.Selection.End) <= 0))
                                 .Select(inline => inline.GetText()));
+
+            //Dont forget to add CurrentText
+            SelectedText += richTextBox.Selection.Text.Trim();
+            return SelectedText;
+        }
+
         public static object[] GetSelectedObjects(this RichTextBox richTextBox)
-            => richTextBox.GetParagraph().Inlines
+            => richTextBox?.GetParagraph()?.Inlines
                                 .Where(inline => (inline.ContentStart.CompareTo(richTextBox.Selection.Start) >= 0 && inline.ContentEnd.CompareTo(richTextBox.Selection.End) <= 0))
                                 .Select(inline => inline.GetObject())
                                 .Where(i => i != null).ToArray();
+
+
         public static object GetObject(this Inline inline)
            => ((inline as InlineUIContainer)?.Child as TextBlock)?.Tag;
         public static string GetText(this Inline inline)

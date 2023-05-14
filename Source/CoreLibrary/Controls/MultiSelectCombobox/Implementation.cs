@@ -120,7 +120,6 @@ namespace BlackPearl.Controls.CoreLibrary
             try
             {
                 string clipboard = GetClipboardTextWithCommandCancelled(e);
-                RichTextBoxElement.Selection.Text = string.Empty;
                 PasteHandler(clipboard);
             }
             catch { }
@@ -206,7 +205,6 @@ namespace BlackPearl.Controls.CoreLibrary
             {
                 //All text entered in Control goes to Run element of RichTextBox
                 string userEnteredText = RichTextBoxElement.GetCurrentText();
-
                 if (!IsEndOfTextDetected(userEnteredText))
                 {
                     UpdateSuggestionAndShowHideDropDown(userEnteredText);
@@ -217,11 +215,9 @@ namespace BlackPearl.Controls.CoreLibrary
                 {
                     return;
                 }
-
                 //Hide suggestion drop-down
                 //Reset suggestion drop down list
                 HideSuggestions(EM.SuggestionCleanupOperation.ResetIndex | EM.SuggestionCleanupOperation.ResetItemSource);
-
                 //User is expecting to complete item selection
                 if (IsBlankTextWithItemSeparator(userEnteredText))
                 {
@@ -230,7 +226,6 @@ namespace BlackPearl.Controls.CoreLibrary
                     RichTextBoxElement.ResetCurrentText();
                     return;
                 }
-
                 //User has entered valid text + separator
                 RichTextBoxElement.RemoveRunBlocks();
                 //Try select item from source based on current entered text
@@ -327,11 +322,11 @@ namespace BlackPearl.Controls.CoreLibrary
                 {
                     return;
                 }
-
+                
                 //User can remove paragraph reference by 'Select all & delete' in RichTextBox
                 //Following method call with make sure local paragraph remains part of RichTextBox
                 RichTextBoxElement.SetParagraphAsFirstBlock();
-
+                
                 //Single item paste
                 if (values.IndexOfAny(GetSeparators()) == -1)
                 {
@@ -345,9 +340,6 @@ namespace BlackPearl.Controls.CoreLibrary
                 string[] multipleTexts = values.Split(GetSeparators());
                 for (i = 0; i < multipleTexts.Length - 1; i++)
                 {
-                    if (string.IsNullOrWhiteSpace(multipleTexts[i]))
-                        continue;
-
                     //Try select item from source based on current entered text
                     UpdateSelectedItemsFromEnteredText(multipleTexts[i]);
                 }
@@ -504,6 +496,11 @@ namespace BlackPearl.Controls.CoreLibrary
         /// <param name="forceAdd">Allows creation of new item</param>
         private void UpdateSelectedItemsFromEnteredText(string itemString)
         {
+            if (string.IsNullOrWhiteSpace(itemString))
+            {
+                return;
+            }
+
             itemString = itemString.Trim(GetSeparators()).Trim(' ');
 
             if (IsItemAlreadySelected(itemString))
