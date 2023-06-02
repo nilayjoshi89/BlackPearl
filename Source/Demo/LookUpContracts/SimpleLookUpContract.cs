@@ -46,7 +46,7 @@ namespace BlackPearl.Controls.Demo
         {
             return value1 != null
                && value2 != null
-               && string.Compare(value1.ToString(), value2, StringComparison.InvariantCultureIgnoreCase) == 0;
+               && string.Compare(value1, value2, StringComparison.InvariantCultureIgnoreCase) == 0;
         }
     }
 }

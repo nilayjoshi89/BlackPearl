@@ -11,29 +11,9 @@ namespace BlackPearl.Controls.Demo
 {
     public class MainWindowViewModel : BindableBase
     {
-        public MainWindowViewModel()
-        {
-            Source = new List<Person>(PersonDataProvider.GetDummyData());
-            ShowSelectedItemCommand = new DelegateCommand<IList<Person>>(ShowSelectedItemCommandAction);
-            AdvanceLookUpContract = new AdvanceLookUpContract();
-            SimpleLookUpContract = new SimpleLookUpContract();
+        public static ICommand ShowSelectedItemCommand { get; } = new DelegateCommand<IList<Person>>(ShowSelectedItemCommandAction);
 
-            SelectedItems = new List<Person>() { Source.FirstOrDefault() };
-            SelectedItems2 = new List<Person>();
-            SelectedItems3 = new List<Person>();
-            SelectedItems4 = new List<Person>();
-            SelectedItems5 = new List<Person>();
-        }
-        public List<Person> Source { get; set; }
-        public ICommand ShowSelectedItemCommand { get; set; }
-        public ILookUpContract AdvanceLookUpContract { get; }
-        public ILookUpContract SimpleLookUpContract { get; }
-        public List<Person> SelectedItems { get; set; }
-        public List<Person> SelectedItems2 { get; set; }
-        public List<Person> SelectedItems3 { get; set; }
-        public List<Person> SelectedItems4 { get; set; }
-        public List<Person> SelectedItems5 { get; set; }
-        private void ShowSelectedItemCommandAction(IList<Person> data)
+        private static void ShowSelectedItemCommandAction(IList<Person> data)
         {
             var stringBuilder = new StringBuilder();
             if (data is null)

@@ -4,195 +4,22 @@
                     xmlns:controls="clr-namespace:BlackPearl.Controls.CoreLibrary;assembly=BlackPearl.Controls.CoreLibrary"
                     xmlns:local="clr-namespace:BlackPearl.Controls.Demo"
                     xmlns:mahapp="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro" 
-                    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+                    xmlns:views="clr-namespace:BlackPearl.Controls.Demo.Views"
                     Title="MultiSelectCombobox Demo - Nilay Joshi"
                     WindowStartupLocation="CenterScreen"
                     Height="500"
-                    Width="500">
+                    Width="800">
     <mahapp:MetroWindow.DataContext>
         <local:MainWindowViewModel />
     </mahapp:MetroWindow.DataContext>
-    <ScrollViewer>
-        <StackPanel>
-            <Border BorderBrush="Black"
-                BorderThickness="1"
-                Margin="5">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-
-                    <Label Content="Simple Example" />
-                    <StackPanel Grid.Row="1" Margin="5,0,5,0">
-                        <TextBlock Text="DisplayMemberPath = Name"/>
-                        <TextBlock Text="ItemSeparator = ;"/>
-                    </StackPanel>
-                    <controls:MultiSelectCombobox ItemSource="{Binding Source, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                              SelectedItems="{Binding SelectedItems, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                              DisplayMemberPath="Name"
-                                              ItemSeparator=";"
-                                              Grid.Row="2" />
-                    <Button Content="Show selected"
-                        Command="{Binding ShowSelectedItemCommand}"
-                        CommandParameter="{Binding SelectedItems}"
-                        Grid.Row="2"
-                        Grid.Column="1" />
-                </Grid>
-            </Border>
-            <Border BorderBrush="Black"
-                BorderThickness="1"
-                Margin="5">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-
-                    <Label Content="Advance look-up contract Example" />
-                    <StackPanel Grid.Row="1"
-                            Margin="5,0,5,0">
-                        <TextBlock Text="DisplayMemberPath = Info"/>
-                        <TextBlock Text="ItemSeparator = ;" />
-                        <TextBlock Text="LookUpContract = AdvanceLookUpContract" />
-                        <TextBlock Text="Create InputFormat= {Name} , {Company} , {ZipCode};" />
-                    </StackPanel>
-                    <controls:MultiSelectCombobox ItemSource="{Binding Source, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                              SelectedItems="{Binding SelectedItems2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                              DisplayMemberPath="Info"
-                                              ItemSeparator=";"
-                                              LookUpContract="{Binding AdvanceLookUpContract}"
-                                              Grid.Row="2" />
-                    <Button Content="Show selected"
-                        Command="{Binding ShowSelectedItemCommand}"
-                        CommandParameter="{Binding SelectedItems2}"
-                        Grid.Row="2"
-                        Grid.Column="1" />
-                </Grid>
-            </Border>
-
-            <Border BorderBrush="Black"
-                BorderThickness="1"
-                Margin="5">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.Resources>
-                        <!--/Don't forget to add « xmlns:sys="clr-namespace:System;assembly=mscorlib" » /-->
-                        <x:Array Type="sys:Char" x:Key="AdditionalCharArray">
-                            <sys:Char>,</sys:Char>
-                            <sys:Char>/</sys:Char>
-                            <sys:Char>-</sys:Char>
-                        </x:Array>
-                    </Grid.Resources>
-
-                    <Label Content="Simple Example with aditional ItemSeparator" />
-                    <StackPanel Grid.Row="1"
-                            Margin="5,0,5,0">
-                        <TextBlock Text="DisplayMemberPath = Name" />
-                        <TextBlock Text="ItemSeparator = [';', ',', '/', '-']" />
-                    </StackPanel>
-                    <controls:MultiSelectCombobox ItemSource="{Binding Source, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                              SelectedItems="{Binding SelectedItems3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                              DisplayMemberPath="Name"
-                                              ItemSeparator=";"
-                                              Grid.Row="2"
-                                              AdditionalItemSeparators="{StaticResource ResourceKey=AdditionalCharArray}" />
-                    <Button Content="Show selected"
-                        Command="{Binding ShowSelectedItemCommand}"
-                        CommandParameter="{Binding SelectedItems3}"
-                        Grid.Row="2"
-                        Grid.Column="1" />
-                </Grid>
-            </Border>
-
-
-            <Border BorderBrush="Black"
-                BorderThickness="1"
-                Margin="5">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-
-                    <Label Content="Simple Example" />
-                    <StackPanel Grid.Row="1"
-                            Margin="5,0,5,0">
-                        <TextBlock Text="with invalid text not remove and suggestion button to add item if possible  (with DefaultLookUpContract and SupportsNewObjectCreation set to false)" TextWrapping="Wrap" />
-                        <TextBlock Text="DisplayMemberPath = Name" />
-                        <TextBlock Text="ItemSeparator = ;" />
-                    </StackPanel>
-                    <controls:MultiSelectCombobox ItemSource="{Binding Source, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                              SelectedItems="{Binding SelectedItems4, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                              DisplayMemberPath="Name"
-                                              ItemSeparator=";"
-                                              Grid.Row="2"/>
-                    <Button Content="Show selected"
-                        Command="{Binding ShowSelectedItemCommand}"
-                        CommandParameter="{Binding SelectedItems4}"
-                        Grid.Row="2"
-                        Grid.Column="1" />
-                </Grid>
-            </Border>
-
-            <Border BorderBrush="Black"
-                BorderThickness="1"
-                Margin="5">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-
-                    <Label Content="Simple Example" />
-                    <StackPanel Grid.Row="1"
-                            Margin="5,0,5,0">
-                        <TextBlock Text="suggestion button to add item if possible (with SimpleLookUpContract and SupportsNewObjectCreation set to true)" TextWrapping="Wrap" />
-                        <TextBlock Text="DisplayMemberPath = Name" />
-                        <TextBlock Text="ItemSeparator = ;" />
-                    </StackPanel>
-                    <controls:MultiSelectCombobox ItemSource="{Binding Source, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                  SelectedItems="{Binding SelectedItems5, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                  DisplayMemberPath="Name"
-                                                  ItemSeparator=";"
-                                                  Grid.Row="2" 
-                                                  LookUpContract="{Binding SimpleLookUpContract}"
-                                                  />
-                    <Button Content="Show selected"
-                        Command="{Binding ShowSelectedItemCommand}"
-                        CommandParameter="{Binding SelectedItems5}"
-                        Grid.Row="2"
-                        Grid.Column="1" />
-                </Grid>
-            </Border>
-        </StackPanel>
-    </ScrollViewer>
+    <Grid>
+        <TabControl>
+            <TabItem Header="Simple Examples">
+                <views:SimpleExampleView />
+            </TabItem>
+            <TabItem Header="Advanced Example">
+                <views:AdvancedExampleView />
+            </TabItem>
+        </TabControl>
+    </Grid>
 </mahapp:MetroWindow>
