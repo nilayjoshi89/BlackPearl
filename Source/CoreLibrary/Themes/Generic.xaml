@@ -8,44 +8,12 @@
                      Color="LightGray" />
     <SolidColorBrush x:Key="BlackPearl.MultiSelectCombobox.SelectedItem.ForegroundColor"
                      Color="Black" />
-
-    <SolidColorBrush x:Key="BlackPearl.MultiSelectCombobox.SuggestedAction.ForegroundColor"
-                     Color="Black" />
-    <SolidColorBrush x:Key="BlackPearl.MultiSelectCombobox.SuggestedAction.BackgroundColor"
-                     Color="Black" />
-    <SolidColorBrush x:Key="BlackPearl.MultiSelectCombobox.SuggestedAction.MouseOver.BackgroundColor"
-                     Color="LightGray" />
     <!--#endregion Brushes-->
 
     <!--#region Style-->
-    <Style TargetType="{x:Type Button}" x:Key="BlackPearl.MultiselectCombobox.SuggestedAction">
-        <Setter Property="Width" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}, 
-            Path=ActualWidth}"/>
-        <Setter Property="Margin" Value="0"/>
-        <Setter Property="Foreground" Value="{DynamicResource BlackPearl.MultiSelectCombobox.SuggestedAction.ForegroundColor}"></Setter>
-        <Setter Property="BorderThickness" Value="0"></Setter>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate>
-                    <Border BorderBrush="Black" BorderThickness="1">
-                        <Border.Style>
-                            <Style TargetType="{x:Type Border}">
-                                <Setter Property="Background" Value="{DynamicResource BlackPearl.MultiSelectCombobox.SuggestedAction.BackgroundColor}" />
-                                <Style.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="{DynamicResource BlackPearl.MultiSelectCombobox.SuggestedAction.MouseOver.BackgroundColor}" />
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Border.Style>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{TemplateBinding Button.Content}" />
-                        </StackPanel>
-                    </Border>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
+    <Style TargetType="{x:Type local:MultiSelectCombobox_CustomRichTextBox}"
+           x:Key="BlackPearl.MultiselectCombobox.RichTextBox" 
+           BasedOn="{StaticResource {x:Type RichTextBox}}"/>
 
     <Style TargetType="TextBlock"
            x:Key="BlackPearl.MultiselectCombobox.SelectedTextBlockStyle">
@@ -60,6 +28,7 @@
         <Setter Property="FontWeight"
                 Value="SemiBold" />
     </Style>
+
     <Style TargetType="Run"
            x:Key="BlackPearl.MultiselectCombobox.RunStyle">
         <!--<Setter Property=""
@@ -73,7 +42,7 @@
         <Setter Property="FontWeight"
                 Value="SemiBold" />
     </Style>
-
+    
     <Style TargetType="{x:Type local:MultiSelectCombobox}">
         <Setter Property="Template">
             <Setter.Value>
@@ -84,18 +53,19 @@
                         <!--Main Grid-->
                         <Grid>
                             <!--Rich TextBox bound to document-->
-                            <RichTextBox Name="rtxt"
+                            <local:MultiSelectCombobox_CustomRichTextBox x:Name="rtxt"
                                          IsDocumentEnabled="False"
                                          AcceptsReturn="False"
                                          VerticalContentAlignment="Center"
-                                         FontSize="{Binding FontSize, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}">
-                                <RichTextBox.Resources>
+                                         FontSize="{Binding FontSize, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"
+                                         Style="{DynamicResource BlackPearl.MultiselectCombobox.RichTextBox}">
+                                <local:MultiSelectCombobox_CustomRichTextBox.Resources>
                                     <Style TargetType="TextBlock"
                                            BasedOn="{StaticResource BlackPearl.MultiselectCombobox.SelectedTextBlockStyle}" />
                                     <Style TargetType="Run"
                                            BasedOn="{StaticResource BlackPearl.MultiselectCombobox.RunStyle}" />
-                                </RichTextBox.Resources>
-                            </RichTextBox>
+                                </local:MultiSelectCombobox_CustomRichTextBox.Resources>
+                            </local:MultiSelectCombobox_CustomRichTextBox>
 
                             <!--Suggestion Drop-Down -->
                             <Popup Name="popup"
@@ -113,7 +83,6 @@
                                              SelectionMode="Multiple"
                                              HorizontalContentAlignment="Stretch">
                                         <ListBox.Resources>
-                                            <Style TargetType="Button" BasedOn="{StaticResource BlackPearl.MultiselectCombobox.SuggestedAction}" />
                                             <Style TargetType="ListBoxItem"
                                                    BasedOn="{StaticResource {x:Type ListBoxItem}}">
                                                 <Setter Property="behavior:ListBoxItemBehavior.IsBroughtIntoViewWhenSelected"

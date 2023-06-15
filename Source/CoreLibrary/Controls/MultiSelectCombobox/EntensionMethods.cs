@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Data;
 using System.Windows.Documents;
 
 using BlackPearl.Controls.Contract;
@@ -183,7 +181,8 @@ namespace BlackPearl.Controls.CoreLibrary
         }
         public static void RemoveRunBlocks(this RichTextBox richTextBox)
         {
-            if (!(richTextBox?.Document?.Blocks?.FirstBlock is Paragraph paragraph))
+            Paragraph paragraph = richTextBox?.GetParagraph();
+            if (paragraph == null)
             {
                 return;
             }
@@ -214,7 +213,7 @@ namespace BlackPearl.Controls.CoreLibrary
         {
             try
             {
-                if (richTextBox?.Document?.Blocks?.FirstBlock is Paragraph)
+                if (richTextBox.GetParagraph() != null)
                 {
                     return;
                 }
@@ -226,27 +225,16 @@ namespace BlackPearl.Controls.CoreLibrary
             catch { }
         }
 
-        public static void MoveCursor(this RichTextBox richTextBox, int NumberOfTimes = 2)
-        {
-            TextPointer NewCaretPosition = richTextBox.CaretPosition.GetPositionAtOffset(NumberOfTimes, LogicalDirection.Forward);
-            if (NewCaretPosition != null)
-            {
-                richTextBox.CaretPosition = NewCaretPosition;
-            }
-            else
-            {
-                richTextBox.CaretPosition = richTextBox.CaretPosition.DocumentEnd;
-            }
-        }
 
-        public static int? AddToParagraph(this RichTextBox richTextBox, object itemToAdd, Func<object, Inline> createInlineElementFunct)
+        public static void AddToParagraph(this RichTextBox richTextBox, object itemToAdd, Func<object, Inline> createInlineElementFunct)
         {
             try
             {
+                richTextBox?.SetParagraphAsFirstBlock();
                 Paragraph paragraph = richTextBox?.GetParagraph();
                 if (paragraph == null)
                 {
-                    return null;
+                    return;
                 }
 
                 Inline elementToAdd = createInlineElementFunct(itemToAdd);
@@ -255,26 +243,21 @@ namespace BlackPearl.Controls.CoreLibrary
                     //First element to insert
                     paragraph.Inlines.Add(elementToAdd);
                     richTextBox.CaretPosition = richTextBox.CaretPosition.DocumentEnd;
+                    return;
                 }
-                else
+
+                if (richTextBox.CaretPosition.GetAdjacentElement(LogicalDirection.Forward) is Inline inlineToInsertBefore)
                 {
-                    //Insert at the cusor position
-                    int InsertIndex = richTextBox.GetLastInlineIndexBeforeCaret();
-                    if (InsertIndex >= 0)
-                    {
-                        Inline LastInlineBeforeCaret = richTextBox?.GetParagraph().Inlines.ElementAtOrDefault(InsertIndex);
-                        paragraph.Inlines.InsertAfter(LastInlineBeforeCaret, elementToAdd);
-                    }
-                    else
-                    {
-                        Inline FirstInlineAfterCaret = richTextBox?.GetParagraph().Inlines.ElementAtOrDefault(0);
-                        paragraph.Inlines.InsertBefore(FirstInlineAfterCaret, elementToAdd);
-                    }
-                    return InsertIndex;
+                    paragraph.Inlines.InsertBefore(inlineToInsertBefore, elementToAdd);
+                    richTextBox.CaretPosition = elementToAdd.ElementEnd;
+                    return;
                 }
+
+                //Insert at the end
+                paragraph.Inlines.InsertAfter(paragraph.Inlines.LastInline, elementToAdd);
+                richTextBox.CaretPosition = richTextBox.CaretPosition.DocumentEnd;
             }
             catch { }
-            return null;
         }
         public static void ClearParagraph(this RichTextBox richTextBox)
         {
@@ -282,70 +265,76 @@ namespace BlackPearl.Controls.CoreLibrary
             richTextBox?.SetParagraphAsFirstBlock();
         }
 
+        public static bool DragDropAdjustSelection(this RichTextBox richTextBox, Point position)
+        {
+            TextPointer textPointer = richTextBox.GetPositionFromPoint(position, true);
+            int EndOffset = new TextRange(textPointer, richTextBox.Selection.End).Text.Length;
+            int StartOffset = new TextRange(textPointer, richTextBox.Selection.Start).Text.Length;
+            if ((EndOffset == 0 || StartOffset == 0) && richTextBox.Selection.Text.Length > 0)
+            {
+                //if its on the same richTextBox and the drag and drop position is the same as actual, then we do not perform OnDragDrop.
+                return false;
+            }
+
+            //Removal of the drag and drop element to be able to move it
+            richTextBox.Selection.Text = "";
+            richTextBox.CaretPosition = textPointer;
+            richTextBox.Focus();
+            return true;
+        }
+        public static DataObject GetDragDropObject(this RichTextBox richTextBox)
+        {
+            var objectToSend = richTextBox.GetSelectedObjects();
+            if ((objectToSend?.Length ?? 0) == 0)
+                return null;
+
+            DataObject data = new DataObject();
+            data.SetData("Object", objectToSend);
+            data.SetText(richTextBox.GetSelectedText());
+            return data;
+        }
+        public static void SetSelectedTextToClipBoard(this RichTextBox richTextBox)
+        {
+            try
+            {
+                Clipboard.SetText(richTextBox.GetSelectedText());
+            }
+            catch (System.Runtime.InteropServices.COMException ex)
+            {
+                //Failed to open Clipboard, this occur when user is copying fast multiples times data
+                const uint CLIPBRD_E_CANT_OPEN = 0x800401D0;
+                if ((uint)ex.ErrorCode != CLIPBRD_E_CANT_OPEN) throw;
+            }
+        }
+
         public static Run GetCurrentRunBlock(this RichTextBox richTextBox) => richTextBox?.CaretPosition?.Parent as Run;
         public static Paragraph GetParagraph(this RichTextBox richTextBox) => richTextBox?.Document?.Blocks?.FirstBlock as Paragraph;
-
-        public static int GetLastInlineIndexBeforeCaret(this RichTextBox richTextBox)
-        {
-            if (richTextBox.CaretPosition.IsAtLineStartPosition)
-            {
-                return -1;
-            }
-
-            Paragraph paragraph = richTextBox?.GetParagraph();
-            for (int i = 0; i < paragraph.Inlines.Count; i++)
-            {
-                Inline inline = paragraph.Inlines.ElementAtOrDefault(i);
-                var start = inline.ContentEnd;
-                var here = richTextBox.CaretPosition;
-                var range = new TextRange(start, here);
-                int indexInText = range.Text.Length;
-                if (indexInText == 0)
-                {
-                    return i;
-                }
-            }
-            return paragraph.Inlines.Count;
-        }
-
+        public static object GetNextItemTag(this RichTextBox richTextBox)
+            => ((richTextBox.CaretPosition.GetAdjacentElement(LogicalDirection.Forward) as InlineUIContainer)?.Child as FrameworkElement)?.Tag;
         public static string GetSelectedText(this RichTextBox richTextBox)
         {
-            string CurentSelectionText = string.Empty;
+            string SelectedText = string.Join(string.Empty,
+                    richTextBox.GetParagraph().Inlines
+                                .Where(inline => (inline.ContentStart.CompareTo(richTextBox.Selection.Start) >= 0 && inline.ContentEnd.CompareTo(richTextBox.Selection.End) <= 0))
+                                .Select(inline => inline.GetText()));
 
-            foreach (Inline inline in richTextBox.GetParagraph().Inlines)
-            {
-                //check if inline is inside the selection
-                if (inline.ContentStart.CompareTo(richTextBox.Selection.Start) >= 0 && inline.ContentEnd.CompareTo(richTextBox.Selection.End) <= 0)
-                {
-                    CurentSelectionText += inline.GetText();
-                }
-            }
-            return CurentSelectionText;
+            //Dont forget to add CurrentText
+            SelectedText += richTextBox.Selection.Text.Trim();
+            return SelectedText;
         }
 
-        public static string GetText(this RichTextBox richTextBox)
-        {
-            string CurentSelectionText = string.Empty;
+        public static object[] GetSelectedObjects(this RichTextBox richTextBox)
+            => richTextBox?.GetParagraph()?.Inlines
+                                .Where(inline => (inline.ContentStart.CompareTo(richTextBox.Selection.Start) >= 0 && inline.ContentEnd.CompareTo(richTextBox.Selection.End) <= 0))
+                                .Select(inline => inline.GetObject())
+                                .Where(i => i != null).ToArray();
 
-            foreach (Inline inline in richTextBox.GetParagraph().Inlines)
-            {
-                CurentSelectionText += inline.GetText();
-            }
-            return CurentSelectionText;
-        }
-
+        public static TextBlock GetTextBlock(this Inline inline)
+        => ((inline as InlineUIContainer)?.Child as TextBlock);
+        public static object GetObject(this Inline inline)
+           => GetTextBlock(inline)?.Tag;
         public static string GetText(this Inline inline)
-        {
-            if (inline is InlineUIContainer inlineUIContainer)
-            {
-                UIElement uiElement = inlineUIContainer.Child;
-                if (uiElement is TextBlock textBlock)
-                {
-                    return textBlock.Text;
-                }
-            }
-            return string.Empty;
-        }
+            => GetTextBlock(inline)?.Text ?? string.Empty;
 
         #endregion
 
