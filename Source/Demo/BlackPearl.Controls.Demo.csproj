@@ -72,8 +72,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="AdvanceLookUpContract.cs" />
-    <Compile Include="PersonDataProvider.cs" />
+    <Compile Include="LookUpContracts\AdvanceLookUpContract.cs" />
+    <Compile Include="LookUpContracts\SimpleLookUpContract.cs" />
+    <Compile Include="Resources\PersonDataProvider.cs" />
+    <Compile Include="Resources\Converters.cs" />
+    <Compile Include="ViewModels\AdvancedExampleViewModel.cs" />
+    <Compile Include="Views\AdvancedExampleView.xaml.cs">
+      <DependentUpon>AdvancedExampleView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SimpleExampleView.xaml.cs">
+      <DependentUpon>SimpleExampleView.xaml</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -87,6 +96,14 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Resources\DefaultStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AdvancedExampleView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\SimpleExampleView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -126,6 +143,9 @@
       <Project>{09779fe5-d1bf-4efb-b259-4471a46b92d4}</Project>
       <Name>BlackPearl.Controls.CoreLibrary</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ViewModels\SimpleExampleViewModel.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

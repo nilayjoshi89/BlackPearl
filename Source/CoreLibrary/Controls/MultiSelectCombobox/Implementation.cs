@@ -1,13 +1,13 @@
-﻿using System.Collections;
+﻿using BlackPearl.Controls.Extension;
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
-
-using BlackPearl.Controls.Extension;
-
 using EM = BlackPearl.Controls.CoreLibrary.EntensionMethods;
 
 namespace BlackPearl.Controls.CoreLibrary
@@ -17,52 +17,77 @@ namespace BlackPearl.Controls.CoreLibrary
         #region Members
         private bool isHandlerRegistered = true;
         private readonly object handlerLock = new object();
+        private const string ObjectString = "Object";
+
         #endregion
 
         #region Control Event Handlers
 
-        private void PasteHandler(object sender, DataObjectPastingEventArgs e)
+        private void OnDragEnter(object sender, DragEventArgs e)
+            => DragDropGetData(e);
+
+        private object DragDropGetData(DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(ObjectString))
+            {
+                var data = e.Data.GetData(ObjectString);
+                if (data == null)
+                {
+                    return null;
+                }
+                e.Effects = e.KeyStates.HasFlag(DragDropKeyStates.ControlKey)
+               ? DragDropEffects.Copy
+               : DragDropEffects.Move;
+                return data;
+            }
+
+            if (e.Data.GetDataPresent(DataFormats.Text))
+            {
+                var data = e.Data.GetData(DataFormats.Text);
+                if (string.IsNullOrWhiteSpace(data.ToString()))
+                {
+                    return null;
+                }
+                e.Effects = DragDropEffects.Copy;
+                return data;
+            }
+
+            return null;
+        }
+        private void OnDragDrop(object sender, DragEventArgs e)
         {
             try
             {
-                string clipboard = GetClipboardTextWithCommandCancelled(e);
-
-                if (string.IsNullOrWhiteSpace(clipboard))
-                    return;
-
-                if (!UnsubscribeHandler())
+                if (!RichTextBoxElement.DragDropAdjustSelection(e.GetPosition(this)))
                 {
+                    //if we get here, that mean that the drag and drop final position is the same as it is now. We cancel OnDragDrop.
                     return;
                 }
 
-                //User can remove paragraph reference by 'Select all & delete' in RichTextBox
-                //Following method call with make sure local paragraph remains part of RichTextBox
-                RichTextBoxElement.SetParagraphAsFirstBlock();
-
-                //Single item paste
-                if (!clipboard.Contains(ItemSeparator))
+                object data = DragDropGetData(e);
+                if (data == null)
                 {
-                    richTextBoxElement.AddToParagraph(clipboard, CreateRunElement);
                     return;
                 }
 
-                //User has entered valid text + separator
-                RichTextBoxElement.RemoveRunBlocks();
-
-                int i;
-                string[] multipleTexts = clipboard.Split(ItemSeparator);
-                for (i = 0; i < multipleTexts.Length - 1; i++)
+                if (data.GetType() == typeof(string))
                 {
-                    if (string.IsNullOrWhiteSpace(multipleTexts[i]))
-                        continue;
-
-                    //Try select item from source based on current entered text
-                    UpdateSelectedItemsFromEnteredText(multipleTexts[i]);
+                    PasteHandler(data.ToString());
+                    return;
                 }
 
-                if (!string.IsNullOrWhiteSpace(multipleTexts[i]))
+                if (data.GetType() == typeof(object[]))
                 {
-                    richTextBoxElement.AddToParagraph(multipleTexts[i], CreateRunElement);
+                    if (!UnsubscribeHandler())
+                    {
+                        e.Effects = DragDropEffects.None;
+                        return;
+                    }
+
+                    foreach (var obj in data as object[])
+                    {
+                        AddToSelectedItems(obj);
+                    }
                 }
             }
             catch { }
@@ -71,6 +96,33 @@ namespace BlackPearl.Controls.CoreLibrary
                 //Subscribe back
                 SubsribeHandler();
             }
+        }
+        private void OnSelectionStartDrag(object sender, DataObjectCopyingEventArgs e)
+        {
+            if (!e.IsDragDrop)
+            {
+                return;
+            }
+
+            var dragDropData = richTextBoxElement.GetDragDropObject();
+            if (dragDropData == null)
+                return;
+
+            var dropResult = DragDrop.DoDragDrop(richTextBoxElement, dragDropData, DragDropEffects.Move | DragDropEffects.Copy);
+            if (dropResult == DragDropEffects.Move)
+            {
+                //If the original RichTextbox is not the same as the one where the drag and drop was performed, then we delete the old text
+                RichTextBoxElement.Selection.Text = "";
+            }
+        }
+        private void PasteHandler(object sender, DataObjectPastingEventArgs e)
+        {
+            try
+            {
+                string clipboard = GetClipboardTextWithCommandCancelled(e);
+                PasteHandler(clipboard);
+            }
+            catch { }
         }
 
         /// <summary>
@@ -101,6 +153,9 @@ namespace BlackPearl.Controls.CoreLibrary
                 //Remove all invalid texts from
                 RemoveInvalidTexts();
 
+                //Deselect text : to fix if we select all, we leave and come back and drag and drop a item
+                RichTextBoxElement.Selection.Select(RichTextBoxElement.CaretPosition, RichTextBoxElement.CaretPosition);
+
                 //Hide drop-down
                 HideSuggestions(EM.SuggestionCleanupOperation.ResetIndex | EM.SuggestionCleanupOperation.ClearSelection);
             }
@@ -117,30 +172,30 @@ namespace BlackPearl.Controls.CoreLibrary
                 switch (e.Key)
                 {
                     case Key.Down:
-                        {
-                            e.Handled = true;
-                            HandleKeyboardDownKeyPress();
-                        }
-                        break;
+                    {
+                        e.Handled = true;
+                        HandleKeyboardDownKeyPress();
+                    }
+                    break;
                     case Key.Up:
-                        {
-                            e.Handled = true;
-                            HandleKeyboardUpKeyPress();
-                        }
-                        break;
+                    {
+                        e.Handled = true;
+                        HandleKeyboardUpKeyPress();
+                    }
+                    break;
                     case Key.Enter:
-                        {
-                            e.Handled = true;
-                            UpdateSelectedItemsFromSuggestionDropdown();
-                        }
-                        break;
+                    {
+                        e.Handled = true;
+                        UpdateSelectedItemsFromSuggestionDropdown();
+                    }
+                    break;
                     case Key.Escape:
-                        {
-                            e.Handled = true;
-                            HideSuggestions(EM.SuggestionCleanupOperation.ResetIndex | EM.SuggestionCleanupOperation.ClearSelection);
-                            RichTextBoxElement.TryFocus();
-                        }
-                        break;
+                    {
+                        e.Handled = true;
+                        HideSuggestions(EM.SuggestionCleanupOperation.ResetIndex | EM.SuggestionCleanupOperation.ClearSelection);
+                        RichTextBoxElement.TryFocus();
+                    }
+                    break;
                     default:
                         break;
                 }
@@ -163,11 +218,9 @@ namespace BlackPearl.Controls.CoreLibrary
                 {
                     return;
                 }
-
                 //Hide suggestion drop-down
                 //Reset suggestion drop down list
                 HideSuggestions(EM.SuggestionCleanupOperation.ResetIndex | EM.SuggestionCleanupOperation.ResetItemSource);
-
                 //User is expecting to complete item selection
                 if (IsBlankTextWithItemSeparator(userEnteredText))
                 {
@@ -176,7 +229,6 @@ namespace BlackPearl.Controls.CoreLibrary
                     RichTextBoxElement.ResetCurrentText();
                     return;
                 }
-
                 //User has entered valid text + separator
                 RichTextBoxElement.RemoveRunBlocks();
                 //Try select item from source based on current entered text
@@ -205,8 +257,9 @@ namespace BlackPearl.Controls.CoreLibrary
         #region Methods
 
         #region event handler helper methods
-        private bool IsBlankTextWithItemSeparator(string userEnteredText) => string.IsNullOrWhiteSpace(userEnteredText.Trim(ItemSeparator));
-        private bool IsEndOfTextDetected(string userEnteredText) => !string.IsNullOrEmpty(userEnteredText) && userEnteredText.EndsWith(ItemSeparator.ToString());
+        private bool IsBlankTextWithItemSeparator(string userEnteredText) => string.IsNullOrWhiteSpace(userEnteredText.Trim(GetSeparators()));
+        private bool IsEndOfTextDetected(string userEnteredText)
+            => !string.IsNullOrEmpty(userEnteredText) && GetSeparators().Any(s => userEnteredText.EndsWith(s.ToString()));
         private void UpdateSuggestionAndShowHideDropDown(string userEnteredText)
         {
             bool hasAnySuggestionToShow = UpdateSuggestions(userEnteredText);
@@ -229,7 +282,7 @@ namespace BlackPearl.Controls.CoreLibrary
             UpdateSelectedItemsFromSuggestionDropdown();
         }
         private bool IsSelectionProcessCompleted() => !IsSelectionProcessInProgress();
-        private bool IsSelectionProcessInProgress(Key? keyUp = null)
+        private static bool IsSelectionProcessInProgress(Key? keyUp = null)
         {
             if (!keyUp.HasValue)
             {
@@ -261,6 +314,77 @@ namespace BlackPearl.Controls.CoreLibrary
                 SubsribeHandler();
             }
         }
+        private void PasteHandler(string values)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(values))
+                {
+                    return;
+                }
+
+                if (!UnsubscribeHandler())
+                {
+                    return;
+                }
+                RemoveSelectedItems();
+                //User can remove paragraph reference by 'Select all & delete' in RichTextBox
+                //Following method call with make sure local paragraph remains part of RichTextBox
+                RichTextBoxElement.SetParagraphAsFirstBlock();
+
+                //Single item paste
+                if (values.IndexOfAny(GetSeparators()) == -1)
+                {
+                    richTextBoxElement.AddToParagraph(values, CreateRunElement);
+                    return;
+                }
+                //User has entered valid text + separator
+                RichTextBoxElement.RemoveRunBlocks();
+
+                int i;
+                string[] multipleTexts = values.Split(GetSeparators());
+                for (i = 0; i < multipleTexts.Length - 1; i++)
+                {
+                    //Try select item from source based on current entered text
+                    UpdateSelectedItemsFromEnteredText(multipleTexts[i]);
+                }
+
+                if (!string.IsNullOrWhiteSpace(multipleTexts[i]))
+                {
+                    richTextBoxElement.AddToParagraph(multipleTexts[i], CreateRunElement);
+                }
+            }
+            catch { }
+            finally
+            {
+                //Subscribe back
+                SubsribeHandler();
+            }
+        }
+        private void RemoveSelectedItems()
+        {
+            object[] selectedItems = RichTextBoxElement.GetSelectedObjects();
+            foreach (var i in selectedItems)
+            {
+                SelectedItems.Remove(i);
+            }
+            //if the user paste and has a item inside the selection, then we need to replace it with the pasted content.
+            //For that, before removing elements, we need to say that we dont want to remove back the tag if the item is unloaded.
+            //For exemple, if we have a item call "Andréa Müller;" and we select it, and we paste back "Andréa Müller;",
+            //if Tb_Unloaded is call, "Andréa Müller;" is removed from SelectedItems => then Combobox and SelectedItems is not sync
+            foreach (var inline in richTextBoxElement.GetParagraph().Inlines)
+            {
+                var textblock = inline.GetTextBlock();
+                if (textblock != null && selectedItems.Contains(inline.GetObject()))
+                {
+                    textblock.Unloaded -= Tb_Unloaded;
+                }
+            }
+            //using richTextBoxElement.Selection.Text to empty has the advantage to keep the cursor position
+            richTextBoxElement.Selection.Text = "";
+        }
+
+
         private static string GetClipboardTextWithCommandCancelled(DataObjectPastingEventArgs e)
         {
             string clipboard = e?.DataObject?.GetData(typeof(string)) as string;
@@ -270,6 +394,21 @@ namespace BlackPearl.Controls.CoreLibrary
             e.CancelCommand();
             e.Handled = true;
             return clipboard;
+        }
+        private void SetClipboardTextWithCommandCancelled(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (e.Command != ApplicationCommands.Copy
+                && e.Command != ApplicationCommands.Cut)
+                return;
+
+            e.Handled = true;
+            RichTextBoxElement.SetSelectedTextToClipBoard();
+
+            if (e.Command == ApplicationCommands.Cut)
+            {
+                //Cut the text = set selection to empty (CTRL + X)
+                RichTextBoxElement.Selection.Text = "";
+            }
         }
         #endregion
 
@@ -386,7 +525,12 @@ namespace BlackPearl.Controls.CoreLibrary
         /// <param name="forceAdd">Allows creation of new item</param>
         private void UpdateSelectedItemsFromEnteredText(string itemString)
         {
-            itemString = itemString.Trim(ItemSeparator, ' ');
+            if (string.IsNullOrWhiteSpace(itemString))
+            {
+                return;
+            }
+
+            itemString = itemString.Trim(GetSeparators()).Trim(' ');
 
             if (IsItemAlreadySelected(itemString))
             {
@@ -416,6 +560,7 @@ namespace BlackPearl.Controls.CoreLibrary
                                     : null;                                             //cant create new item. return
             return itemToAdd;
         }
+
         private void AddToSelectedItems(object itemToAdd)
         {
             if (SelectedItems?.Contains(itemToAdd) == true)
@@ -423,11 +568,20 @@ namespace BlackPearl.Controls.CoreLibrary
                 return;
             }
 
-            //Add item to Selected Item list
-            SelectedItems?.Add(itemToAdd);
             //Add item in RichTextBox UI
             RichTextBoxElement.AddToParagraph(itemToAdd, CreateInlineUIElement);
+
+            var nextItemTag = richTextBoxElement.GetNextItemTag();
+
+            if (nextItemTag == null || SelectedItems?.Contains(nextItemTag) != true)
+            {
+                SelectedItems?.Add(itemToAdd);
+                return;
+            }
+
+            SelectedItems?.Insert(SelectedItems.IndexOf(nextItemTag), itemToAdd);
         }
+
         private void AddSuggestionsToSelectedItems(IList itemsToAdd)
         {
             foreach (object item in itemsToAdd)
@@ -523,7 +677,7 @@ namespace BlackPearl.Controls.CoreLibrary
         /// <returns></returns>
         private Inline CreateRunElement(object text)
         {
-            var runElement = richTextBoxElement.GetCurrentRunBlock();
+            Run runElement = richTextBoxElement.GetCurrentRunBlock();
 
             if (runElement == null)
             {
@@ -545,7 +699,6 @@ namespace BlackPearl.Controls.CoreLibrary
             return re;
         }
 
-
         /// <summary>
         /// Event to handle scenario where User removes selected item from UI
         /// </summary>
@@ -555,8 +708,7 @@ namespace BlackPearl.Controls.CoreLibrary
         {
             try
             {
-                if (!IsLoaded
-                    || !(sender is TextBlock tb))
+                if (!IsLoaded || !(sender is TextBlock tb))
                 {
                     return;
                 }
@@ -568,6 +720,22 @@ namespace BlackPearl.Controls.CoreLibrary
             catch { }
         }
         #endregion
+
+        #region Mist
+
+        public char[] GetSeparators()
+        {
+            char[] array = new char[1] { ItemSeparator };
+            if (AdditionalItemSeparators == null)
+            {
+                return array;
+            }
+            //Array.Append not available in net 461
+            return array.Concat(AdditionalItemSeparators).ToArray();
+        }
+
+        #endregion
+
         #endregion
     }
 }

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 
 using BlackPearl.Controls.Contract;
 
@@ -23,6 +24,7 @@ namespace BlackPearl.Controls.CoreLibrary
             PreviewKeyDown += MultiSelectCombobox_PreviewKeyDown;
             LostFocus += MultiSelectCombobox_LostFocus;
         }
+
         #endregion
 
         #region Template Parts
@@ -45,6 +47,10 @@ namespace BlackPearl.Controls.CoreLibrary
                     richTextBoxElement.TextChanged -= RichTextBoxElement_TextChanged;
                     richTextBoxElement.SizeChanged -= RichTextBoxElement_SizeChanged;
                     DataObject.RemovePastingHandler(richTextBoxElement, PasteHandler);
+                    DataObject.RemoveCopyingHandler(richTextBoxElement, OnSelectionStartDrag);
+                    richTextBoxElement.RemoveHandler(CommandManager.PreviewExecutedEvent, new ExecutedRoutedEventHandler(SetClipboardTextWithCommandCancelled));
+                    richTextBoxElement.DragEnter -= OnDragEnter;
+                    richTextBoxElement.Drop -= OnDragDrop;
                 }
 
                 richTextBoxElement = value;
@@ -65,6 +71,11 @@ namespace BlackPearl.Controls.CoreLibrary
                     richTextBoxElement.TextChanged += RichTextBoxElement_TextChanged;
                     richTextBoxElement.SizeChanged += RichTextBoxElement_SizeChanged;
                     DataObject.AddPastingHandler(richTextBoxElement, PasteHandler);
+                    DataObject.AddCopyingHandler(richTextBoxElement, OnSelectionStartDrag);
+                    richTextBoxElement.AddHandler(CommandManager.PreviewExecutedEvent, new ExecutedRoutedEventHandler(SetClipboardTextWithCommandCancelled));
+                    richTextBoxElement.DragEnter += OnDragEnter;
+                    richTextBoxElement.Drop += OnDragDrop;
+                    richTextBoxElement.AllowDrop = true;
                 }
             }
         }
@@ -96,6 +107,7 @@ namespace BlackPearl.Controls.CoreLibrary
                 }
             }
         }
+
         #endregion
 
         #region Properties
@@ -133,6 +145,17 @@ namespace BlackPearl.Controls.CoreLibrary
         }
 
         /// <summary>
+        /// Array of additional char value that separates two selected items. Default value is null
+        /// </summary>
+        public static readonly DependencyProperty AdditionalItemSeparatorsProperty =
+            DependencyProperty.Register(nameof(AdditionalItemSeparators), typeof(char[]), typeof(MultiSelectCombobox), new PropertyMetadata(System.Array.Empty<char>()));
+        public char[] AdditionalItemSeparators
+        {
+            get => (char[])GetValue(AdditionalItemSeparatorsProperty);
+            set => SetValue(AdditionalItemSeparatorsProperty, value);
+        }
+
+        /// <summary>
         /// Display member path - for complex object, we can set this to show value on given path
         /// </summary>
         public static readonly DependencyProperty DisplayMemberPathProperty =
@@ -144,7 +167,7 @@ namespace BlackPearl.Controls.CoreLibrary
         }
 
         /// <summary>
-        /// ILookUpContract - implementation for custom behavior of Look-up and create. 
+        /// ILookUpContract - implementation for custom behavior of Look-up and create.
         /// If not set, default behavior will be set.
         /// </summary>
         public static readonly DependencyProperty LookUpContractProperty =
@@ -212,6 +235,7 @@ namespace BlackPearl.Controls.CoreLibrary
 
             multiChoiceControl.SuggestionElement.ItemsSource = (e.NewValue as IEnumerable)?.Cast<object>();
         }
+
         /// <summary>
         /// Display member path change handler
         /// </summary>
