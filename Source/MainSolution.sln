@@ -1,13 +1,23 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29806.167
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlackPearl.Controls.Common", "Common\BlackPearl.Controls.Common.csproj", "{D6866289-89D6-4A76-A935-443BC30D07AE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlackPearl.Controls.CoreLibrary", "CoreLibrary\BlackPearl.Controls.CoreLibrary.csproj", "{09779FE5-D1BF-4EFB-B259-4471A46B92D4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackPearl.Controls.Demo", "Demo\BlackPearl.Controls.Demo.csproj", "{EB730717-05BB-4488-808F-6C18F359D652}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlackPearl.Controls.Demo", "Demo\BlackPearl.Controls.Demo.csproj", "{EB730717-05BB-4488-808F-6C18F359D652}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlackPearl.Prism", "Prism\BlackPearl.Prism.csproj", "{ED40637F-3160-4EEA-9C6C-9D8F56983A3D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlackPearl.Mahapps", "Mahapps\BlackPearl.Mahapps.csproj", "{DD3F3845-051A-41BA-9F0A-8A4ABEABE15A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EC41479F-5E2C-4DE8-8E67-FA6185F5B061}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+		Directory.Packages.props = Directory.Packages.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +37,14 @@ Global
 		{EB730717-05BB-4488-808F-6C18F359D652}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB730717-05BB-4488-808F-6C18F359D652}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EB730717-05BB-4488-808F-6C18F359D652}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED40637F-3160-4EEA-9C6C-9D8F56983A3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED40637F-3160-4EEA-9C6C-9D8F56983A3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED40637F-3160-4EEA-9C6C-9D8F56983A3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED40637F-3160-4EEA-9C6C-9D8F56983A3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD3F3845-051A-41BA-9F0A-8A4ABEABE15A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD3F3845-051A-41BA-9F0A-8A4ABEABE15A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD3F3845-051A-41BA-9F0A-8A4ABEABE15A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD3F3845-051A-41BA-9F0A-8A4ABEABE15A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

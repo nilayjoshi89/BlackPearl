@@ -1,7 +1,8 @@
-﻿using BlackPearl.Controls.Contract;
+﻿using System;
+
+using BlackPearl.Controls.Contract;
 using BlackPearl.Controls.CoreLibrary;
 using BlackPearl.Controls.Extension;
-using System;
 
 namespace BlackPearl.Controls.Demo
 {

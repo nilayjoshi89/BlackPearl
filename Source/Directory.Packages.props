@@ -1,0 +1,11 @@
+<Project>
+	<PropertyGroup>
+		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageVersion Include="MahApps.Metro" Version="2.4.10" />
+		<PackageVersion Include="MahApps.Metro.IconPacks" Version="4.11.0" />
+		<PackageVersion Include="Prism.Unity" Version="8.1.97" />
+		<PackageVersion Include="Prism.WPF" Version="8.1.97" />
+	</ItemGroup>
+</Project>

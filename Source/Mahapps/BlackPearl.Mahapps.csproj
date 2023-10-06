@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>$(TargetFrameworkVersion)</TargetFramework>
+		<UseWPF>true</UseWPF>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="MahApps.Metro"/>
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="MahApps.Metro" />
+		<ProjectReference Include="..\Prism\BlackPearl.Prism.csproj" />
+	</ItemGroup>
+</Project>

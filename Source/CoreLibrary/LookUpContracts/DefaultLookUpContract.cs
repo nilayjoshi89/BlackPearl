@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Globalization;
-using System.Linq;
-using System.Text;
+
 using BlackPearl.Controls.Contract;
 using BlackPearl.Controls.Extension;
 
@@ -14,13 +12,13 @@ namespace BlackPearl.Controls.CoreLibrary
     {
         public bool SupportsNewObjectCreation => false;
 
-        public object CreateObject(object sender, string searchString) => throw new NotImplementedException();
+        public object CreateObject(object sender, string searchString) => throw new NotSupportedException();
 
         public bool IsItemEqualToString(object sender, object item, string seachString)
         {
             string itemString = item?.GetPropertyValue((sender as MultiSelectCombobox)?.DisplayMemberPath)
                                     ?.ToString();
-            return StringEqualsPredicate(RemoveDiacritics(itemString), RemoveDiacritics(seachString));
+            return StringEqualsPredicate(itemString.RemoveDiacritics(), seachString.RemoveDiacritics());
         }
 
         public bool IsItemMatchingSearchString(object sender, object item, string searchString)
@@ -32,7 +30,7 @@ namespace BlackPearl.Controls.CoreLibrary
 
             string itemString = item?.GetPropertyValue((sender as MultiSelectCombobox)?.DisplayMemberPath)
                                     ?.ToString();
-            return StringStartsWithPredicate(RemoveDiacritics(itemString), RemoveDiacritics(searchString));
+            return StringStartsWithPredicate(itemString.RemoveDiacritics(), searchString.RemoveDiacritics());
         }
 
         private static bool StringStartsWithPredicate(string value, string searchString)
@@ -47,15 +45,6 @@ namespace BlackPearl.Controls.CoreLibrary
             return value1 != null
                && value2 != null
                && string.Compare(value1, value2, StringComparison.InvariantCultureIgnoreCase) == 0;
-        }
-
-        static string RemoveDiacritics(string text)
-        {
-            //"héllo" becomes "he<acute>llo", which in turn becomes "hello".
-            return string.Concat(
-                text.Normalize(NormalizationForm.FormD)
-                .Where(ch => CharUnicodeInfo.GetUnicodeCategory(ch) != UnicodeCategory.NonSpacingMark))
-                .Normalize(NormalizationForm.FormC);
         }
     }
 }

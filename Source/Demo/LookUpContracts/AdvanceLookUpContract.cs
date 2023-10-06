@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+
 using BlackPearl.Controls.Contract;
 
 namespace BlackPearl.Controls.Demo
@@ -32,7 +33,7 @@ namespace BlackPearl.Controls.Demo
             {
                 return false;
             }
-            return string.Compare(seachString, std.Name, System.StringComparison.InvariantCultureIgnoreCase) == 0;
+            return string.Compare(seachString, std.Name, StringComparison.InvariantCultureIgnoreCase) == 0;
         }
 
         public bool IsItemMatchingSearchString(object sender, object item, string searchString)

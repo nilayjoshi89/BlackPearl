@@ -1,0 +1,46 @@
+﻿<windowBase:BlackPearlMetroWindow x:Class="BlackPearl.Controls.Demo.ShellWindow"
+                                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                                  xmlns:views="clr-namespace:BlackPearl.Controls.Demo"
+                                  xmlns:windowBase="clr-namespace:BlackPearl.Mahapps;assembly=BlackPearl.Mahapps"
+                                  xmlns:prism="http://prismlibrary.com/"
+                                  xmlns:mahapps="http://metro.mahapps.com/winfx/xaml/controls"
+                                  Title="MultiSelectCombobox Demo - Nilay Joshi"
+                                  GlowBrush="{DynamicResource MahApps.Brushes.Accent}"
+                                  WindowStartupLocation="CenterScreen"
+                                  Height="600"
+                                  Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.Resources>
+            <DataTemplate DataType="{x:Type mahapps:HamburgerMenuIconItem}">
+                <Grid Margin="0,5,0,5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="50" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Rectangle HorizontalAlignment="Stretch"
+                               VerticalAlignment="Stretch"
+                               Fill="Transparent"
+                               ToolTip="{Binding ToolTip}" />
+
+                    <ContentControl Content="{Binding Icon}"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center" />
+                    <TextBlock Text="{Binding Label}"
+                               VerticalAlignment="Center"
+                               Grid.Column="1"
+                               FontWeight="Bold"
+                               FontSize="16" />
+
+                </Grid>
+            </DataTemplate>
+        </Grid.Resources>
+        <mahapps:HamburgerMenu prism:RegionManager.RegionName="{x:Static views:Constants.ContentRegion}"
+                               ItemsSource="{Binding MenuSource, UpdateSourceTrigger=PropertyChanged}"
+                               DisplayMode="CompactOverlay" />
+    </Grid>
+</windowBase:BlackPearlMetroWindow>

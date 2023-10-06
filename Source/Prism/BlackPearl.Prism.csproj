@@ -2,4 +2,7 @@
 	<PropertyGroup>
 		<TargetFramework>$(TargetFrameworkVersion)</TargetFramework>
 	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Prism.WPF" />
+	</ItemGroup>
 </Project>
