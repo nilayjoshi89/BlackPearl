@@ -1,0 +1,111 @@
+﻿<blackpearlprism:BlackPearlUserControl  x:Class="BlackPearl.Mahapps.ThemeView"
+                                        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                                        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                                        xmlns:blackpearlprism="clr-namespace:BlackPearl.PrismUI;assembly=BlackPearl.Prism"
+                                        xmlns:mahapp="http://metro.mahapps.com/winfx/xaml/controls"
+                                        xmlns:icon="http://metro.mahapps.com/winfx/xaml/iconpacks"
+                                        xmlns:local="clr-namespace:BlackPearl.Mahapps">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Grid.Resources>
+            <DataTemplate DataType="{x:Type local:AccentInfo}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Ellipse Width="25"
+                             Height="25"
+                             Stroke="{DynamicResource MahApps.Brushes.Gray2}"
+                             Fill="{Binding Brush}" />
+                    <Label Content="{Binding Name}"
+                           Grid.Column="1"
+                           Margin="0"
+                           HorizontalAlignment="Center"
+                           Style="{DynamicResource BlackPearlLabel}" />
+                </Grid>
+            </DataTemplate>
+        </Grid.Resources>
+
+        <Label Content="Theme:"
+               Style="{DynamicResource BlackPearlLabel}" />
+        <mahapp:ToggleSwitch IsOn="{Binding IsDark}"
+                             Grid.Column="1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Label Content="{Binding ThemeText}"
+                       VerticalAlignment="Center"
+                       Margin="0,0,10,0"
+                       Style="{DynamicResource BlackPearlLabel}" />
+                <icon:PackIconFeatherIcons Kind="Moon"
+                                           Height="20"
+                                           Width="20"
+                                           VerticalAlignment="Center"
+                                           Visibility="{Binding MoonVisibility}"
+                                           Grid.Column="1" />
+                <icon:PackIconFeatherIcons Kind="Sun"
+                                           Height="25"
+                                           Width="25"
+                                           VerticalAlignment="Center"
+                                           Visibility="{Binding SunVisibility}"
+                                           Grid.Column="1" />
+            </Grid>
+        </mahapp:ToggleSwitch>
+
+        <Label Content="Accent Color:"
+               Grid.Row="1"
+               Style="{DynamicResource BlackPearlLabel}" />
+        <ComboBox ItemsSource="{Binding Accents}"
+                  SelectedItem="{Binding SelectedAccent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  Grid.Row="1"
+                  Grid.Column="1"
+                  Style="{DynamicResource BlackPearlComboBox}" />
+
+        <Label Content="Font Size:"
+               Grid.Row="2"
+               Style="{DynamicResource BlackPearlLabel}" />
+        <Border BorderThickness="1"
+                Grid.Row="2"
+                Grid.Column="1"
+                Margin="5">
+            <WrapPanel Orientation="Horizontal"
+                       VerticalAlignment="Center"
+                       Margin="3">
+
+                <icon:PackIconRemixIcon Kind="FontSize2"
+                                        Height="30"
+                                        Width="30" />
+                <Button Command="{Binding IncreaseFontCommand}"
+                        Width="20"
+                        Height="20"
+                        Style="{DynamicResource BlackPearlSquareHighlightButton}"
+                        Margin="15,0,3,0">
+                    <icon:PackIconBootstrapIcons Width="12"
+                                                 Height="12"
+                                                 Kind="CaretUpFill" />
+                </Button>
+                <Button Command="{Binding DecreaseFontCommand}"
+                        Width="20"
+                        Height="20"
+                        Style="{DynamicResource BlackPearlSquareHighlightButton}"
+                        Margin="3,0,3,0">
+                    <icon:PackIconBootstrapIcons Width="12"
+                                                 Height="12"
+                                                 Kind="CaretDownFill" />
+                </Button>
+            </WrapPanel>
+        </Border>
+    </Grid>
+</blackpearlprism:BlackPearlUserControl>

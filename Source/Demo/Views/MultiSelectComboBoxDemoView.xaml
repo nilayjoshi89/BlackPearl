@@ -3,7 +3,8 @@
                                        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                                        xmlns:blackpearlprism="clr-namespace:BlackPearl.PrismUI;assembly=BlackPearl.Prism">
     <StackPanel>
-        <TextBlock>There there!</TextBlock>
-        <TextBlock Text="{Binding Content, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        <Label Style="{DynamicResource BlackPearlLabel}">There there!</Label>
+        <Label Content="{Binding Content, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                   Style="{DynamicResource BlackPearlLabel}" />
     </StackPanel>
 </blackpearlprism:BlackPearlUserControl>

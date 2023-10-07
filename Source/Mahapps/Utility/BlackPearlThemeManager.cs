@@ -3,7 +3,7 @@ using System.Windows.Media;
 
 using ControlzEx.Theming;
 
-namespace BlackPearl.Mahapps.Themes
+namespace BlackPearl.Mahapps
 {
     public interface IBlackPearlThemeManager
     {
@@ -16,11 +16,11 @@ namespace BlackPearl.Mahapps.Themes
 
     public class BlackPearlThemeManager : IBlackPearlThemeManager
     {
-        public const string H1FontSize = "H1FontSize";
-        public const string H2FontSize = "H2FontSize";
-        public const string FontSizeIncrementBy = "FontSizeIncrementBy";
-        public const string MaxH1FontSize = "MaxH1FontSize";
-        public const string MinH1FontSize = "MinH1FontSize";
+        public const string H1FontSize = "BlackPearl.H1FontSize";
+        public const string H2FontSize = "BlackPearl.H2FontSize";
+        public const string FontSizeIncrementBy = "BlackPearl.FontSizeIncrementBy";
+        public const string MaxH1FontSize = "BlackPearl.MaxH1FontSize";
+        public const string MinH1FontSize = "BlackPearl.MinH1FontSize";
         public bool IsDarkTheme()
             => ThemeManager.Current.DetectTheme()?.BaseColorScheme == ThemeManager.BaseColorDarkConst;
         public Color GetAccentColor()
@@ -37,6 +37,8 @@ namespace BlackPearl.Mahapps.Themes
         }
         public void IncreaseFontSize()
         {
+            var v = Application.Current.Resources.Contains(H1FontSize);
+
             var currentValue = (double)Application.Current.Resources[H1FontSize];
             var maxH1FontSize = (double)Application.Current.Resources[MaxH1FontSize];
             var incrementBy = (double)Application.Current.Resources[FontSizeIncrementBy];

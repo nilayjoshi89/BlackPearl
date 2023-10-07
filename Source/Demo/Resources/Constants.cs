@@ -7,7 +7,7 @@ namespace BlackPearl.Controls.Demo
 {
     public static class Constants
     {
-        public static string ThemeView = "ThemeView";
+        public static string ThemeView = "BlackPearlThemeView";
         public static string MultiSelectComboBoxView = "MultiSelectComboBoxView";
         public static string ContentRegion = "ContentRegion";
 

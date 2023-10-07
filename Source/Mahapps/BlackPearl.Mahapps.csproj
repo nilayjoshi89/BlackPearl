@@ -4,10 +4,10 @@
 		<UseWPF>true</UseWPF>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="MahApps.Metro"/>
+		<PackageReference Include="MahApps.Metro" />
+		<PackageReference Include="MahApps.Metro.IconPacks" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="MahApps.Metro" />
 		<ProjectReference Include="..\Prism\BlackPearl.Prism.csproj" />
 	</ItemGroup>
 </Project>

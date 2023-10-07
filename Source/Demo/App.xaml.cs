@@ -2,7 +2,6 @@
 using System.Windows;
 
 using BlackPearl.Mahapps;
-using BlackPearl.PrismUI;
 
 using MahApps.Metro.Controls;
 
@@ -28,7 +27,7 @@ namespace BlackPearl.Controls.Demo
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            containerRegistry.Register<IDispatcherService, DispatcherService>()
+            containerRegistry.RegisterBlackPearlServices()
                             .Register<ShellWindowViewModel>()
                             .Register<ShellWindow>()
                             .Register<MultiSelectComboBoxDemoViewModel>()

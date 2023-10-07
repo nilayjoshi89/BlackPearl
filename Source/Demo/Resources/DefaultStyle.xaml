@@ -1,32 +1,42 @@
-﻿<ResourceDictionary
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:controls="clr-namespace:BlackPearl.Controls.CoreLibrary;assembly=BlackPearl.Controls.CoreLibrary">
-    <Style BasedOn="{StaticResource {x:Type Label}}" TargetType="Label">
-        <Setter Property="FontSize" Value="14" />
-        <Setter Property="FontWeight" Value="Bold" />
-        <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.ThemeForeground}" />
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:BlackPearl.Controls.CoreLibrary;assembly=BlackPearl.Controls.CoreLibrary">
+
+    <Style BasedOn="{StaticResource {x:Type Label}}"
+           TargetType="Label">
+        <Setter Property="FontSize"
+                Value="14" />
+        <Setter Property="FontWeight"
+                Value="Bold" />
+        <Setter Property="Foreground"
+                Value="{DynamicResource MahApps.Brushes.ThemeForeground}" />
     </Style>
 
-    <Style
-        x:Key="TextBlockStyle"
-        BasedOn="{StaticResource {x:Type TextBlock}}"
-        TargetType="TextBlock">
-        <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.ThemeForeground}" />
+    <Style x:Key="TextBlockStyle"
+           BasedOn="{StaticResource {x:Type TextBlock}}"
+           TargetType="TextBlock">
+        <Setter Property="Foreground"
+                Value="{DynamicResource MahApps.Brushes.ThemeForeground}" />
     </Style>
 
-    <SolidColorBrush x:Key="BlackPearl.MultiSelectCombobox.SelectedItem.BackgroundColor" Color="{DynamicResource MahApps.Colors.Accent3}" />
+    <SolidColorBrush x:Key="BlackPearl.MultiSelectCombobox.SelectedItem.BackgroundColor"
+                     Color="{DynamicResource MahApps.Colors.Accent3}" />
 
-    <SolidColorBrush x:Key="BlackPearl.MultiSelectCombobox.SelectedItem.ForegroundColor" Color="{DynamicResource MahApps.Colors.ThemeForeground}" />
+    <SolidColorBrush x:Key="BlackPearl.MultiSelectCombobox.SelectedItem.ForegroundColor"
+                     Color="{DynamicResource MahApps.Colors.ThemeForeground}" />
 
     <Style TargetType="{x:Type controls:MultiSelectCombobox}">
-        <Setter Property="Margin" Value="5" />
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Margin"
+                Value="5" />
+        <Setter Property="FontSize"
+                Value="14" />
     </Style>
 
 
-    <Style x:Key="InlineSelectedItemsControlStyle" TargetType="ItemsControl">
-        <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.ThemeForeground}" />
+    <Style x:Key="InlineSelectedItemsControlStyle"
+           TargetType="ItemsControl">
+        <Setter Property="Foreground"
+                Value="{DynamicResource MahApps.Brushes.ThemeForeground}" />
         <Setter Property="ItemsPanel">
             <Setter.Value>
                 <ItemsPanelTemplate>
@@ -38,7 +48,8 @@
             <Setter.Value>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Margin="2,0,0,0" Text="{Binding Name}" />
+                        <TextBlock Margin="2,0,0,0"
+                                   Text="{Binding Name}" />
                         <TextBlock Text="; " />
                     </StackPanel>
                 </DataTemplate>
@@ -46,15 +57,22 @@
         </Setter>
     </Style>
 
-    <Style BasedOn="{StaticResource {x:Type TabItem}}" TargetType="TabItem">
-        <Setter Property="Margin" Value="5,0,0,0" />
-        <Setter Property="BorderThickness" Value="0,0,0,2" />
+    <Style BasedOn="{StaticResource {x:Type TabItem}}"
+           TargetType="TabItem">
+        <Setter Property="Margin"
+                Value="5,0,0,0" />
+        <Setter Property="BorderThickness"
+                Value="0,0,0,2" />
         <Style.Triggers>
-            <Trigger Property="IsSelected" Value="True">
-                <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.Accent3}" />
+            <Trigger Property="IsSelected"
+                     Value="True">
+                <Setter Property="BorderBrush"
+                        Value="{DynamicResource MahApps.Brushes.Accent3}" />
             </Trigger>
-            <Trigger Property="IsSelected" Value="False">
-                <Setter Property="BorderBrush" Value="Transparent" />
+            <Trigger Property="IsSelected"
+                     Value="False">
+                <Setter Property="BorderBrush"
+                        Value="Transparent" />
             </Trigger>
         </Style.Triggers>
     </Style>

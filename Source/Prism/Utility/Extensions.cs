@@ -3,11 +3,14 @@ using System.Threading.Tasks;
 using System.Windows;
 
 using Prism.Events;
+using Prism.Ioc;
 
 namespace BlackPearl.PrismUI
 {
     public static class Extensions
     {
+        public static IContainerRegistry RegisterBlackPearlCoreServices(this IContainerRegistry registry)
+            => registry?.Register<IDispatcherService, DispatcherService>();
         public static async Task<bool> DataContextAction<T>(this FrameworkElement frameworkElement, Func<T, Task> action)
         {
             if (!(frameworkElement?.DataContext is T vm) || vm == null)
