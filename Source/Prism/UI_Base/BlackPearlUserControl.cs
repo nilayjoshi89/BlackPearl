@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Markup;
 
+using Prism.Regions;
+
 namespace BlackPearl.PrismUI
 {
     public abstract class BlackPearlUserControl : UserControl
@@ -21,6 +23,11 @@ namespace BlackPearl.PrismUI
 
             try
             {
+                if (DataContext is IRegionMemberLifetime rlm && rlm.KeepAlive)
+                {
+                    return;
+                }
+
                 await this.DataContextAction<BlackPearlViewModel>(vm => vm.OnUnload());
                 await this.DataContextAction<IDisposable>(vm =>
                 {

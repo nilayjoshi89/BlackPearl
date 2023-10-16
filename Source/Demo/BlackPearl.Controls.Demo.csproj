@@ -5,12 +5,11 @@
 		<UseWPF>true</UseWPF>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="MahApps.Metro"/>
-		<PackageReference Include="MahApps.Metro.IconPacks"/>
-		<PackageReference Include="Prism.Unity"/>
+		<PackageReference Include="MahApps.Metro" />
+		<PackageReference Include="MahApps.Metro.IconPacks" />
+		<PackageReference Include="Prism.Unity" />
 	</ItemGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\Common\BlackPearl.Controls.Common.csproj" />
 		<ProjectReference Include="..\CoreLibrary\BlackPearl.Controls.CoreLibrary.csproj" />
 		<ProjectReference Include="..\Mahapps\BlackPearl.Mahapps.csproj" />
 		<ProjectReference Include="..\Prism\BlackPearl.Prism.csproj" />

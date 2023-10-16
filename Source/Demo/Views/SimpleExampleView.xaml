@@ -21,17 +21,17 @@
                 <Label Content="Simple Example" />
                 <StackPanel Grid.Row="1"
                             Margin="5,0,5,0">
-                    <StackPanel.Resources>
+                    <!--<StackPanel.Resources>
                         <Style BasedOn="{StaticResource TextBlockStyle}"
                                TargetType="TextBlock" />
-                    </StackPanel.Resources>
+                    </StackPanel.Resources>-->
                     <TextBlock Text="DisplayMemberPath = Name" />
                     <TextBlock Text="ItemSeparator = ;" />
-                    <WrapPanel Orientation="Horizontal">
+                    <!--<WrapPanel Orientation="Horizontal">
                         <TextBlock Text="SelectedItems = " />
                         <ItemsControl ItemsSource="{Binding SelectedItemsBasic}"
                                       Style="{StaticResource InlineSelectedItemsControlStyle}" />
-                    </WrapPanel>
+                    </WrapPanel>-->
                 </StackPanel>
                 <controls:MultiSelectCombobox Grid.Row="2"
                                               DisplayMemberPath="Name"
@@ -58,20 +58,19 @@
                 <Label Content="Simple Example with additional ItemSeparator" />
                 <StackPanel Grid.Row="1"
                             Margin="5,0,5,0">
-                    <StackPanel.Resources>
+                    <!--<StackPanel.Resources>
                         <Style BasedOn="{StaticResource TextBlockStyle}"
                                TargetType="TextBlock" />
-                    </StackPanel.Resources>
+                    </StackPanel.Resources>-->
                     <TextBlock Text="DisplayMemberPath = Name" />
                     <TextBlock Text="ItemSeparator = One of the following characters: &quot;;&quot; or &quot;,&quot; or &quot;/&quot; or &quot;-&quot;" />
-                    <StackPanel Orientation="Horizontal">
+                    <!--<StackPanel Orientation="Horizontal">
                         <TextBlock Text="SelectedItems = " />
                         <ItemsControl ItemsSource="{Binding SelectedItemsWithAdditionalItemSeparator}"
                                       Style="{StaticResource InlineSelectedItemsControlStyle}" />
-                    </StackPanel>
+                    </StackPanel>-->
                 </StackPanel>
                 <controls:MultiSelectCombobox Grid.Row="2"
-                                              AdditionalItemSeparators="{DynamicResource ResourceKey=AdditionalCharArray}"
                                               DisplayMemberPath="Name"
                                               ItemSeparator=";"
                                               ItemSource="{Binding Source, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"

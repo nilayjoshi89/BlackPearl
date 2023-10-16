@@ -196,10 +196,16 @@ namespace BlackPearl.Controls.CoreLibrary
             try
             {
                 //Unsubscribe handlers first
-                if (!multiChoiceControl.UnsubscribeHandler())
+                if (!multiChoiceControl.UnsubscribeHandler() 
+                    || multiChoiceControl?.RichTextBoxElement == null)
                 {
                     //Failed to unsubscribe, return
                     return;
+                }
+
+                foreach (var textblock in multiChoiceControl?.RichTextBoxElement?.GetParagraph()?.Inlines?.Select(i => i.GetTextBlock())?.Where(i => i != null))
+                {
+                    textblock.Unloaded -= multiChoiceControl.Tb_Unloaded;
                 }
 
                 //Clear everything in RichTextBox
@@ -210,6 +216,8 @@ namespace BlackPearl.Controls.CoreLibrary
                 {
                     multiChoiceControl?.RichTextBoxElement?.AddToParagraph(item, multiChoiceControl.CreateInlineUIElement);
                 }
+
+                multiChoiceControl.RaiseSelectionChangedEvent(e.OldValue as IList ?? new ArrayList(0), e.NewValue as IList ?? new ArrayList(0));
             }
             finally
             {

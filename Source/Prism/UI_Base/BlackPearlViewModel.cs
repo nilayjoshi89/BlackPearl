@@ -102,7 +102,7 @@ namespace BlackPearl.PrismUI
         private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e) => Validate(e?.PropertyName);
         #endregion
 
-        bool IRegionMemberLifetime.KeepAlive => false;
+        public virtual bool KeepAlive => false;
 
         #region INotifyDataErrorInfo
         public bool HasErrors => propertyErrors?.Any(pe => pe.Value?.Any() == true) == true;

@@ -23,6 +23,13 @@
                 Value="Center" />
     </Style>
 
+    <Style x:Key="BlackPearlTextBlock"
+           BasedOn="{StaticResource {x:Type TextBlock}}"
+           TargetType="TextBlock">
+        <Setter Property="Foreground"
+                Value="{DynamicResource MahApps.Brushes.ThemeForeground}" />
+    </Style>
+
     <Style TargetType="ComboBox"
            BasedOn="{StaticResource {x:Type ComboBox}}"
            x:Key="BlackPearlComboBox">
@@ -30,8 +37,6 @@
                 Value="{DynamicResource BlackPearl.DefaultMargin}" />
         <Setter Property="MinWidth"
                 Value="120" />
-        <Setter Property="MaxWidth"
-                Value="300" />
         <Setter Property="FontSize"
                 Value="{DynamicResource BlackPearl.H2FontSize}" />
         <Setter Property="VerticalAlignment"
@@ -45,10 +50,21 @@
                 Value="{DynamicResource BlackPearl.DefaultMargin}" />
         <Setter Property="MinWidth"
                 Value="120" />
-        <Setter Property="MaxWidth"
-                Value="300" />
         <Setter Property="FontSize"
                 Value="{DynamicResource BlackPearl.H2FontSize}" />
+        <Setter Property="VerticalAlignment"
+                Value="Center" />
+    </Style>
+
+    <Style TargetType="CheckBox"
+           BasedOn="{StaticResource {x:Type CheckBox}}"
+           x:Key="BlackCheckBox">
+        <Setter Property="Margin"
+                Value="{DynamicResource BlackPearl.DefaultMargin}" />
+        <Setter Property="FontSize"
+                Value="{DynamicResource BlackPearl.H1FontSize}" />
+        <Setter Property="FontWeight"
+                Value="DemiBold" />
         <Setter Property="VerticalAlignment"
                 Value="Center" />
     </Style>
@@ -62,8 +78,6 @@
                 Value="Bold" />
         <Setter Property="MinWidth"
                 Value="40" />
-        <Setter Property="MaxWidth"
-                Value="300" />
         <Setter Property="FontSize"
                 Value="{DynamicResource BlackPearl.H2FontSize}" />
         <Setter Property="VerticalAlignment"
@@ -79,8 +93,6 @@
                 Value="Bold" />
         <Setter Property="MinWidth"
                 Value="40" />
-        <Setter Property="MaxWidth"
-                Value="300" />
         <Setter Property="FontSize"
                 Value="{DynamicResource BlackPearl.H2FontSize}" />
         <Setter Property="VerticalAlignment"
@@ -96,8 +108,6 @@
                 Value="Bold" />
         <Setter Property="MinWidth"
                 Value="40" />
-        <Setter Property="MaxWidth"
-                Value="300" />
         <Setter Property="FontSize"
                 Value="{DynamicResource BlackPearl.H2FontSize}" />
         <Setter Property="VerticalAlignment"

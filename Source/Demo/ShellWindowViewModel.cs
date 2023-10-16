@@ -33,6 +33,8 @@ namespace BlackPearl.Controls.Demo
                 item.Command = new DelegateCommand<object>(n => regionManager.RequestNavigate(Constants.ContentRegion, n?.ToString()));
             }
 
+            regionManager.RequestNavigate(Constants.ContentRegion, Constants.MultiSelectComboBoxView);
+
             return Task.CompletedTask;
         }
     }

@@ -1,13 +1,14 @@
-﻿using BlackPearl.Controls.Extension;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
+
+using BlackPearl.Controls.Extension;
+
 using EM = BlackPearl.Controls.CoreLibrary.EntensionMethods;
 
 namespace BlackPearl.Controls.CoreLibrary
@@ -172,30 +173,30 @@ namespace BlackPearl.Controls.CoreLibrary
                 switch (e.Key)
                 {
                     case Key.Down:
-                    {
-                        e.Handled = true;
-                        HandleKeyboardDownKeyPress();
-                    }
-                    break;
+                        {
+                            e.Handled = true;
+                            HandleKeyboardDownKeyPress();
+                        }
+                        break;
                     case Key.Up:
-                    {
-                        e.Handled = true;
-                        HandleKeyboardUpKeyPress();
-                    }
-                    break;
+                        {
+                            e.Handled = true;
+                            HandleKeyboardUpKeyPress();
+                        }
+                        break;
                     case Key.Enter:
-                    {
-                        e.Handled = true;
-                        UpdateSelectedItemsFromSuggestionDropdown();
-                    }
-                    break;
+                        {
+                            e.Handled = true;
+                            UpdateSelectedItemsFromSuggestionDropdown();
+                        }
+                        break;
                     case Key.Escape:
-                    {
-                        e.Handled = true;
-                        HideSuggestions(EM.SuggestionCleanupOperation.ResetIndex | EM.SuggestionCleanupOperation.ClearSelection);
-                        RichTextBoxElement.TryFocus();
-                    }
-                    break;
+                        {
+                            e.Handled = true;
+                            HideSuggestions(EM.SuggestionCleanupOperation.ResetIndex | EM.SuggestionCleanupOperation.ClearSelection);
+                            RichTextBoxElement.TryFocus();
+                        }
+                        break;
                     default:
                         break;
                 }
@@ -364,6 +365,9 @@ namespace BlackPearl.Controls.CoreLibrary
         private void RemoveSelectedItems()
         {
             object[] selectedItems = RichTextBoxElement.GetSelectedObjects();
+
+            if (selectedItems == null) return;
+
             foreach (var i in selectedItems)
             {
                 SelectedItems.Remove(i);

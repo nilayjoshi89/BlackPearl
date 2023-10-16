@@ -5,7 +5,7 @@ using BlackPearl.Controls.Extension;
 
 namespace BlackPearl.Controls.CoreLibrary
 {
-    public class DefaultLookUpContract : ILookUpContract
+    public class DiacriticLookUpContract : ILookUpContract
     {
         public bool SupportsNewObjectCreation => false;
 
@@ -15,7 +15,7 @@ namespace BlackPearl.Controls.CoreLibrary
         {
             string itemString = item?.GetPropertyValue((sender as MultiSelectCombobox)?.DisplayMemberPath)
                                     ?.ToString();
-            return StringEqualsPredicate(itemString, seachString);
+            return StringEqualsPredicate(itemString?.RemoveDiacritics(), seachString?.RemoveDiacritics());
         }
 
         public bool IsItemMatchingSearchString(object sender, object item, string searchString)
@@ -27,7 +27,7 @@ namespace BlackPearl.Controls.CoreLibrary
 
             string itemString = item?.GetPropertyValue((sender as MultiSelectCombobox)?.DisplayMemberPath)
                                     ?.ToString();
-            return StringStartsWithPredicate(itemString, searchString);
+            return StringStartsWithPredicate(itemString?.RemoveDiacritics(), searchString?.RemoveDiacritics());
         }
 
         private static bool StringStartsWithPredicate(string value, string searchString)
