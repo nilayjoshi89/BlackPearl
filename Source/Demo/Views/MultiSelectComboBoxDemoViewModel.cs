@@ -70,7 +70,7 @@ namespace BlackPearl.Controls.Demo
                 RaisePropertyChanged(nameof(SelectedItemsString));
             }
         }
-        public string SelectedItemsString => string.Join(ItemSeparator, SelectedItems.Select(p => p.Name));
+        public string SelectedItemsString => string.Join(ItemSeparator.ToString(), SelectedItems.Select(p => p.Name));
         public DelegateCommand<SelectionChangedEventArgs> SelectionChangedEventCommand => new DelegateCommand<SelectionChangedEventArgs>(SelectionChangedEventAction);
 
         public string DisplayMemberPath => SelectedDisplayPath.ToString();
@@ -215,11 +215,19 @@ namespace BlackPearl.Controls.Demo
         }
         private void ChangeLookupContract(string index)
         {
-            LookupContract = (index == null || index == "0")
-                                ? new DefaultLookUpContract()
-                                : (index == "1")
-                                    ? new DiacriticLookUpContract()
-                                    : new AdvanceLookUpContract();
+            if (index == null || index == "0")
+            {
+                LookupContract = new DefaultLookUpContract();
+            }
+            else if (index == "1")
+            {
+                LookupContract = new DiacriticLookUpContract();
+            }
+            else
+            {
+                LookupContract = new AdvanceLookUpContract();
+            }
+
             ForceReloadControl();
         }
     }
