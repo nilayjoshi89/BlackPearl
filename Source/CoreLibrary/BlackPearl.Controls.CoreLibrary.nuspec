@@ -1,70 +1,48 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <package>
-  <metadata>
-    <id>BlackPearl.Controls.Library</id>
-    <version>2.0.3.0</version>
-    <title>WPF control library</title>
-    <authors>nilayjoshi89@gmail.com</authors>
-    <owners>nilayjoshi89@gmail.com</owners>
-    <description>WPF control library</description>
-    <releaseNotes>Minor bug fix.</releaseNotes>
-    <copyright>Copyright 2021</copyright>
-    <tags>WPF MultiSelectCombobox ComboBox MultiSelectDropDown</tags>
-    <references>
-      <group>
-        <reference file="BlackPearl.Controls.Common.dll" />
-        <reference file="BlackPearl.Controls.CoreLibrary.dll" />
-      </group>
-      <group targetFramework="net461">
-        <reference file="BlackPearl.Controls.Common.dll" />
-        <reference file="BlackPearl.Controls.CoreLibrary.dll" />
-      </group>
-      <group targetFramework="net48">
-        <reference file="BlackPearl.Controls.Common.dll" />
-        <reference file="BlackPearl.Controls.CoreLibrary.dll" />
-      </group>
-      <group targetFramework="net5.0-windows7.0">
-        <reference file="BlackPearl.Controls.Common.dll" />
-        <reference file="BlackPearl.Controls.CoreLibrary.dll" />
-      </group>
-      <group targetFramework="netcoreapp3.1">
-        <reference file="BlackPearl.Controls.Common.dll" />
-        <reference file="BlackPearl.Controls.CoreLibrary.dll" />
-      </group>
-    </references>
-	  <frameworkReferences>
-		  <group targetFramework="netcoreapp3.1">
-			  <frameworkReference name="Microsoft.WindowsDesktop.App.WPF" />
-		  </group>
-		  <group targetFramework="net5.0-windows7.0">
-			  <frameworkReference name="Microsoft.WindowsDesktop.App.WPF" />
-		  </group>
-		  <group targetFramework="net461" />
-		  <group targetFramework="net48" />
-	  </frameworkReferences>
-	  <dependencies>
-		  <group targetFramework="netcoreapp3.1"/>
-		  <group targetFramework="net5.0-windows7.0"/>
-		  <group targetFramework="net461" />
-		  <group targetFramework="net48" />
-	  </dependencies>
-  </metadata>
-  <files>
-    <file src="bin\release\net461\BlackPearl.Controls.Common.dll" target="ref\net461" />
-    <file src="bin\release\net461\BlackPearl.Controls.CoreLibrary.dll" target="ref\net461" />
-    <file src="bin\release\net48\BlackPearl.Controls.Common.dll" target="ref\net48" />
-    <file src="bin\release\net48\BlackPearl.Controls.CoreLibrary.dll" target="ref\net48" />
-    <file src="bin\release\net5.0-windows7.0\BlackPearl.Controls.Common.dll" target="ref\net5.0-windows7.0" />
-    <file src="bin\release\net5.0-windows7.0\BlackPearl.Controls.CoreLibrary.dll" target="ref\net5.0-windows7.0" />
-    <file src="bin\release\netcoreapp3.1\BlackPearl.Controls.Common.dll" target="ref\netcoreapp3.1" />
-    <file src="bin\release\netcoreapp3.1\BlackPearl.Controls.CoreLibrary.dll" target="ref\netcoreapp3.1" />
-    <file src="bin\release\net461\BlackPearl.Controls.Common.dll" target="lib\net461" />
-    <file src="bin\release\net461\BlackPearl.Controls.CoreLibrary.dll" target="lib\net461" />
-    <file src="bin\release\net48\BlackPearl.Controls.Common.dll" target="lib\net48" />
-    <file src="bin\release\net48\BlackPearl.Controls.CoreLibrary.dll" target="lib\net48" />
-    <file src="bin\release\net5.0-windows7.0\BlackPearl.Controls.Common.dll" target="lib\net5.0-windows7.0" />
-    <file src="bin\release\net5.0-windows7.0\BlackPearl.Controls.CoreLibrary.dll" target="lib\net5.0-windows7.0" />
-    <file src="bin\release\netcoreapp3.1\BlackPearl.Controls.Common.dll" target="lib\netcoreapp3.1" />
-    <file src="bin\release\netcoreapp3.1\BlackPearl.Controls.CoreLibrary.dll" target="lib\netcoreapp3.1" />
-  </files>
+	<metadata>
+		<id>BlackPearl.Controls.Library</id>
+		<version>2.0.4.0</version>
+		<title>WPF control library</title>
+		<authors>nilayjoshi89@gmail.com</authors>
+		<description>WPF control library</description>
+		<projectUrl>https://github.com/nilayjoshi89/BlackPearl</projectUrl>
+		<releaseNotes>RN1</releaseNotes>
+		<copyright>Copyright 2021</copyright>
+		<tags>WPF MultiSelectCombobox ComboBox MultiSelectDropDown</tags>
+		<references>
+			<group>
+				<reference file="BlackPearl.Controls.Common.dll" />
+				<reference file="BlackPearl.Controls.CoreLibrary.dll" />
+			</group>
+			<group targetFramework="net48">
+				<reference file="BlackPearl.Controls.Common.dll" />
+				<reference file="BlackPearl.Controls.CoreLibrary.dll" />
+			</group>
+			<group targetFramework="net6.0-windows7.0">
+				<reference file="BlackPearl.Controls.Common.dll" />
+				<reference file="BlackPearl.Controls.CoreLibrary.dll" />
+			</group>
+		</references>
+		<frameworkReferences>
+			<group targetFramework="net6.0-windows7.0">
+				<frameworkReference name="Microsoft.WindowsDesktop.App.WPF" />
+			</group>
+			<group targetFramework="net48" />
+		</frameworkReferences>
+		<dependencies>
+			<group targetFramework="net6.0-windows7.0"/>
+			<group targetFramework="net48" />
+		</dependencies>
+	</metadata>
+	<files>
+		<file src="bin\release\net48\BlackPearl.Controls.Common.dll" target="ref\net48" />
+		<file src="bin\release\net48\BlackPearl.Controls.CoreLibrary.dll" target="ref\net48" />
+		<file src="bin\release\net6.0-windows7.0\BlackPearl.Controls.Common.dll" target="ref\net6.0-windows7.0" />
+		<file src="bin\release\net6.0-windows7.0\BlackPearl.Controls.CoreLibrary.dll" target="ref\net6.0-windows7.0" />
+		<file src="bin\release\net48\BlackPearl.Controls.Common.dll" target="lib\net48" />
+		<file src="bin\release\net48\BlackPearl.Controls.CoreLibrary.dll" target="lib\net48" />
+		<file src="bin\release\net6.0-windows7.0\BlackPearl.Controls.Common.dll" target="lib\net6.0-windows7.0" />
+		<file src="bin\release\net6.0-windows7.0\BlackPearl.Controls.CoreLibrary.dll" target="lib\net6.0-windows7.0" />
+	</files>
 </package>

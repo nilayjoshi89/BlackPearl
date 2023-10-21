@@ -1,38 +1,31 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:controls="clr-namespace:BlackPearl.Controls.CoreLibrary;assembly=BlackPearl.Controls.CoreLibrary">
-    <Style TargetType="Label"
-           BasedOn="{StaticResource {x:Type Label}}">
-        <Setter Property="FontSize"
-                Value="16" />
-        <Setter Property="FontWeight"
-                Value="Bold" />
-    </Style>
 
+    <!--Theming related overrides-->
     <SolidColorBrush x:Key="BlackPearl.MultiSelectCombobox.SelectedItem.BackgroundColor"
                      Color="{DynamicResource MahApps.Colors.Accent3}" />
 
     <SolidColorBrush x:Key="BlackPearl.MultiSelectCombobox.SelectedItem.ForegroundColor"
                      Color="{DynamicResource MahApps.Colors.ThemeForeground}" />
 
-    <Style TargetType="{x:Type controls:MultiSelectCombobox}">
+    <SolidColorBrush x:Key="borderBrush"
+                     Color="{StaticResource MahApps.Colors.Gray}"
+                     Opacity=".5" />
+
+    <Style x:Key="DemoBorderStyle"
+           BasedOn="{StaticResource BlackPearlBorder}"
+           TargetType="Border">
+        <Setter Property="MinWidth"
+                Value="365" />
+        <Setter Property="BorderBrush"
+                Value="{DynamicResource borderBrush}" />
+    </Style>
+    <Style TargetType="{x:Type controls:MultiSelectCombobox}"
+           BasedOn="{StaticResource {x:Type controls:MultiSelectCombobox} }">
         <Setter Property="Margin"
-                Value="5" />
+                Value="{DynamicResource BlackPearl.DefaultMargin}" />
         <Setter Property="FontSize"
-                Value="14" />
+                Value="{DynamicResource BlackPearl.H2FontSize}" />
     </Style>
-    <Style TargetType="Button"
-           BasedOn="{StaticResource {x:Type Button}}">
-        <Setter Property="HorizontalAlignment"
-                Value="Center" />
-        <Setter Property="VerticalAlignment"
-                Value="Center" />
-        <Setter Property="Height"
-                Value="30" />
-        <Setter Property="FontWeight"
-                Value="Bold" />
-        <Setter Property="Margin"
-                Value="5" />
-    </Style>
-   
 </ResourceDictionary>

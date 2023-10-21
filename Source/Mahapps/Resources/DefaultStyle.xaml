@@ -1,0 +1,146 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+    <system:Double x:Key="BlackPearl.H1FontSize">14</system:Double>
+    <system:Double x:Key="BlackPearl.H2FontSize">12</system:Double>
+    <system:Double x:Key="BlackPearl.FontSizeIncrementBy">1</system:Double>
+    <system:Double x:Key="BlackPearl.MaxH1FontSize">24</system:Double>
+    <system:Double x:Key="BlackPearl.MinH1FontSize">14</system:Double>
+    <Thickness x:Key="BlackPearl.DefaultMargin">5</Thickness>
+
+    <Style TargetType="Label"
+           BasedOn="{StaticResource {x:Type Label}}"
+           x:Key="BlackPearlLabel">
+        <Setter Property="Margin"
+                Value="{DynamicResource BlackPearl.DefaultMargin}" />
+        <Setter Property="Padding"
+                Value="0" />
+        <Setter Property="FontWeight"
+                Value="Bold" />
+        <Setter Property="FontSize"
+                Value="{DynamicResource BlackPearl.H1FontSize}" />
+        <Setter Property="Foreground"
+                Value="{DynamicResource MahApps.Brushes.Text}" />
+        <Setter Property="VerticalAlignment"
+                Value="Center" />
+    </Style>
+
+    <Style x:Key="BlackPearlBorder"
+           TargetType="Border">
+        <Setter Property="BorderBrush"
+                Value="{DynamicResource MahApps.Brushes.Control.Border}" />
+        <Setter Property="Margin"
+                Value="{DynamicResource BlackPearl.DefaultMargin}" />
+        <Setter Property="BorderThickness"
+                Value="1" />
+        <Setter Property="CornerRadius"
+                Value="3" />
+    </Style>
+
+    <Style x:Key="BlackPearlTextBlock"
+           BasedOn="{StaticResource {x:Type TextBlock}}"
+           TargetType="TextBlock">
+        <Setter Property="Foreground"
+                Value="{DynamicResource MahApps.Brushes.ThemeForeground}" />
+        <Setter Property="Margin"
+                Value="{DynamicResource BlackPearl.DefaultMargin}" />
+    </Style>
+
+    <Style TargetType="ComboBox"
+           BasedOn="{StaticResource {x:Type ComboBox}}"
+           x:Key="BlackPearlComboBox">
+        <Setter Property="Margin"
+                Value="{DynamicResource BlackPearl.DefaultMargin}" />
+        <Setter Property="MinWidth"
+                Value="120" />
+        <Setter Property="FontSize"
+                Value="{DynamicResource BlackPearl.H2FontSize}" />
+        <Setter Property="VerticalAlignment"
+                Value="Center" />
+    </Style>
+
+    <Style TargetType="TextBox"
+           BasedOn="{StaticResource {x:Type TextBox}}"
+           x:Key="BlackPearlTextBox">
+        <Setter Property="Margin"
+                Value="{DynamicResource BlackPearl.DefaultMargin}" />
+        <Setter Property="MinWidth"
+                Value="120" />
+        <Setter Property="FontSize"
+                Value="{DynamicResource BlackPearl.H2FontSize}" />
+        <Setter Property="VerticalAlignment"
+                Value="Center" />
+    </Style>
+
+    <Style TargetType="CheckBox"
+           BasedOn="{StaticResource {x:Type CheckBox}}"
+           x:Key="BlackPearlCheckBox">
+        <Setter Property="Margin"
+                Value="{DynamicResource BlackPearl.DefaultMargin}" />
+        <Setter Property="FontSize"
+                Value="{DynamicResource BlackPearl.H1FontSize}" />
+        <Setter Property="FontWeight"
+                Value="DemiBold" />
+        <Setter Property="VerticalAlignment"
+                Value="Center" />
+    </Style>
+
+    <Style TargetType="RadioButton"
+           BasedOn="{StaticResource {x:Type RadioButton}}"
+           x:Key="BlackPearlRadioButton">
+        <Setter Property="Margin"
+                Value="{DynamicResource BlackPearl.DefaultMargin}" />
+        <Setter Property="FontSize"
+                Value="{DynamicResource BlackPearl.H1FontSize}" />
+        <Setter Property="FontWeight"
+                Value="DemiBold" />
+        <Setter Property="VerticalAlignment"
+                Value="Center" />
+    </Style>
+
+    <Style TargetType="Button"
+           BasedOn="{StaticResource MahApps.Styles.Button.Square}"
+           x:Key="BlackPearlSquareButton">
+        <Setter Property="Margin"
+                Value="{DynamicResource BlackPearl.DefaultMargin}" />
+        <Setter Property="FontWeight"
+                Value="Bold" />
+        <Setter Property="MinWidth"
+                Value="40" />
+        <Setter Property="FontSize"
+                Value="{DynamicResource BlackPearl.H2FontSize}" />
+        <Setter Property="VerticalAlignment"
+                Value="Center" />
+    </Style>
+
+    <Style TargetType="Button"
+           x:Key="BlackPearlSquareAccentButton"
+           BasedOn="{StaticResource MahApps.Styles.Button.Square.Accent}">
+        <Setter Property="Margin"
+                Value="{DynamicResource BlackPearl.DefaultMargin}" />
+        <Setter Property="FontWeight"
+                Value="Bold" />
+        <Setter Property="MinWidth"
+                Value="40" />
+        <Setter Property="FontSize"
+                Value="{DynamicResource BlackPearl.H2FontSize}" />
+        <Setter Property="VerticalAlignment"
+                Value="Center" />
+    </Style>
+
+    <Style TargetType="Button"
+           x:Key="BlackPearlSquareHighlightButton"
+           BasedOn="{StaticResource MahApps.Styles.Button.Square.Highlight}">
+        <Setter Property="Margin"
+                Value="{DynamicResource BlackPearl.DefaultMargin}" />
+        <Setter Property="FontWeight"
+                Value="Bold" />
+        <Setter Property="MinWidth"
+                Value="40" />
+        <Setter Property="FontSize"
+                Value="{DynamicResource BlackPearl.H2FontSize}" />
+        <Setter Property="VerticalAlignment"
+                Value="Center" />
+    </Style>
+
+</ResourceDictionary>
