@@ -5,15 +5,12 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <!-- MahApps.Metro resource dictionaries. Make sure that all file names are Case Sensitive! -->
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
-                <!-- Accent and AppTheme setting -->
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Dark.Orange.xaml" />
-                <!--<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />-->
 
                 <ResourceDictionary Source="pack://application:,,,/BlackPearl.Controls.CoreLibrary;component/Themes/Generic.xaml" />
-
+                <ResourceDictionary Source="pack://application:,,,/BlackPearl.Mahapps;component/Resources/DefaultStyle.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/BlackPearl.Controls.Demo;component/Resources/DefaultStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

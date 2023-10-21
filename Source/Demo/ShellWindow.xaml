@@ -5,10 +5,10 @@
                                   xmlns:windowBase="clr-namespace:BlackPearl.Mahapps;assembly=BlackPearl.Mahapps"
                                   xmlns:prism="http://prismlibrary.com/"
                                   xmlns:mahapps="http://metro.mahapps.com/winfx/xaml/controls"
-                                  Title="MultiSelectCombobox Demo - Nilay Joshi"
+                                  Title="BlackPearl WPF Library Demo App - Nilay Joshi"
                                   GlowBrush="{DynamicResource MahApps.Brushes.Accent}"
                                   WindowStartupLocation="CenterScreen"
-                                  Height="600"
+                                  Height="1000"
                                   Width="800">
     <Grid>
         <Grid.RowDefinitions>

@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
+using BlackPearl.Controls.Contract;
+using BlackPearl.Controls.CoreLibrary;
 using BlackPearl.PrismUI;
 
 using Prism.Commands;
@@ -15,10 +18,12 @@ namespace BlackPearl.Controls.Demo
         private readonly IDispatcherService dispatcherService;
         private char itemSeparator = ';';
         private char[] additionalItemSeparators = new char[0];
-        private PersonDisplayPath selectedDisplayPath = PersonDisplayPath.City;
+        private PersonDisplayPath selectedDisplayPath = PersonDisplayPath.Name;
         private ObservableCollection<Person> source = new ObservableCollection<Person>();
         private ObservableCollection<Person> selectedItems = new ObservableCollection<Person>();
         private bool isActive = true;
+        private ILookUpContract lookupContract = new DefaultLookUpContract();
+        private bool includeDiacriticItems = false;
 
         public MultiSelectComboBoxDemoViewModel(IDispatcherService dispatcherService)
         {
@@ -42,6 +47,16 @@ namespace BlackPearl.Controls.Demo
             {
                 source = value;
                 RaisePropertyChanged(nameof(Source));
+            }
+        }
+        public bool IncludeDiacriticItems
+        {
+            get => includeDiacriticItems;
+            set
+            {
+                includeDiacriticItems = value;
+                RaisePropertyChanged(nameof(IncludeDiacriticItems));
+                ForceReloadControl(changeInItemSource: true);
             }
         }
 
@@ -94,13 +109,40 @@ namespace BlackPearl.Controls.Demo
         }
         public DelegateCommand<CheckBox> AdditionalSeparatorCheckCommand => new DelegateCommand<CheckBox>(SetAdditionalSeparator);
 
-        private async void ForceReloadControl()
+        public bool IsDefaultContract => LookupContract is DefaultLookUpContract;
+        public bool IsDiacriticContract => LookupContract is DiacriticLookUpContract;
+        public bool IsCustomContract => LookupContract is AdvanceLookUpContract;
+        public ILookUpContract LookupContract
+        {
+            get => lookupContract;
+            set
+            {
+                lookupContract = value;
+                RaisePropertyChanged(nameof(LookupContract));
+                RaisePropertyChanged(nameof(IsDefaultContract));
+                RaisePropertyChanged(nameof(IsDiacriticContract));
+                RaisePropertyChanged(nameof(IsCustomContract));
+            }
+        }
+        public DelegateCommand<string> ChangeLookupContractCommand => new DelegateCommand<string>(ChangeLookupContract);
+
+        private async void ForceReloadControl(bool changeInItemSource = false)
         {
             try
             {
                 IsActive = false;
-                var currentSelection = SelectedItems.ToList();
-                await SetPersonSelectedItemRandom(currentSelection);
+
+                List<Person> selection = null;
+                if (changeInItemSource)
+                {
+                    await SetPersonItemSource();
+                }
+                else
+                {
+                    selection = SelectedItems.ToList();
+                }
+
+                await SetPersonSelectedItemRandom(selection);
             }
             catch { }
             finally
@@ -159,11 +201,26 @@ namespace BlackPearl.Controls.Demo
         }
         private async Task SetPersonItemSource()
         {
-            var data = await Task.Run(() => new ObservableCollection<Person>(PersonDataProvider.GetDummyData()));
+            var data = await Task.Run(() => PersonDataProvider.GetDummyData());
+
+            if (!IncludeDiacriticItems)
+            {
+                data = data.Skip(20);
+            }
+
             await dispatcherService.Execute(() =>
             {
-                Source = data;
+                Source = new ObservableCollection<Person>(data);
             });
+        }
+        private void ChangeLookupContract(string index)
+        {
+            LookupContract = (index == null || index == "0")
+                                ? new DefaultLookUpContract()
+                                : (index == "1")
+                                    ? new DiacriticLookUpContract()
+                                    : new AdvanceLookUpContract();
+            ForceReloadControl();
         }
     }
 

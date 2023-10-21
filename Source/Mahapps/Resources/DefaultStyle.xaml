@@ -13,8 +13,10 @@
            x:Key="BlackPearlLabel">
         <Setter Property="Margin"
                 Value="{DynamicResource BlackPearl.DefaultMargin}" />
+        <Setter Property="Padding"
+                Value="0" />
         <Setter Property="FontWeight"
-                Value="DemiBold" />
+                Value="Bold" />
         <Setter Property="FontSize"
                 Value="{DynamicResource BlackPearl.H1FontSize}" />
         <Setter Property="Foreground"
@@ -23,11 +25,25 @@
                 Value="Center" />
     </Style>
 
+    <Style x:Key="BlackPearlBorder"
+           TargetType="Border">
+        <Setter Property="BorderBrush"
+                Value="{DynamicResource MahApps.Brushes.Control.Border}" />
+        <Setter Property="Margin"
+                Value="{DynamicResource BlackPearl.DefaultMargin}" />
+        <Setter Property="BorderThickness"
+                Value="1" />
+        <Setter Property="CornerRadius"
+                Value="3" />
+    </Style>
+
     <Style x:Key="BlackPearlTextBlock"
            BasedOn="{StaticResource {x:Type TextBlock}}"
            TargetType="TextBlock">
         <Setter Property="Foreground"
                 Value="{DynamicResource MahApps.Brushes.ThemeForeground}" />
+        <Setter Property="Margin"
+                Value="{DynamicResource BlackPearl.DefaultMargin}" />
     </Style>
 
     <Style TargetType="ComboBox"
@@ -58,7 +74,20 @@
 
     <Style TargetType="CheckBox"
            BasedOn="{StaticResource {x:Type CheckBox}}"
-           x:Key="BlackCheckBox">
+           x:Key="BlackPearlCheckBox">
+        <Setter Property="Margin"
+                Value="{DynamicResource BlackPearl.DefaultMargin}" />
+        <Setter Property="FontSize"
+                Value="{DynamicResource BlackPearl.H1FontSize}" />
+        <Setter Property="FontWeight"
+                Value="DemiBold" />
+        <Setter Property="VerticalAlignment"
+                Value="Center" />
+    </Style>
+
+    <Style TargetType="RadioButton"
+           BasedOn="{StaticResource {x:Type RadioButton}}"
+           x:Key="BlackPearlRadioButton">
         <Setter Property="Margin"
                 Value="{DynamicResource BlackPearl.DefaultMargin}" />
         <Setter Property="FontSize"

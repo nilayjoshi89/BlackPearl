@@ -9,6 +9,18 @@
     <SolidColorBrush x:Key="BlackPearl.MultiSelectCombobox.SelectedItem.ForegroundColor"
                      Color="{DynamicResource MahApps.Colors.ThemeForeground}" />
 
+    <SolidColorBrush x:Key="borderBrush"
+                     Color="{StaticResource MahApps.Colors.Gray}"
+                     Opacity=".5" />
+
+    <Style x:Key="DemoBorderStyle"
+           BasedOn="{StaticResource BlackPearlBorder}"
+           TargetType="Border">
+        <Setter Property="MinWidth"
+                Value="365" />
+        <Setter Property="BorderBrush"
+                Value="{DynamicResource borderBrush}" />
+    </Style>
     <Style TargetType="{x:Type controls:MultiSelectCombobox}"
            BasedOn="{StaticResource {x:Type controls:MultiSelectCombobox} }">
         <Setter Property="Margin"
