@@ -7,7 +7,7 @@
 		<authors>nilayjoshi89@gmail.com</authors>
 		<description>WPF control library</description>
 		<projectUrl>https://github.com/nilayjoshi89/BlackPearl</projectUrl>
-		<releaseNotes>RN1</releaseNotes>
+		<releaseNotes>Added Drag-Drop support</releaseNotes>
 		<copyright>Copyright 2021</copyright>
 		<tags>WPF MultiSelectCombobox ComboBox MultiSelectDropDown</tags>
 		<references>
