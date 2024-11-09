@@ -51,6 +51,10 @@ namespace BlackPearl.Controls.CoreLibrary
                     richTextBoxElement.RemoveHandler(CommandManager.PreviewExecutedEvent, new ExecutedRoutedEventHandler(SetClipboardTextWithCommandCancelled));
                     richTextBoxElement.DragEnter -= OnDragEnter;
                     richTextBoxElement.Drop -= OnDragDrop;
+                    foreach (var textblock in richTextBoxElement.GetParagraph()?.Inlines?.Select(i => i.GetTextBlock())?.Where(i => i != null))
+                    {
+                        textblock.Unloaded -= Tb_Unloaded;
+                    }
                 }
 
                 richTextBoxElement = value;
@@ -177,7 +181,7 @@ namespace BlackPearl.Controls.CoreLibrary
             get => (ILookUpContract)GetValue(LookUpContractProperty);
             set => SetValue(LookUpContractProperty, value);
         }
-        #endregion  
+        #endregion
 
         #region Property changed callback
         /// <summary>
@@ -196,7 +200,7 @@ namespace BlackPearl.Controls.CoreLibrary
             try
             {
                 //Unsubscribe handlers first
-                if (!multiChoiceControl.UnsubscribeHandler() 
+                if (!multiChoiceControl.UnsubscribeHandler()
                     || multiChoiceControl?.RichTextBoxElement == null)
                 {
                     //Failed to unsubscribe, return
