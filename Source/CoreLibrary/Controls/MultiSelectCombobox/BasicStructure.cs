@@ -51,7 +51,7 @@ namespace BlackPearl.Controls.CoreLibrary
                     richTextBoxElement.RemoveHandler(CommandManager.PreviewExecutedEvent, new ExecutedRoutedEventHandler(SetClipboardTextWithCommandCancelled));
                     richTextBoxElement.DragEnter -= OnDragEnter;
                     richTextBoxElement.Drop -= OnDragDrop;
-                    foreach (var textblock in richTextBoxElement.GetParagraph().Inlines.Select(i => i.GetTextBlock()).Where(i => i != null))
+                    foreach (var textblock in richTextBoxElement.GetParagraph()?.Inlines?.Select(i => i.GetTextBlock())?.Where(i => i != null))
                     {
                         textblock.Unloaded -= Tb_Unloaded;
                     }
