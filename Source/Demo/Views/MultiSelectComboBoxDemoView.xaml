@@ -31,7 +31,7 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="200" />
+                <ColumnDefinition Width="400" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
@@ -53,6 +53,7 @@
                           VerticalAlignment="Stretch"
                           ShowsPreview="true"
                           ResizeDirection="Columns"
+                          ToolTip="Resize"
                           Width="3"
                           Margin="5" />
         </Grid>
@@ -62,37 +63,17 @@
                       VerticalAlignment="Center"
                       ShowsPreview="true"
                       ResizeDirection="Rows"
+                      ToolTip="Resize"
                       Height="3"
                       Margin="5" />
 
-        <WrapPanel Grid.ColumnSpan="2"
-                   Grid.Row="3">
-            <Border Style="{DynamicResource DemoBorderStyle}">
-                <StackPanel>
-                    <Label Style="{DynamicResource BlackPearlLabel}"
-                           Content="Item Source - with diacritic texts" />
-                    <CheckBox Style="{DynamicResource BlackPearlCheckBox}"
-                              FontSize="{DynamicResource BlackPearl.H2FontSize}"
-                              IsChecked="{Binding IncludeDiacriticItems, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              Content="Include" />
-                </StackPanel>
-            </Border>
-            <Border Style="{DynamicResource DemoBorderStyle}">
-                <StackPanel>
-                    <Label Style="{DynamicResource BlackPearlLabel}"
-                           Content="Selected Items" />
-                    <TextBlock Style="{DynamicResource BlackPearlTextBlock}"
-                               FontSize="{DynamicResource BlackPearl.H2FontSize}"
-                               Text="{Binding SelectedItemsString}"
-                               TextWrapping="WrapWithOverflow" />
-                </StackPanel>
-            </Border>
+        <WrapPanel Grid.Row="3">
 
             <Border BorderBrush="{StaticResource borderBrush}"
                     Style="{DynamicResource DemoBorderStyle}">
-                <StackPanel>
+                <StackPanel Orientation="Horizontal">
                     <Label Style="{DynamicResource BlackPearlLabel}"
-                           Content="Display Member Path" />
+                           Content="Display Member Path:" />
                     <ComboBox ItemsSource="{controls:EnumBindingSource EnumType={x:Type local:PersonDisplayPath}}"
                               SelectedItem="{Binding SelectedDisplayPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               Style="{DynamicResource BlackPearlComboBox}"
@@ -103,9 +84,9 @@
 
             <Border BorderBrush="{StaticResource borderBrush}"
                     Style="{DynamicResource DemoBorderStyle}">
-                <StackPanel>
+                <StackPanel Orientation="Horizontal">
                     <Label Style="{DynamicResource BlackPearlLabel}"
-                           Content="Item Separator" />
+                           Content="Item Separator:" />
                     <ComboBox ItemsSource="{Binding ItemSeparatorSource, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                               SelectedItem="{Binding ItemSeparator, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               Grid.Row="2"
@@ -118,9 +99,9 @@
 
             <Border BorderBrush="{StaticResource borderBrush}"
                     Style="{DynamicResource DemoBorderStyle}">
-                <StackPanel>
+                <StackPanel Orientation="Horizontal">
                     <Label Style="{DynamicResource BlackPearlLabel}"
-                           Content="Additional Item Separator" />
+                           Content="Additional Item Separator:" />
                     <WrapPanel>
                         <CheckBox Command="{Binding AdditionalSeparatorCheckCommand}"
                                   CommandParameter="{Binding RelativeSource={RelativeSource Mode=Self}}"
@@ -142,11 +123,33 @@
                 </StackPanel>
             </Border>
 
+            <Border Style="{DynamicResource DemoBorderStyle}">
+                <StackPanel Orientation="Horizontal">
+                    <Label Style="{DynamicResource BlackPearlLabel}"
+                           Content="Item Source:" />
+                    <CheckBox Style="{DynamicResource BlackPearlCheckBox}"
+                              FontSize="{DynamicResource BlackPearl.H2FontSize}"
+                              IsChecked="{Binding IncludeDiacriticItems, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              Content="Include items with diacritic texts" />
+                </StackPanel>
+            </Border>
+
+            <Border Style="{DynamicResource DemoBorderStyle}">
+                <StackPanel>
+                    <Label Style="{DynamicResource BlackPearlLabel}"
+                           Content="Selected Items:" />
+                    <TextBlock Style="{DynamicResource BlackPearlTextBlock}"
+                               FontSize="{DynamicResource BlackPearl.H2FontSize}"
+                               Text="{Binding SelectedItemsString}"
+                               TextWrapping="WrapWithOverflow" />
+                </StackPanel>
+            </Border>
+
             <Border BorderBrush="{StaticResource borderBrush}"
                     Style="{DynamicResource DemoBorderStyle}">
                 <StackPanel>
                     <Label Style="{DynamicResource BlackPearlLabel}"
-                           Content="Lookup Contract" />
+                           Content="Lookup Contract:" />
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
@@ -155,7 +158,11 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="25" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        
                         <RadioButton Content="Default Lookup Contract (included with Library)"
                                      GroupName="LookUpContractGroup"
                                      IsChecked="{Binding IsDefaultContract, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
@@ -164,11 +171,12 @@
                                      Style="{DynamicResource BlackPearlRadioButton}"
                                      Grid.ColumnSpan="2" />
                         <TextBlock Grid.Row="1"
-                                   Grid.ColumnSpan="2"
+                                   Grid.Column="1"
                                    Text="This is the default contract used for look-up items. Contract does basic string comparison (case-insensitive), suitable for most common scenarios."
                                    TextWrapping="WrapWithOverflow"
                                    Style="{DynamicResource BlackPearlTextBlock}" />
                         <TextBlock Grid.Row="2"
+                                   Grid.Column="1"
                                    TextWrapping="WrapWithOverflow"
                                    Style="{DynamicResource BlackPearlTextBlock}">
                             <Run Text="Support New object Creation - "
@@ -176,6 +184,7 @@
                             <Run Text="No" />
                         </TextBlock>
                         <TextBlock Grid.Row="3"
+                                   Grid.Column="1"
                                    TextWrapping="WrapWithOverflow"
                                    Style="{DynamicResource BlackPearlTextBlock}">
                             <Run Text="Equal comparison - "
@@ -183,6 +192,7 @@
                             <Run Text="string value comparison invariant of case/culture." />
                         </TextBlock>
                         <TextBlock Grid.Row="4"
+                                   Grid.Column="1"
                                    TextWrapping="WrapWithOverflow"
                                    Style="{DynamicResource BlackPearlTextBlock}">
                             <Run Text="Look-up comparison - "
@@ -198,6 +208,10 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="25" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
 
                         <RadioButton Content="Diacritic Lookup Contract (included with Library)"
                                      GroupName="LookUpContractGroup"
@@ -207,11 +221,12 @@
                                      Style="{DynamicResource BlackPearlRadioButton}"
                                      Grid.ColumnSpan="2" />
                         <TextBlock Grid.Row="1"
-                                   Grid.ColumnSpan="2"
+                                   Grid.Column="1"
                                    Text="This contract behaves like DefaultLookupContract, except it also supports diacritic string comparisons."
                                    TextWrapping="WrapWithOverflow"
                                    Style="{DynamicResource BlackPearlTextBlock}" />
                         <TextBlock Grid.Row="2"
+                                   Grid.Column="1"
                                    TextWrapping="WrapWithOverflow"
                                    Style="{DynamicResource BlackPearlTextBlock}">
                             <Run Text="Support New object Creation - "
@@ -219,6 +234,7 @@
                             <Run Text="No" />
                         </TextBlock>
                         <TextBlock Grid.Row="3"
+                                   Grid.Column="1"
                                    TextWrapping="WrapWithOverflow"
                                    Style="{DynamicResource BlackPearlTextBlock}">
                             <Run Text="Equal comparison - "
@@ -226,6 +242,7 @@
                             <Run Text="diacritic string value comparison invariant of case/culture." />
                         </TextBlock>
                         <TextBlock Grid.Row="4"
+                                   Grid.Column="1"
                                    TextWrapping="WrapWithOverflow"
                                    Style="{DynamicResource BlackPearlTextBlock}">
                             <Run Text="Look-up comparison - "
@@ -242,6 +259,10 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="25" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
 
                         <RadioButton Content="Custom Lookup with object creation support (part of Demo app only)"
                                      GroupName="LookUpContractGroup"
@@ -251,11 +272,12 @@
                                      Style="{DynamicResource BlackPearlRadioButton}"
                                      Grid.ColumnSpan="2" />
                         <TextBlock Grid.Row="1"
-                                   Grid.ColumnSpan="2"
-                                   Text="This contract is used for look-up and creation of custom complex object. If control supports new item (complex object) creation, ILookUpContract.CreateObject need to be implemented. Method receives input string and contract needs to provide implementation of parsing that string into copmplex object."
+                                   Grid.Column="1"
+                                   Text="This contract is used for complex item look-up and creation. If control supports new item (complex object) creation, ILookUpContract.CreateObject need to be implemented. Method receives string as input and should return copmplex object as output."
                                    TextWrapping="WrapWithOverflow"
                                    Style="{DynamicResource BlackPearlTextBlock}" />
                         <TextBlock Grid.Row="2"
+                                   Grid.Column="1"
                                    TextWrapping="WrapWithOverflow"
                                    Style="{DynamicResource BlackPearlTextBlock}">
                             <Run Text="Support New object Creation - "
@@ -263,6 +285,7 @@
                             <Run Text="No" />
                         </TextBlock>
                         <TextBlock Grid.Row="3"
+                                   Grid.Column="1"
                                    TextWrapping="WrapWithOverflow"
                                    Style="{DynamicResource BlackPearlTextBlock}">
                             <Run Text="Equal comparison - "
@@ -270,6 +293,7 @@
                             <Run Text="Person.Name value is equal invariant of case/culture." />
                         </TextBlock>
                         <TextBlock Grid.Row="4"
+                                   Grid.Column="1"
                                    TextWrapping="WrapWithOverflow"
                                    Style="{DynamicResource BlackPearlTextBlock}">
                             <Run Text="Look-up comparison - "
@@ -277,6 +301,7 @@
                             <Run Text="Person.Name, Person.Company or Person.Zip value contains search string invariant of case/culture." />
                         </TextBlock>
                         <TextBlock Grid.Row="5"
+                                   Grid.Column="1"
                                    TextWrapping="WrapWithOverflow"
                                    Style="{DynamicResource BlackPearlTextBlock}">
                             <Run Text="Input String (creating new object) -"
